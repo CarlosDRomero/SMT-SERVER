@@ -1,0 +1,40 @@
+POST http://localhost:5000/register/
+content-type: application/json
+
+{
+    "clave": "12345",   
+    "nombres": "Luis",
+    "apellidos": "Mora",
+    "nombreUsuario": "luis.mora",
+    "email": "luis.mora@gmail.co",
+    "fecha_nac": "2003/10/10"
+}
+
+###
+POST http://localhost:5000/register/cliente
+content-type: application/json
+
+{
+    "clave": "12345",
+    "nombres": "Carlos",
+    "apellidos": "Romero",
+    "nombreUsuario": "qwer",
+    "email": "qwer@gmail.com",
+    "fecha_nac": "2003-08-08"
+}
+###
+GET http://localhost:5000
+content-type: application/json
+
+{
+    "clave": "12345",
+    "nombres": "Carlos",
+    "apellidos": "Romero",
+    "nombreUsuario": "qwer",
+    "email": "qwer@gmail.com",
+    "fecha_nac": "2003-08-08"
+}
+
+
+
+
