@@ -5,10 +5,11 @@ import { checkValidator, claveEncrypt } from "../middlewares.js";
 
 const usuarioRouter = Router()
 
-usuarioRouter.post("/cliente",
- usuarioValidator(),
- checkValidator, 
- claveEncrypt,
- usuarioController.registrar);
+usuarioRouter.post("/register",
+  usuarioValidator,
+  checkValidator,
+  claveEncrypt,
+  usuarioController.registrar
+);
 
 export default usuarioRouter;

@@ -1,19 +1,18 @@
 import { usuarioModel } from "../models/usuario.js";
-import "express-async-errors";
 
 const registrar = async (req, res) => {
   console.log("registrando")
-  const values = [req.body.nombres, 
+  const values = [req.body.nombres,
     req.body.apellidos,
-     req.body.clave, 
-     req.body.nombreUsuario, 
-     req.body.email, 
-     req.body.fecha_nac]
+    req.body.clave,
+    req.body.nombreUsuario,
+    req.body.email,
+    req.body.fecha_nac]
 
     
   const user = await usuarioModel.registrar(values)
-  res.json(user)
+  res.json(user.rows[0])
 }
 
 
-export const usuarioController =  {registrar}
+export const usuarioController =  { registrar }
