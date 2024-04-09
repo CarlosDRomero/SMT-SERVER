@@ -18,9 +18,17 @@ create table usuario (
   primary key(idUsuario)
 );
 
-create table codigos_verficiacion(
-  idUsuario uuid,
+create table codigos_verificacion(
+  idUsuario uuid PRIMARY KEY,
   codigo varchar(6),
-  
+  fecha_creacion timestamp DEFAULT current_timestamp,
   constraint codigo_usuario foreign key(idUsuario) references usuario(idUsuario)
 );
+
+
+
+
+
+
+
+
