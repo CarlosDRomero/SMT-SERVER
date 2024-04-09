@@ -35,6 +35,10 @@ returns trigger as $$
 	
 $$ language plpgsql;
 
+create or replace trigger nuevo_codigo_confirmacion
+after insert on codigos_verificacion
+for each row
+execute function cambiar_confirmado();
 /*
  * 
  * esta funcion junto con el trigger "actualizado_codigo_verificacion" se ejecutara para
@@ -43,10 +47,7 @@ $$ language plpgsql;
  * 
  * */
 
-create or replace trigger nuevo_codigo_confirmacion
-after insert on codigos_verificacion
-for each row
-execute function cambiar_confirmado();
+
 
 create or replace function actualizar_fecha_codigo()
 returns trigger as $$

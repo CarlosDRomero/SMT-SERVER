@@ -1,7 +1,7 @@
 create type rolesUsuario as enum ('admin', 'empleado', 'cliente');
 
 create table usuario (
-  idUsuario uuid default gen_random_uuid(),
+  idusuario uuid default gen_random_uuid(),
   nombres varchar(50) not null,
   apellidos varchar(50) not null,
   clave varchar(256) not null,

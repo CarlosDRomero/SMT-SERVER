@@ -1,17 +1,13 @@
 import { usuarioModel } from "../models/usuario.js";
 
 const registrar = async (req, res) => {
-  console.log("registrando")
-  const values = [req.body.nombres,
-    req.body.apellidos,
-    req.body.clave,
-    req.body.nombreUsuario,
-    req.body.email,
-    req.body.fecha_nac]
 
-    
-  const user = await usuarioModel.registrar(values)
-  res.json(user.rows[0])
+  const existingUser = await usuarioModel.getUsuario(req.body)
+
+  const user = await usuarioModel.registrar(req.body);
+  const codigo_verificacion = await usuarioModel.nuevoCodigo(user)
+  
+  res.json(codigo_verificacion)
 }
 
 
