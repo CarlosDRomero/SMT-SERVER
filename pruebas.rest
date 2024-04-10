@@ -19,7 +19,7 @@ content-type: application/json
     "nombres": "Carlos",
     "apellidos": "Romero",
     "nombreUsuario": "qwr",
-    "email": "qwr@gmail.com",
+    "email": "qwgmail.com",
     "fecha_nac": "2003-08-08"
 }
 ###

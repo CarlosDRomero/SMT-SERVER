@@ -1,6 +1,12 @@
 import { validationResult } from "express-validator"
 import { Encrypt } from "./utils/encryption.js"
 
+export const claveEncrypt = async (req, res, next) => {
+  req.body.clave = await Encrypt.encryptPassword(req.body.clave);
+  next()
+}
+
+
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
   console.log(checkValidator)
@@ -10,10 +16,6 @@ export const checkValidator = (req, res, next) => {
   next()
 }
 
-export const claveEncrypt = async (req, res, next) => {
-  req.body.clave = await Encrypt.encryptPassword(req.body.clave);
-  next()
-}
 
 export const errorHandler = (err, req, res, next) => {
   console.log("err code: ", err.code)
