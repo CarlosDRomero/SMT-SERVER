@@ -1,39 +1,116 @@
 import supertest from "supertest"
-import app from "../index.js"
+import app from "../app.js"
 import { pool } from "../database/database.js"
+import { limpiarTablas } from "./test_helper.js"
 const api = supertest(app)
 
+beforeAll(async () => {
+  await limpiarTablas()
+})
 
 
-test("Si se pasa un dato incorrecto se devuelve un error 400", async () => {
-  const res = await api.post("/auth/register").send({
-    "clave": "12345",
-    "nombres": "Carlos",
-    "apellidos": "",
-    "nombreUsuario": "qwer",
-    "email": "qwergmail.com",
-    "fecha_nac": "2003-0808"
-  }).expect(400)
-  expect(res.body.errors).toBeDefined()
-  expect(res.body.errors).toHaveLength(3)
+describe("tests de ruta /auth/register", () => {
+  test("POST de datos incorrectos es status 400 y responde con errores", async () => {
+    const res = await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "",
+      "nombreUsuario": "qwer",
+      "email": "qwergmail.com",
+      "fecha_nac": "2003-0808"
+    }).expect(400)
+    expect(res.body.errors).toBeDefined()
+    expect(res.body.errors).toHaveLength(3)
+    
+  })
+  test("POST con datos correctos genera un codigo de verificacion", async () => {
+    await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "Romero",
+      "email": "qwer@gmail.com",
+      "fecha_nac": "2003-08-08"
+    }).expect(200)
   
+    let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@gmail.com'")
+    expect(result.rows[0].nombre_usuario).toEqual("qwer")
+    expect(result.rows[0].confirmado).toEqual(false)
+  
+    result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+  
+    expect(result).toBeDefined()
+  })
+  
+  test("Un usuario que nunca ha confirmado puede hacer su registro como si fuera la primer vez", async () => {
+    await limpiarTablas();
+
+    await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "Romero",
+      "nombreUsuario": "usuario",
+      "email": "qwer@gmail.com",
+      "fecha_nac": "2003-08-08"
+    }).expect(200)
+  
+    let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@gmail.com'")
+    expect(result.rows[0].nombres).toEqual("Carlos")
+    expect(result.rows[0].confirmado).toEqual(false)
+    expect(result.rows[0].fecha_confirmado).toBeNull()
+    result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+  
+    await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "Romero",
+      "nombreUsuario": "usuario",
+      "email": "qwer@gmail.com",
+      "fecha_nac": "2003-08-08"
+    }).expect(200)
+    result = await pool.query("SELECT * FROM usuario WHERE email='qwer@gmail.com'")
+    expect(result.rows[0].nombre_usuario).toEqual("qwer")
+    expect(result.rows[0].confirmado).toEqual(false)
+    result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+  
+    expect(result).toBeDefined()
+  })
+
+  test("Un usuario ya confirmado no podra volverse a registrar en la base de datos", async () => {
+    await limpiarTablas();
+
+    await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "Romero",
+      "nombreUsuario": "usuario",
+      "email": "qwer@gmail.com",
+      "fecha_nac": "2003-08-08"
+    }).expect(200)
+  
+    let result = await pool.query("UPDATE usuario SET confirmado=true WHERE email='qwer@gmail.com' RETURNING *")
+    expect(result.rows[0].nombres).toEqual("Carlos")
+    expect(result.rows[0].confirmado).toEqual(true)
+    result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+
+    expect(result.rows[0]).toBeUndefined()
+    await api.post("/auth/register").send({
+      "clave": "12345",
+      "nombres": "Carlos",
+      "apellidos": "Romero",
+      "email": "qwer@gmail.com",
+      "fecha_nac": "2003-08-08"
+    }).expect(409)
+    result = await pool.query("SELECT * FROM usuario WHERE email='qwer@gmail.com'")
+    expect(result.rows[0].nombres).toEqual("Carlos")
+    expect(result.rows[0].confirmado).toEqual(true)
+    result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+  
+    expect(result.rows[0]).toBeUndefined()
+  })
 })
 
-test("Si se envia un valor valido estará en la base de datos", async () => {
-  await api.post("/auth/register").send({
-    "clave": "12345",
-    "nombres": "Carlos",
-    "apellidos": "Romero",
-    "nombreUsuario": "usuario",
-    "email": "qwer@gmail.com",
-    "fecha_nac": "2003-08-08"
-  }).expect(200)
 
-  const result =  await pool.query("SELECT * FROM usuario fetch first 1 row only")
-  expect(result.rows[0].nombres).toEqual("Carlos")
-})
 
 afterAll(async () => {
-  console.log("closing database connection")
   await pool.end()
 })

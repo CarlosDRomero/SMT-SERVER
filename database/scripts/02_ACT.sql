@@ -8,7 +8,7 @@ create or replace function eliminar_codigo_confirmacion()
 returns trigger as $$
 begin
     delete from codigos_verificacion where idUsuario = new.idUsuario;
-   	update usuario set fecha_confirmacion = current_timestamp where idUsuario = new.idUsuario;
+   	update usuario set fecha_confirmado = current_timestamp where idUsuario = new.idUsuario;
     return new;
 end;
 $$ language plpgsql;

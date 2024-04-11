@@ -1,18 +1,8 @@
 import { pool } from "../database/database.js"
 import { genCode } from "../utils/random.js"
+import { codigoModel } from "./codigo_verificacion.js";
 
-const limpiarCodigo = async (idUsuario) => {
-  const query = {
-    name: "limpiar-codigo",
-    text: "DELETE FROM codigos_verificacion WHERE idUsuario=$1",
-    values: [idUsuario]
-  }
-  
-  const result = await pool.query(query);
-  return result.rows[0]
-}
 const limpiarUsuario = async (idUsuario) => {
-  await limpiarCodigo(idUsuario);
   const query = {
     name: "limpiar-usuario",
     text: "DELETE FROM usuario WHERE idUsuario=$1",
@@ -23,7 +13,7 @@ const limpiarUsuario = async (idUsuario) => {
   return result.rows[0]
 }
 
-const getUsuario = async (userInfo) => {
+const findUsuario = async (userInfo) => {
   const query = {
     name: "obtener-usuario",
     text: "SELECT * FROM usuario WHERE nombre_usuario=$1 OR email=$2",
@@ -48,31 +38,20 @@ const registrar = async ( userInfo ) => {
       userInfo.fecha_nac
     ]
   }
-  
+
   const result = await pool.query(query);
   return result.rows[0]
 }
-
-const nuevoCodigo = async (user) => {
+const confirmar = async (idUsuario) => {
   const query = {
-    name: "crear-codigo",
-    text: "INSERT INTO codigos_verificacion (idUsuario, codigo) VALUES ($1, $2) RETURNING *",
-    values: [user.idusuario, genCode()]
+    name: "confirmar-usuario",
+    text: "UPDATE usuario SET confirmado=true WHERE idusuario=$1 RETURNING *",
+    values: [idUsuario]
   }
+
   const result = await pool.query(query);
   return result.rows[0]
 }
-
-const actualizarCodigo = async (payload) => {
-  const query = {
-    name: "actualizar-codigo",
-    text: "UPDATE codigos_verificacion SET codigo=$2 WHERE idUsuario=$1 RETURNING *",
-    values: [payload.idUsuario, genCode()]
-  }
-  const result = await pool.query(query);
-  return result.rows[0]
-}
-
 export const usuarioModel = {
-  registrar, nuevoCodigo, actualizarCodigo, getUsuario,limpiarUsuario
+  registrar, findUsuario,limpiarUsuario, confirmar
 }

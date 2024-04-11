@@ -19,7 +19,7 @@ content-type: application/json
     "nombres": "Carlos",
     "apellidos": "Romero",
     "nombreUsuario": "qwr",
-    "email": "qwgmail.com",
+    "email": "qwg@mail.com",
     "fecha_nac": "2003-08-08"
 }
 ###
@@ -33,6 +33,14 @@ content-type: application/json
     "nombreUsuario": "qwer",
     "email": "qwer@gmail.com",
     "fecha_nac": "2003-08-08"
+}
+
+###
+POST http://localhost:5000/auth/verification/5a882f46-383c-4a88-83fd-d65fd1829864
+content-type: application/json
+
+{
+    "codigo": "E571KZ"
 }
 
 
