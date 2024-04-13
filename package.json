@@ -8,9 +8,9 @@
     "start": "set NODE_ENV=production && node index.js",
     "dev": "set NODE_ENV=development && nodemon index.js",
     "lint": "eslint .",
-    "db:dev": "docker-compose -f ./database/docker-compose.yml down db & docker-compose -f ./database/docker-compose.yml up -d db",
+    "db:dev": "docker-compose -f ./database/docker-compose.yml down -v db & docker-compose -f ./database/docker-compose.yml up -d db",
     "db:test-up": "docker-compose -f ./database/docker-compose.yml up -d test-db",
-    "db:test-down": "docker-compose -f ./database/docker-compose.yml down test-db",
+    "db:test-down": "docker-compose -f ./database/docker-compose.yml down -v test-db",
     "test:options": "set NODE_OPTIONS=--experimental-vm-modules && set NODE_ENV=test && pnpm exec jest  --verbose",
     "test": "pnpm run db:test-down & pnpm run db:test-up && pnpm run test:options"
   },
