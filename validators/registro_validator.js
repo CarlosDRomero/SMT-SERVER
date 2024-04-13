@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 import { fecha_validator } from "./custom/fecha_validator.js";
 
-export const usuarioValidator = [
+export const registroValidator = [
   body("nombres", "Nombres no validos").notEmpty(),
   body("apellidos", "Apellidos no validos").notEmpty(),
   body("clave", "Clave no valida").notEmpty(),

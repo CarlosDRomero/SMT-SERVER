@@ -4,6 +4,7 @@ const NODE_ENV = process.env.NODE_ENV.trim()
 export const env = {
 
   PORT:    process.env.PORT,
+  JWT_SECRET: process.env.JWT_SECRET,
   DB_USER: NODE_ENV !== "test" ? process.env.DB_USER : process.env.TEST_DB_USER,
   DB_NAME: NODE_ENV !== "test" ? process.env.DB_NAME : process.env.TEST_DB_NAME,
   DB_PASS: NODE_ENV !== "test" ? process.env.DB_PASS : process.env.TEST_DB_PASS,
