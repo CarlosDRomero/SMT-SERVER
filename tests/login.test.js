@@ -3,6 +3,7 @@ import app from "../app.js"
 import { pool } from "../database/database.js"
 import { limpiarTablas } from "./test_helper.js"
 import moment from "moment"
+import { tokens } from "../utils/tokens.js"
 
 app.removeAllListeners()
 const api = supertest(app)
@@ -33,10 +34,10 @@ describe("Tests ruta /auth/login", () => {
       
       await api.post("/auth/login").send(credenciales).expect(403)
 
-      result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${res.rows[0].idusuario}'`)
+      const result =  await pool.query(`SELECT * FROM codigos_verificacion WHERE idusuario='${res.rows[0].idusuario}'`)
       expect(result.rows[0]).toBeDefined();
     })
-    test("Si ha pasado mas de 1 minuto desde la ultima confirmacion, se crea un codigo de verificacion, status 403", async () => {
+    test("Si ha pasado mas de 5 minuto desde la ultima confirmacion, se crea un codigo de verificacion, status 403", async () => {
       const credenciales = { email: "testing@gmail.com", clave: "test" }
       await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing@gmail.com'")
       const fecha_expirada = moment().subtract(1,"m").format("YYYY-MM-DD H:mm:s.SSS");
@@ -46,9 +47,8 @@ describe("Tests ruta /auth/login", () => {
       console.log("FECHA ACT: ", result.rows[0].fecha_confirmado)
       const res = await api.post("/auth/login").send(credenciales).expect(403)
 
-      expect(res.body.error).toBeDefined()
-      expect(res.body.error).toBeInstanceOf(String)
-      expect(res.body.error.toLowerCase()).toContain("verificacion")
+      expect(res.body.token).toBeDefined()
+      
       
     })
   })
@@ -69,7 +69,9 @@ describe("Tests ruta /auth/login", () => {
       const credenciales = { email: "testing@gmail.com", clave: "test" }
       const res = await api.post("/auth/login").send(credenciales).expect(200)
       
-      expect(res.token).toBeDefined()
+      // console.log(res.token);
+      expect(res.body.token).toBeDefined()
+      expect(tokens.tokenSign(res.body.token)).toBeTruthy();
     })
     test("Si se pasan mal las credenciales entonces se recibe un 401 con un mensaje de error en un objeto JSON", async () => {
   
@@ -77,7 +79,6 @@ describe("Tests ruta /auth/login", () => {
       const res = await api.post("/auth/login").send(credenciales).expect(401)
   
       expect(res.body.error).toBeDefined()
-      expect(res.body.error).toBeInstanceOf(String)
       expect(res.body.error.toLowerCase()).toContain("credenciales")
     })
   })

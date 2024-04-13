@@ -17,7 +17,7 @@ export const extraerNombreUsuario = (req, res, next) => {
 
 export const validarUUID = (req, res, next) => {
   const id = req.params.id
-  if (!isUUID(id)) res.status().json({ error: "Token no valido" })
+  if (!isUUID(id)) return res.status(400).json({ error: "Token no valido" })
   req.body.id = id;
   next()
 }

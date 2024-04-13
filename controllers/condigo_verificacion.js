@@ -19,7 +19,6 @@ const crearCodigo = async (req, res) => {
     codigo_verificacion = await codigoModel.crearCodigo(idusuario, nuevo_codigo)
   else
     codigo_verificacion = await codigoModel.actualizarCodigoById(idusuario, nuevo_codigo)
-
   res.status(403).json({ token: codigo_verificacion.idcodigo })
 }
 
