@@ -1,4 +1,43 @@
 {
+  "todo-tree.general.tags": [
+    "FIXME",
+    "TODO",
+    "TODO: OPCIONAL >",
+    "TODO: IMPORTANTE >",
+  ],
+  "todo-tree.highlights.defaultHighlight": {
+    "icon": "alert",
+    "type": "text-and-comment",
+    "foreground": "#eedaff",
+    "background": "#7300ff",
+    "opacity": 60,
+    "iconColour": "#b04fff"
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "check"
+    },
+    "TODO: OPCIONAL >": {
+      "foreground": "#210062",
+      "background": "#e6deff",
+      "iconColour": "#e6deff",
+      "icon": "beaker",
+      "gutterIcon": true
+    },
+    "TODO: IMPORTANTE >": {
+      "foreground": "#ffee00",
+      "background": "#fbffd0",
+      "iconColour": "#fff8a5",
+      "icon": "eye",
+      "gutterIcon": true
+    },
+    "FIXME": {
+      "foreground": "#fff6ee",
+      "background": "#ff7300",
+      "iconColour": "#ff5900",
+      "gutterIcon": true
+    }
+  },
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },

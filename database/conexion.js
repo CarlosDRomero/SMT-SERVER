@@ -10,8 +10,8 @@ export const pool = new Pool({
 })
 
 try{
-  await pool.query("SELECT NOW()")
-  console.log("Conectado a postgres")
+  
+  console.log("Conectado a postgres, ",await pool.query("SELECT NOW()"))
 }catch(e){
   console.log("Error al conectar con Postgres")
 }

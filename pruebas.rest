@@ -6,7 +6,7 @@ content-type: application/json
     "nombres": "Luis",
     "apellidos": "Mora",
     "nombreUsuario": "qrqfvsa",
-    "email": "luis.mora@gmail.co",
+    "email": "luis.mora@tests.test.t.co",
     "fecha_nac": "2003/10/10"
 }
 
@@ -19,7 +19,7 @@ content-type: application/json
     "nombres": "Carlos",
     "apellidos": "Romero",
     "nombreUsuario": "qwrugjvbik",
-    "email": "qwg@mail.com",
+    "email": "c6099020@gmail.com",
     "fecha_nac": "2003-08-08"
 }
 ###
@@ -28,7 +28,7 @@ content-type: application/json
 
 {
     "clave": "12345",
-    "email": "asdail.com"
+    "email": "c6099020@gmail.com"
    
 }
 ###
@@ -40,17 +40,20 @@ content-type: application/json
     "nombres": "Carlos",
     "apellidos": "Romero",
     "nombreUsuario": "qwer",
-    "email": "qwer@gmail.com",
+    "email": "qwer@tests.test.t.com",
     "fecha_nac": "2003-08-08"
 }
 
 ###
-POST http://localhost:5000/auth/verification/9333c8cb-bbc8-4cd3-8bfb-9722c3b2bc58
+POST http://localhost:5000/auth/verification/009b8d51-3502-4ce8-840e-f17e6b02f92c
 content-type: application/json
 
 {
-    "codigo": "3K4HG9"
+    "codigo": "6Z4HU6"
 }
+###
+POST http://localhost:5000/auth/resendcode/6605dc04-f0aa-4424-b70a-00f130f992ef
+
 
 
 

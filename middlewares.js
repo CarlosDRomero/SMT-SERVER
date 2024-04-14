@@ -1,10 +1,21 @@
 import { validationResult } from "express-validator"
-import { Encrypt } from "./utils/encryption.js"
+import { Encrypt } from "./services/encryption.js"
 import isUUID from "uuid-validate"
+import { genCode } from "./services/random.js";
+import { tokens } from "./services/tokens.js";
 
 export const claveEncrypt = async (req, res, next) => {
   req.body.clave = await Encrypt.toHash(req.body.clave);
   next()
+}
+
+export const firmarToken = (req,res, next) => {
+
+  if (!req.usuario) return next();
+
+  const payload = { idusuario: req.usuario.idusuario, rol: req.usuario.rol }
+  const token = tokens.tokenSign(payload);
+  return res.json({ token });
 }
 
 export const extraerNombreUsuario = (req, res, next) => {
@@ -18,10 +29,14 @@ export const extraerNombreUsuario = (req, res, next) => {
 export const validarUUID = (req, res, next) => {
   const id = req.params.id
   if (!isUUID(id)) return res.status(400).json({ error: "Token no valido" })
-  req.body.id = id;
+  req.id = id;
   next()
 }
 
+export const generarCodigo = (req, res, next) => {
+  req.payload = { ...req.payload, codigo: genCode() };
+  next();
+}
 
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);

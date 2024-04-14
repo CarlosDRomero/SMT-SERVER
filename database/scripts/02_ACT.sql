@@ -4,20 +4,23 @@
  * el codigo de verificacion de la tabla una vez su dueño lo haya redimido
  * 
  * */
-create or replace function eliminar_codigo_confirmacion()
-returns trigger as $$
-begin
-    delete from codigos_verificacion where idUsuario = new.idUsuario;
-   	update usuario set fecha_confirmado = current_timestamp where idUsuario = new.idUsuario;
-    return new;
-end;
-$$ language plpgsql;
+CREATE OR REPLACE
+FUNCTION eliminar_codigo_confirmacion()
+RETURNS TRIGGER AS $$
+BEGIN
+  DELETE FROM	codigo_verificacion WHERE	idUsuario = new.idUsuario;
+	UPDATE usuario SET fecha_confirmado = current_timestamp WHERE	idUsuario = new.idUsuario;
+	RETURN NEW;
+END;
 
-create or replace  trigger codigo_confirmado
-after update of confirmado on usuario
-for each row
-when (old.confirmado=false and new.confirmado=true)
-execute function eliminar_codigo_confirmacion();
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE
+TRIGGER codigo_confirmado
+AFTER UPDATE OF confirmado ON usuario
+FOR EACH ROW
+WHEN (old.confirmado = FALSE AND new.confirmado = TRUE)
+EXECUTE FUNCTION eliminar_codigo_confirmacion();
 
 /*
  * 
@@ -36,7 +39,7 @@ returns trigger as $$
 $$ language plpgsql;
 
 create or replace trigger nuevo_codigo_confirmacion
-after insert on codigos_verificacion
+after insert on codigo_verificacion
 for each row
 execute function cambiar_confirmado();
 /*
@@ -52,13 +55,13 @@ execute function cambiar_confirmado();
 create or replace function actualizar_fecha_codigo()
 returns trigger as $$
 	begin
-		update codigos_verificacion set fecha_creacion=current_timestamp where new.idUsuario=idUsuario;
+		update codigo_verificacion set fecha_creacion=current_timestamp where new.idUsuario=idUsuario;
 		return new;
 	end;
 	
 $$ language plpgsql;
 
 create or replace trigger actualizado_codigo_verificacion
-after update of codigo on codigos_verificacion
+after update of codigo on codigo_verificacion
 for each row
 execute function actualizar_fecha_codigo();

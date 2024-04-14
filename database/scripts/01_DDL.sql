@@ -1,4 +1,4 @@
-CREATE TYPE rolesUsuario AS enum ('admin', 'empleado', 'cliente');
+CREATE TYPE rolesUsuario AS ENUM ('admin', 'empleado', 'cliente');
 
 CREATE TABLE usuario (
   idusuario uuid DEFAULT gen_random_uuid(),
@@ -18,19 +18,20 @@ CREATE TABLE usuario (
   PRIMARY KEY(idUsuario)
 );
 
-CREATE TABLE codigos_verificacion(
+CREATE TABLE codigo_verificacion(
   idcodigo uuid DEFAULT gen_random_uuid(),
-  idusuario uuid UNIQUE,
+  idusuario uuid UNIQUE NOT NULL,
   codigo varchar(256),
   fecha_creacion timestamp DEFAULT current_timestamp,
-  PRIMARY KEY(idCodigo),
+  PRIMARY KEY(idcodigo),
   CONSTRAINT codigo_usuario FOREIGN KEY(idUsuario) REFERENCES usuario(idUsuario) 
   ON DELETE CASCADE
 );
 
 
-
-
+CREATE TABLE vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
+CREATE TABLE vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';
+CREATE TABLE vista_admins AS SELECT * FROM usuario WHERE rol='admin';
 
 
 
