@@ -62,3 +62,14 @@ export const errorHandler = (err, req, res, next) => {
   }
 }
 
+//Middleware para verificar si el usuario esta logeado puede acceder
+export const checkAuth = (req, res, next) => {
+  const token = req.headers.authorization.split(' ').pop() 
+  //El token viene concatenado y esto obtiene el token no mas
+  const tokenData = tokens.verifyToken(token) 
+  const idusuario = req.usuario.idusuario
+  // Al hacer la verificacion se almacena la informacion del mismo en tokenData
+  if (!idusuario) return res.status(401).json({ error: "Credenciales no validas" });
+
+}
+

@@ -18,6 +18,13 @@ authRouter.post("/register",
   mailerController.mailVerificacion,
   codigoController.crearCodigo
 );
+
+authRouter.post("/register/empleado",
+
+
+)
+
+
 authRouter.post("/login",
   loginValidator,
   checkValidator,
