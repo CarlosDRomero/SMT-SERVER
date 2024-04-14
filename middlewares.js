@@ -3,6 +3,7 @@ import { Encrypt } from "./services/encryption.js"
 import isUUID from "uuid-validate"
 import { genCode } from "./services/random.js";
 import { tokens } from "./services/tokens.js";
+import { usuarioModel } from "./models/usuario.js";
 
 export const claveEncrypt = async (req, res, next) => {
   req.body.clave = await Encrypt.toHash(req.body.clave);
@@ -64,12 +65,17 @@ export const errorHandler = (err, req, res, next) => {
 
 //Middleware para verificar si el usuario esta logeado puede acceder
 export const checkAuth = (req, res, next) => {
-  const token = req.headers.authorization.split(' ').pop() 
-  //El token viene concatenado y esto obtiene el token no mas
-  const tokenData = tokens.verifyToken(token) 
-  const idusuario = req.usuario.idusuario
-  // Al hacer la verificacion se almacena la informacion del mismo en tokenData
-  if (!idusuario) return res.status(401).json({ error: "Credenciales no validas" });
+  const token = req.headers.authorization.split(' ').pop() //El token viene concatenado y esto obtiene el token no mas
+  const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del mismo en tokenData
+    if(!tokenData.idusuario) return res.status(401).json({ error: "Credenciales no validas" })//no seguro
+     next()
+}
 
+export const checkRoleAuth = (req, res, next) => {
+  const token = req.headers.authorization.split(' ').pop()
+  const tokenData = tokens.verifyToken(token)
+  const userData = usuarioModel.findUsuario(tokenData.idusuario)
+  if (![].concat(rol).includes(userData.role)) return res.status(401).json({ error: "Acceso no permitido" })
+    next()
 }
 

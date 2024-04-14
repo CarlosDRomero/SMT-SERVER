@@ -2,7 +2,7 @@ import { Router } from "express"
 import { usuarioController } from "../controllers/usuario.js"
 import { registroValidator } from "../validators/registro_validator.js";
 import { loginValidator } from "../validators/login_validator.js";
-import { checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, validarUUID } from "../middlewares.js";
+import { checkAuth, checkRoleAuth, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, validarUUID } from "../middlewares.js";
 import { codigoController } from "../controllers/condigo_verificacion.js";
 import { mailerController } from "../controllers/mailer.js";
 
@@ -20,7 +20,8 @@ authRouter.post("/register",
 );
 
 authRouter.post("/register/empleado",
-
+  checkAuth,
+  checkRoleAuth(['admin']),
 
 )
 
