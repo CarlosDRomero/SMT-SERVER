@@ -70,7 +70,7 @@ export const checkAuth = (req, res, next) => {
     if(!tokenData.idusuario) return res.status(401).json({ error: "Credenciales no validas" })//no seguro
      next()
 }
-
+//Middleware para verificar a que rol pertenece el logeado 
 export const checkRoleAuth = (req, res, next) => {
   const token = req.headers.authorization.split(' ').pop()
   const tokenData = tokens.verifyToken(token)
