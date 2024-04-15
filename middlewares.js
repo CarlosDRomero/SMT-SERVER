@@ -38,7 +38,7 @@ export const generarCodigo = (req, res, next) => {
   req.payload = { ...req.payload, codigo: genCode() };
   next();
 }
-
+//TODO:OPCIONAL > return map de la propiedad del mensaje del error 
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()){
@@ -64,18 +64,21 @@ export const errorHandler = (err, req, res, next) => {
 }
 
 //Middleware para verificar si el usuario esta logeado puede acceder
-export const checkAuth = (req, res, next) => {
+export const extraerUsuario = async (req, res, next) => {
   const token = req.headers.authorization.split(' ').pop() //El token viene concatenado y esto obtiene el token no mas
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del mismo en tokenData
-    if(!tokenData.idusuario) return res.status(401).json({ error: "Credenciales no validas" })//no seguro
-     next()
+  if(tokenData===null || !tokenData.idusuario) return res.status(401).json({ error: "Credenciales no validas" })//no seguro
+  const userData = await usuarioModel.findUsuarioById(tokenData.idusuario)
+  if (!userData) return res.status(401).json({ error: "Credenciales no validas" })
+  
+  req.usuario = userData;
+  next()
 }
 //Middleware para verificar a que rol pertenece el logeado 
-export const checkRoleAuth = (req, res, next) => {
-  const token = req.headers.authorization.split(' ').pop()
-  const tokenData = tokens.verifyToken(token)
-  const userData = usuarioModel.findUsuario(tokenData.idusuario)
-  if (![].concat(rol).includes(userData.role)) return res.status(401).json({ error: "Acceso no permitido" })
+export const verificarRol = (rolesAdmitidos) => {
+  return async (req, res, next) => {
+    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.status(401).json({ error: "Acceso no permitido" })
     next()
+  }
 }
 

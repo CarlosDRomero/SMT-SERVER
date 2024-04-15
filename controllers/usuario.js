@@ -28,6 +28,10 @@ export const usuarioController = {
     next()
   
   },
+  actualizarRolEmpleado: async (req, res, next) => {
+    await usuarioModel.actualizarRol("empleado", req.payload.idusuario)
+    next()
+  },
   login: async(req, res, next) => {
     const usuario = await usuarioModel.findUsuario(req.body)
     if (!usuario || !await Encrypt.compareHash(req.body.clave, usuario.clave)){

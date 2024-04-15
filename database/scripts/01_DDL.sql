@@ -29,9 +29,9 @@ CREATE TABLE codigo_verificacion(
 );
 
 
-CREATE TABLE vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
-CREATE TABLE vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';
-CREATE TABLE vista_admins AS SELECT * FROM usuario WHERE rol='admin';
+CREATE VIEW vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
+CREATE VIEW vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';
+CREATE VIEW vista_admins AS SELECT * FROM usuario WHERE rol='admin';
 
 
 

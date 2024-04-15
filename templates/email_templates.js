@@ -1,5 +1,5 @@
 export const emailTemplates = {
-  //TODO: OPCIONAL > PARAMETRO PARA COLOCAR IMAGENES EN EL CORREO
+  //TODO:OPCIONAL > PARAMETRO PARA COLOCAR IMAGENES EN EL CORREO
   correoVerificacion: (codigo) => {
     return (
       `

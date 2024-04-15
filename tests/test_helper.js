@@ -1,4 +1,4 @@
-import { pool } from "../database/database";
+import { pool } from "../database/conexion.js";
 
 export const limpiarTablas = async () => {
   

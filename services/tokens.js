@@ -7,10 +7,7 @@ export const tokens = {
   tokenSign: (user) => { //Generar Token
     return jwt.sign(
       user,
-      env.JWT_SECRET,
-      {
-        expiresIn: "2h", //Tiempo de vida
-      }
+      env.JWT_SECRET
     );
   },
   

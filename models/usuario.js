@@ -23,6 +23,17 @@ export const usuarioModel = {
     const result = await pool.query(query);
     return result.rows[0]
   },
+
+  findUsuarioById: async (idusuario) => {
+    const query = {
+      name: "obtener-usuario-id",
+      text: "SELECT * FROM usuario WHERE idusuario=$1",
+      values: [idusuario]
+    }
+    
+    const result = await pool.query(query);
+    return result.rows[0]
+  },
   
   findUsuarioByIdCodigo: async (idcodigo) => {
     const query = {
@@ -46,6 +57,19 @@ export const usuarioModel = {
         userInfo.nombreUsuario,
         userInfo.email,
         userInfo.fecha_nac
+      ]
+    }
+  
+    const result = await pool.query(query);
+    return result.rows[0]
+  },
+  actualizarRol: async ( rol, idusuario ) => {
+    const query = {
+      name: "actualizar-rol",
+      text: "UPDATE usuario SET rol=$1 WHERE idusuario=$2",
+      values: [
+        rol,
+        idusuario
       ]
     }
   

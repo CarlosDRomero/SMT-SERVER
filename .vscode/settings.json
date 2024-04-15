@@ -2,8 +2,8 @@
   "todo-tree.general.tags": [
     "FIXME",
     "TODO",
-    "TODO: OPCIONAL >",
-    "TODO: IMPORTANTE >",
+    "TODO:OPCIONAL >",
+    "TODO:IMPORTANTE >",
   ],
   "todo-tree.highlights.defaultHighlight": {
     "icon": "alert",
@@ -17,14 +17,14 @@
     "TODO": {
       "icon": "check"
     },
-    "TODO: OPCIONAL >": {
+    "TODO:OPCIONAL >": {
       "foreground": "#210062",
       "background": "#e6deff",
       "iconColour": "#e6deff",
       "icon": "beaker",
       "gutterIcon": true
     },
-    "TODO: IMPORTANTE >": {
+    "TODO:IMPORTANTE >": {
       "foreground": "#ffee00",
       "background": "#fbffd0",
       "iconColour": "#fff8a5",
