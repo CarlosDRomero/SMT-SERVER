@@ -1,5 +1,4 @@
-import moment from "moment"
-
+import moment from "moment-timezone"
 /**
 * @param fecha Es la fecha que queremos comprobar si ha expirado
 * @param tiempo Es el valor numerico que queremos saber si ha pasado desde la fecha del primer argumento (si no se pasa nada toma el valor 1)
@@ -20,3 +19,5 @@ export const calcularExpirado = (fecha, tiempo = 1, unidad = "m") => {
   const fecha_calculada = moment(fecha).add(tiempo, unidad)
   return moment().isAfter(fecha_calculada)
 }
+
+export const getTimeZone = () => moment.tz.guess();

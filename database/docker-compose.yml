@@ -9,7 +9,6 @@ services:
     environment:
       POSTGRES_USER:     test
       POSTGRES_PASSWORD: test
-      TZ: America/Bogota
     volumes:
       - ./scripts:/docker-entrypoint-initdb.d
   db:
@@ -20,6 +19,5 @@ services:
     environment:
       POSTGRES_USER:     dev
       POSTGRES_PASSWORD: dev
-      TZ: America/Bogota
     volumes:
       - ./scripts:/docker-entrypoint-initdb.d

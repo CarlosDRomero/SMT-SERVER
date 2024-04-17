@@ -1,7 +1,7 @@
 import "dotenv/config"
 
 const IS_TEST = process.env.NODE_ENV.trim() === "test"
-console.log(process.env.TZ)
+
 export const env = {
   IS_TEST,
   PORT:    process.env.PORT,
