@@ -41,9 +41,6 @@ dependencies:
   pg:
     specifier: ^8.11.5
     version: 8.11.5
-  uuid-validate:
-    specifier: ^0.0.3
-    version: 0.0.3
 
 devDependencies:
   '@types/jest':
@@ -3701,10 +3698,6 @@ packages:
   /utils-merge@1.0.1:
     resolution: {integrity: sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==}
     engines: {node: '>= 0.4.0'}
-    dev: false
-
-  /uuid-validate@0.0.3:
-    resolution: {integrity: sha512-Fykw5U4eZESbq739BeLvEBFRuJODfrlmjx5eJux7W817LjRaq4b7/i4t2zxQmhcX+fAj4nMfRdTzO4tmwLKn0w==}
     dev: false
 
   /v8-to-istanbul@9.2.0:

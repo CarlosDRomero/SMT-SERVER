@@ -16,8 +16,10 @@ export const codigoController = {
     res.json({ verificationId: codigo_verificacion.idcodigo })
   },
   validarCodigo: async (req,res,next) => {
+    const idcodigo = req.params.id
     const { codigo } = req.body
-    const codigo_db = await codigoModel.findCodigoById(req.id);
+    const codigo_db = await codigoModel.findCodigoById(idcodigo);
+    console.log(codigo_db)
     if (!!codigo_db
     && await Encrypt.compareHash(codigo.toUpperCase(), codigo_db.codigo)
     && !calcularExpirado(codigo_db.fecha_creacion, 1, "m") //ESTO SIGNIFICA QUE NO HAYA PASADO UN MINUTO

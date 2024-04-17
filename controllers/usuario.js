@@ -4,7 +4,8 @@ import { Encrypt } from "../services/encryption.js";
 
 export const usuarioController = {
   encontrarUsuarioCodigo: async (req, res, next) => {
-    const usuario = await usuarioModel.findUsuarioByIdCodigo(req.id);
+    const idcodigo = req.params.id;
+    const usuario = await usuarioModel.findUsuarioByIdCodigo(idcodigo);
     if (!usuario) return res.status(404).json({ error: "Error, no se pudo encontrar su id de verificación" });
     req.payload = { idusuario: usuario.idusuario, email: usuario.email }
     next()
@@ -29,7 +30,7 @@ export const usuarioController = {
   
   },
   actualizarRolEmpleado: async (req, res, next) => {
-    await usuarioModel.actualizarRol("empleado", req.payload.idusuario)
+    await usuarioModel.actualizarRol(usuarioModel.roles.EMPLEADO, req.payload.idusuario)
     next()
   },
   login: async(req, res, next) => {
@@ -37,7 +38,7 @@ export const usuarioController = {
     if (!usuario || !await Encrypt.compareHash(req.body.clave, usuario.clave)){
       return res.status(401).json({ error: "Credenciales invalidas" })
     }
-
+    console.log(usuario)
     if (usuario.fecha_confirmado === null || calcularExpirado(usuario.fecha_confirmado, 1, "m")) {
       req.payload = { idusuario: usuario.idusuario, email: usuario.email }
 

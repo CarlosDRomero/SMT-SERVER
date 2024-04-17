@@ -18,6 +18,19 @@ CREATE TABLE usuario (
   PRIMARY KEY(idUsuario)
 );
 
+CREATE TABLE direccion (
+	iddireccion uuid DEFAULT gen_random_uuid(),
+	idusuario uuid NOT NULL,
+	predeterminada bool,
+	c_dane_departamento integer,
+	c_dane_municipio float,
+	barrio varchar(50),
+	cadena_direccion varchar(100)
+	
+	CONSTRAINT direccion_usuario FOREIGN KEY(idusuario) REFERENCES usuario(idusuario)
+	ON DELETE CASCADE
+);
+
 CREATE TABLE codigo_verificacion(
   idcodigo uuid DEFAULT gen_random_uuid(),
   idusuario uuid UNIQUE NOT NULL,

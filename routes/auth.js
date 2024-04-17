@@ -2,10 +2,12 @@ import { Router } from "express"
 import { usuarioController } from "../controllers/usuario.js"
 import { registroValidator } from "../validators/registro_validator.js";
 import { loginValidator } from "../validators/login_validator.js";
-import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, validarUUID } from "../middlewares.js";
-import { codigoController } from "../controllers/condigo_verificacion.js";
+import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo } from "../middlewares.js";
+import { codigoController } from "../controllers/codigo_verificacion.js";
 import { mailerController } from "../controllers/mailer.js";
 import { codigoValidator } from "../validators/codigo_validator.js";
+import { usuarioModel } from "../models/usuario.js";
+import { UUIDParamValidator } from "../validators/general_validators.js";
 
 const authRouter = Router()
 
@@ -24,7 +26,7 @@ authRouter.post("/register",
 
 authRouter.post("/register/empleado",
   extraerUsuario,
-  verificarRol(['admin']),
+  verificarRol([usuarioModel.roles.ADMIN]),
   registroValidator,
   checkValidator,
   extraerNombreUsuario,
@@ -48,7 +50,7 @@ authRouter.post("/login",
 )
 
 authRouter.post("/verification/:id",
-  validarUUID,
+  UUIDParamValidator,
   codigoValidator,
   checkValidator,
   codigoController.validarCodigo,
@@ -56,7 +58,7 @@ authRouter.post("/verification/:id",
   firmarToken
 )
 authRouter.post("/resendcode/:id",
-  validarUUID,
+  UUIDParamValidator,
   usuarioController.encontrarUsuarioCodigo,
   generarCodigo,
   mailerController.mailVerificacion,

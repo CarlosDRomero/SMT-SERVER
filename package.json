@@ -29,8 +29,7 @@
     "moment": "^2.30.1",
     "moment-timezone": "^0.5.45",
     "nodemailer": "^6.9.13",
-    "pg": "^8.11.5",
-    "uuid-validate": "^0.0.3"
+    "pg": "^8.11.5"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

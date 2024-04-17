@@ -1,7 +1,11 @@
 import { pool } from "../database/conexion.js"
 
 export const usuarioModel = {
-
+  roles: {
+    ADMIN: "admin",
+    EMPLEADO: "empleado",
+    CLIENTE: "cliente"
+  },
   limpiarUsuario: async (idUsuario) => {
     const query = {
       name: "limpiar-usuario",
