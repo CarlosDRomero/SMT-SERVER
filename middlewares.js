@@ -44,7 +44,7 @@ export const checkValidator = (req, res, next) => {
 export const errorHandler = (err, req, res, next) => {
   console.log("err code: ", err)
   if (err.name === "JsonWebTokenError"){
-    return res.status(401).json({ error: "El token no es valido" });
+    return res.status(401).json({ error: err.message });
   }else if (err.name === "RolNoPermitido"){
     return res.status(403).json({ error: err.message })
   }else{
@@ -57,11 +57,10 @@ export const errorHandler = (err, req, res, next) => {
 //Middleware para verificar si el usuario esta logeado puede acceder
 export const extraerUsuario = async (req, res, next) => {
   const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
-  
-  const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del mismo en tokenData
+  const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del token decodificado en tokenData
 
   const userData = await usuarioModel.findUsuarioById(tokenData.idusuario)
-  if (!userData) return next({ name: "JsonWebTokenError" })
+  if (!tokenData || !userData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
   
   req.usuario = userData;
   next()

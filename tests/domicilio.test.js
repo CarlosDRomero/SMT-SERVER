@@ -1,7 +1,7 @@
 import supertest from "supertest"
 import app from "../app"
 import { limpiarTablas } from "./test_helper"
-import { pool } from "../database/conexion"
+import { poolClient } from "../database/conexion"
 import { tokens } from "../services/tokens"
 
 app.removeAllListeners()
@@ -46,7 +46,7 @@ describe("CRUD de direcciones", () => {
       email: "testing@tests.test.t.com",
       fecha_nac: "2003-06-06"
     })
-    await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
+    await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
 
     await api.post("/auth/register").send({
       nombres: "Test",
@@ -55,7 +55,7 @@ describe("CRUD de direcciones", () => {
       email: "testing2@tests.test.t.com",
       fecha_nac: "2003-06-06"
     })
-    await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing2@tests.test.t.com'")
+    await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing2@tests.test.t.com'")
 
     console.log("Registrando usuario admin");
     await api.post("/auth/register").send({
@@ -65,7 +65,7 @@ describe("CRUD de direcciones", () => {
       email: "admin@tests.test.t.com",
       fecha_nac: "2003-06-06"
     })
-    await pool.query("UPDATE usuario SET confirmado=true, rol='admin' WHERE email='admin@tests.test.t.com'")
+    await poolClient.query("UPDATE usuario SET confirmado=true, rol='admin' WHERE email='admin@tests.test.t.com'")
   })
 
   test("Un usuario puede agregar una o mas direcciones haciendo un POST a la ruta /domicilio/direcciones", async () => {
@@ -78,13 +78,13 @@ describe("CRUD de direcciones", () => {
       cadena_direccion: "Calle 13 #11-23, Sur???"
     }
     await api.post("/domicilio/direcciones").send(nuevaDireccion).set("authorization", jwt.body.token).expect(201);
-    const { rows: direccion } = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
+    const { rows: direccion } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
     expect(direccion[0].barrio).toEqual("Comuna 5");
     expect(direccion[0].predeterminada, "La primera direccion se deberia crear como predeterminada automaticamente").toBe(true);
     expect(direccion).toHaveLength(1);
     
     await api.post("/domicilio/direcciones").send(nuevaDireccion).set("authorization", jwt.body.token).expect(201);
-    const { rows: direccion2 } = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
+    const { rows: direccion2 } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
     expect(direccion2).toHaveLength(2);
     expect(direccion2[1].predeterminada, "Si hay alguna direccion predeterminada las demas no deberian serlo").toBe(false);
   });
@@ -107,7 +107,7 @@ describe("CRUD de direcciones", () => {
       cadena_direccion: "Calle 13 #11-23, Sur???"
     }
     const usuario = tokens.verifyToken(jwt.body.token);
-    const { rows: direccionesb } = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
+    const { rows: direccionesb } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
     const res = await api.get(`/domicilio/direcciones/${direccionesb[0].iddireccion}`).send(nuevaDireccion).set("authorization", jwt.body.token).expect(204);
 
     expect(res.body.c_dane_departamento, "Se deberia devolver la nueva direccion en la respuesta para esta peticion, para que el frontend la pueda actualizar, lo puede hacer con un RETUNING * al final de la consulta UPDATE")
@@ -115,7 +115,7 @@ describe("CRUD de direcciones", () => {
     expect(res.body.c_dane_municipio, "Se deberia devolver la nueva direccion en la respuesta para esta peticion, para que el frontend la pueda actualizar, lo puede hacer con un RETUNING * al final de la consulta UPDATE")
       .toBe("97.001")
 
-    const q = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario} AND c_dane_municipio=97.001`);
+    const q = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario} AND c_dane_municipio=97.001`);
 
     expect(q.rows.length, "Puede ser que lo devuelva pero en la base de datos no se haya actualizado?").toBeGreaterThan(0)
     
@@ -124,16 +124,16 @@ describe("CRUD de direcciones", () => {
     const jwt = await api.post("/auth/login").send({ clave: "test", email: "testing@tests.test.t.com" }).expect(200);
     
     const usuario = tokens.verifyToken(jwt.body.token);
-    const { rows: direccionesb } = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
+    const { rows: direccionesb } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
     await api.delete(`/domicilio/direcciones/${direccionesb[0].iddireccion}`).set("authorization", jwt.body.token).expect(204);
     
-    const { rows: direccionesa } = await pool.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
+    const { rows: direccionesa } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario=${usuario.idusuario}`);
 
     expect(direccionesa).toHaveLength(direccionesb.length - 1);
   });
   test("Un usuario no deberia poder eliminar o modificar la direccion de otro con un DELETE o PUT a la ruta parametrizada /domicilio/direcciones/:id", async () => {
     const jwt = await api.post("/auth/login").send({ clave: "test", email: "testing2@tests.test.t.com" }).expect(200);
-    const { rows: direccionesb } = await pool.query("SELECT * FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
+    const { rows: direccionesb } = await poolClient.query("SELECT * FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
     const nuevaDireccion = {
       c_departamento: "97",
       c_municipio: "97.001",
@@ -141,11 +141,11 @@ describe("CRUD de direcciones", () => {
       cadena_direccion: "CAMBIO MALICIOSO"
     }
     await api.put(`/domicilio/direcciones/${rows[0].iddireccion}`).send(nuevaDireccion).set("authorization", jwt.body.token).expect(403);
-    const cambio = await pool.query("SELECT * FROM direccion WHERE cadena_direccion='CAMBIO MALICIOSO'");
+    const cambio = await poolClient.query("SELECT * FROM direccion WHERE cadena_direccion='CAMBIO MALICIOSO'");
     expect(cambio.rows, "Se devolvio 401 pero aun asi hizo el cambio quien no debia").toHaveLength(0)
     await api.delete(`/domicilio/direcciones/${rows[0].iddireccion}`).set("authorization", jwt.body.token).expect(403);
     
-    const { rows: direccionesa } = await pool.query("SELECT * FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
+    const { rows: direccionesa } = await poolClient.query("SELECT * FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
 
     expect(direccionesa).toHaveLength(direccionesb.length);
   });
@@ -153,7 +153,7 @@ describe("CRUD de direcciones", () => {
   test("Solo admin deberia poder obtener las direcciones de un usuario haciendo un GET a la ruta parametrizada con la id de dicho usuario /domicilio/direcciones/:id", async () => {
     const jwtadmin = await api.post("/auth/login").send({ clave: "admin", email: "admin@tests.test.t.com" }).expect(200);
     const jwtusuario = await api.post("/auth/login").send({ clave: "test", email: "testing@tests.test.t.com" }).expect(200);
-    const { rows } = await pool.query("SELECT u.idusuario FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
+    const { rows } = await poolClient.query("SELECT u.idusuario FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
     
     let res = await api.get(`/domicilio/direcciones/${rows[0].idusuario}`).set("authorization", jwtadmin.body.token).expect(200);
 
