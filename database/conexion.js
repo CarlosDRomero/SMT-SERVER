@@ -2,6 +2,7 @@ import pg from "pg"
 import { env } from "../environment.js"
 import { getTimeZone } from "../services/time.js"
 const { Pool } = pg
+
 export const pool = new Pool({
   user: env.DB_USER,
   host: env.DB_HOST,
@@ -9,7 +10,6 @@ export const pool = new Pool({
   password: env.DB_PASS,
   port: env.DB_PORT
 })
-
 
 pool.on("error", () => {
   console.log("Error en la base datos, desconectando")
@@ -23,4 +23,3 @@ try{
 }
 
    
-

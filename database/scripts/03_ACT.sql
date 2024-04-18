@@ -9,7 +9,7 @@ FUNCTION eliminar_codigo_confirmacion()
 RETURNS TRIGGER AS $$
 BEGIN
   DELETE FROM	codigo_verificacion WHERE	idUsuario = new.idUsuario;
-	UPDATE usuario SET fecha_confirmado = current_timestamp WHERE	idUsuario = new.idUsuario;
+	NEW.fecha_confirmado = current_timestamp;
 	RETURN NEW;
 END;
 
@@ -17,11 +17,31 @@ $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE
 TRIGGER codigo_confirmado
-AFTER UPDATE OF confirmado ON usuario
+BEFORE UPDATE OF confirmado ON usuario
 FOR EACH ROW
 WHEN (old.confirmado = FALSE AND new.confirmado = TRUE)
 EXECUTE FUNCTION eliminar_codigo_confirmacion();
 
+/*
+ * 
+ * esta funcion junto con el trigger "nuevo_codigo_confirmacion" se ejecutara para
+ * cambiar el valor de "confirmado" a falso del usuario al que se le dio un nuevo codigo
+ * 
+ * */
+
+create or replace function cambiar_confirmado()
+returns trigger as $$
+	begin
+		update usuario set confirmado=false where new.idusuario=idusuario;
+		return new;
+	end;
+	
+$$ language plpgsql;
+
+create or replace trigger nuevo_codigo_confirmacion
+after insert on codigo_verificacion
+for each row
+execute function cambiar_confirmado();
 /*
  * 
  * esta funcion junto con el trigger "actualizado_codigo_verificacion" se ejecutara para
@@ -92,7 +112,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER nueva_predeterminada
-AFTER UPDATE OF predeterminada ON direccion
+BEFORE UPDATE OF predeterminada ON direccion
 FOR EACH ROW
 WHEN (NEW.predeterminada=TRUE AND OLD.predeterminada=FALSE)
 EXECUTE FUNCTION limpiar_predeterminadas();

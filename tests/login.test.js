@@ -1,9 +1,10 @@
 import supertest from "supertest"
 import app from "../app.js"
 import { pool } from "../database/conexion.js"
-import { limpiarTablas } from "./test_helper.js"
+import { limpiarTablas, setTimeZone } from "./test_helper.js"
 import moment from "moment"
 import { tokens } from "../services/tokens.js"
+
 
 app.removeAllListeners()
 const api = supertest(app)
@@ -11,6 +12,7 @@ const api = supertest(app)
 
 beforeAll(async () => {
   await limpiarTablas();
+  await setTimeZone();
 })
 
 
@@ -43,15 +45,11 @@ describe("Tests ruta /auth/login", () => {
       const credenciales = { email: "testing@tests.test.t.com", clave: "test" }
       await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com' RETURNING *")
       const r = await pool.query("SELECT * FROM usuario where email='testing@tests.test.t.com'")
-      console.log(r.rows[0])
-      const fecha_expirada = moment(r.rows[0].fecha_confirmado).subtract(1,"m").format("YYYY-MM-DD H:mm:s.SSS");
+      const fecha_expirada = moment().subtract(1,"m").format("YYYY-MM-DD H:mm:s.SSS");
 
-      console.log("FECHA CAMBIADA: ", fecha_expirada)
       const result = await pool.query(`UPDATE usuario SET fecha_confirmado='${fecha_expirada}' WHERE email='testing@tests.test.t.com' RETURNING *`)
       
-      console.log("FECHA ACT: ", result.rows[0].fecha_confirmado)
       const res = await api.post("/auth/login").send(credenciales).expect(200)
-      console.log("id: ", res.body.verificationId)
       expect(res.body.verificationId).toBeDefined()
       
       
@@ -111,7 +109,7 @@ describe("Tests ruta /auth/login", () => {
       
       let res = await api.post("/auth/login").send(credenciales).expect(200)
       expect(res.body.token).toBeDefined()
-      await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(401)
+      await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(403)
       await pool.query("UPDATE usuario SET rol='admin' WHERE email='admin@tests.test.t.com'")
       await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(200)
 

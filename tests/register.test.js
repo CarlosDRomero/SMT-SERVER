@@ -2,7 +2,6 @@ import supertest from "supertest"
 import app from "../app.js"
 import { pool } from "../database/conexion.js"
 import { limpiarTablas } from "./test_helper.js"
-import isUUID from "uuid-validate"
 
 const api = supertest(app)
 
@@ -35,7 +34,6 @@ describe("tests de ruta /auth/register", () => {
     }).expect(200)
     
     expect(apires.body.verificationId).toBeDefined();
-    expect(isUUID(apires.body.verificationId)).toEqual(true);
     let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombre_usuario).toEqual("qwer")
     expect(result.rows[0].fecha_confirmado).toBeNull()

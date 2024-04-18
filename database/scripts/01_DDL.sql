@@ -10,6 +10,7 @@ CREATE TABLE usuario (
   nombre_usuario varchar(50) NOT NULL UNIQUE,
   fecha_nac date NOT NULL,
 
+  confirmado bool DEFAULT FALSE,
   fecha_creacion timestamp DEFAULT current_timestamp,
   fecha_confirmado timestamp,
   
