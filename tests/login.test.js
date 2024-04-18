@@ -1,6 +1,6 @@
 import supertest from "supertest"
 import app from "../app.js"
-import { pool } from "../database/conexion.js"
+import { poolClient } from "../database/conexion.js"
 import { limpiarTablas, setTimeZone } from "./test_helper.js"
 import moment from "moment"
 import { tokens } from "../services/tokens.js"
@@ -32,22 +32,22 @@ describe("Tests ruta /auth/login", () => {
     })
     test("Si un usuario no ha confirmado, no puede logear, pero recibe info para verificarse, status 200", async () => {
       const credenciales = { email: "testing@tests.test.t.com", clave: "test" }
-      let res = await pool.query("SELECT * FROM usuario WHERE nombre_usuario='testing'")
+      let res = await poolClient.query("SELECT * FROM usuario WHERE nombre_usuario='testing'")
       
       expect(res.rows[0].fecha_confirmado).toBeNull()
       
       await api.post("/auth/login").send(credenciales).expect(200)
 
-      const result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${res.rows[0].idusuario}'`)
+      const result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${res.rows[0].idusuario}'`)
       expect(result.rows[0]).toBeDefined();
     })
     test("Si ha pasado mas de 1 minuto desde la ultima confirmacion, se crea un codigo de verificacion, status 200", async () => {
       const credenciales = { email: "testing@tests.test.t.com", clave: "test" }
-      await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com' RETURNING *")
-      const r = await pool.query("SELECT * FROM usuario where email='testing@tests.test.t.com'")
+      await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com' RETURNING *")
+      const r = await poolClient.query("SELECT * FROM usuario where email='testing@tests.test.t.com'")
       const fecha_expirada = moment().subtract(1,"m").format("YYYY-MM-DD H:mm:s.SSS");
 
-      const result = await pool.query(`UPDATE usuario SET fecha_confirmado='${fecha_expirada}' WHERE email='testing@tests.test.t.com' RETURNING *`)
+      const result = await poolClient.query(`UPDATE usuario SET fecha_confirmado='${fecha_expirada}' WHERE email='testing@tests.test.t.com' RETURNING *`)
       
       const res = await api.post("/auth/login").send(credenciales).expect(200)
       expect(res.body.verificationId).toBeDefined()
@@ -65,7 +65,7 @@ describe("Tests ruta /auth/login", () => {
         email: "testing@tests.test.t.com",
         fecha_nac: "2003-06-06"
       })
-      await pool.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
+      await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
     })
   
     test("Si se pasan bien las credenciales entonces se recibe un token JWT", async () => {
@@ -94,7 +94,7 @@ describe("Tests ruta /auth/login", () => {
         email: "admin@tests.test.t.com",
         fecha_nac: "2003-06-06"
       })
-      await pool.query("UPDATE usuario SET confirmado=true WHERE email='admin@tests.test.t.com'")
+      await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='admin@tests.test.t.com'")
     })
     
     test("Solo un admin puede crear una cuenta a un empleado en /auth/register/empleado", async () => {
@@ -110,10 +110,10 @@ describe("Tests ruta /auth/login", () => {
       let res = await api.post("/auth/login").send(credenciales).expect(200)
       expect(res.body.token).toBeDefined()
       await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(403)
-      await pool.query("UPDATE usuario SET rol='admin' WHERE email='admin@tests.test.t.com'")
+      await poolClient.query("UPDATE usuario SET rol='admin' WHERE email='admin@tests.test.t.com'")
       await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(200)
 
-      const result = (await pool.query("SELECT * FROM usuario WHERE email='emp@tests.test.t.com'")).rows[0];
+      const result = (await poolClient.query("SELECT * FROM usuario WHERE email='emp@tests.test.t.com'")).rows[0];
 
       expect(result.rol, "Se registro pero seguramente no como empleado").toEqual("empleado");
       // res = await api.post("/auth/login").send(credenciales).expect(200)
@@ -122,5 +122,5 @@ describe("Tests ruta /auth/login", () => {
 })
 
 afterAll(async () => {
-  await pool.end()
+  await poolClient.end()
 })

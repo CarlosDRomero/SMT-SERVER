@@ -42,27 +42,26 @@ export const checkValidator = (req, res, next) => {
 
 
 export const errorHandler = (err, req, res, next) => {
-  console.log("err code: ", err.code)
-  if (err.menssage === "Acceso Denegado"){
-    res.status(403);
-    res.json({ error: err.message });
-  }else if (!!err.code){
-    
-    console.log(`${err.code}: ${err.message}`)
-    res.status(500);
-    res.json({ error: "Internal database error" });
+  console.log("err code: ", err)
+  if (err.name === "JsonWebTokenError"){
+    return res.status(401).json({ error: "El token no es valido" });
+  }else if (err.name === "RolNoPermitido"){
+    return res.status(403).json({ error: err.message })
   }else{
-    next(err)
+    // console.log(`${err.code}: ${err.message}`)
+    res.status(500).json({ error: "Internal server error" });
   }
+  next(err)
 }
 
 //Middleware para verificar si el usuario esta logeado puede acceder
 export const extraerUsuario = async (req, res, next) => {
-  const token = req.headers.authorization.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
+  const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
+  
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del mismo en tokenData
-  if(tokenData === null || !tokenData.idusuario) return res.status(401).json({ error: "Credenciales no validas" })//no seguro
+
   const userData = await usuarioModel.findUsuarioById(tokenData.idusuario)
-  if (!userData) return res.status(401).json({ error: "Credenciales no validas" })
+  if (!userData) return next({ name: "JsonWebTokenError" })
   
   req.usuario = userData;
   next()
@@ -70,7 +69,7 @@ export const extraerUsuario = async (req, res, next) => {
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, res, next) => {
-    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.status(403).json({ error: "Acceso no permitido" })
+    if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", content: "Acceso no permitido" })
     next()
   }
 }

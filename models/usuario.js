@@ -1,4 +1,4 @@
-import { pool } from "../database/conexion.js"
+import { poolClient } from "../database/conexion.js"
 
 export const usuarioModel = {
   roles: {
@@ -13,7 +13,7 @@ export const usuarioModel = {
       values: [idUsuario]
     }
     
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -24,7 +24,7 @@ export const usuarioModel = {
       values: [userInfo.nombreUsuario, userInfo.email]
     }
     
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
 
@@ -35,7 +35,7 @@ export const usuarioModel = {
       values: [idusuario]
     }
     
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -46,7 +46,7 @@ export const usuarioModel = {
       values: [idcodigo]
     }
   
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -64,7 +64,7 @@ export const usuarioModel = {
       ]
     }
   
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   actualizarRol: async ( rol, idusuario ) => {
@@ -77,7 +77,7 @@ export const usuarioModel = {
       ]
     }
   
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   confirmar: async (idUsuario) => {
@@ -87,7 +87,7 @@ export const usuarioModel = {
       values: [idUsuario]
     }
   
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   }
 }

@@ -12,11 +12,7 @@ export const tokens = {
   },
   
   verifyToken: (token) => {
-    try {
-      return jwt.verify(token, env.JWT_SECRET)
-    } catch (e) {
-      return null
-    }
+    return jwt.verify(token, env.JWT_SECRET)
   },
   
   decodeSign: (token) => {

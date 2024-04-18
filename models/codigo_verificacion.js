@@ -1,4 +1,4 @@
-import { pool } from "../database/conexion.js";
+import { poolClient } from "../database/conexion.js";
 
 export const codigoModel = {
   findCodigoById: async (idcodigo) => {
@@ -8,7 +8,7 @@ export const codigoModel = {
       values: [idcodigo]
     }
     
-    const result = await pool.query(query)
+    const result = await poolClient.query(query)
     return result.rows[0]
   },
   
@@ -19,7 +19,7 @@ export const codigoModel = {
       values: [idusuario]
     }
     
-    const result = await pool.query(query)
+    const result = await poolClient.query(query)
     return result.rows[0]
   },
   
@@ -30,7 +30,7 @@ export const codigoModel = {
       values: [idUsuario]
     }
     
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -40,7 +40,7 @@ export const codigoModel = {
       text: "INSERT INTO codigo_verificacion (idUsuario, codigo) VALUES ($1, $2) RETURNING *",
       values: [idusuario, codigo]
     }
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -50,7 +50,7 @@ export const codigoModel = {
       text: "UPDATE codigo_verificacion SET codigo=$2 WHERE idusuario=$1 RETURNING *",
       values: [idusuario, codigo]
     }
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   },
   
@@ -60,7 +60,7 @@ export const codigoModel = {
       text: "UPDATE codigo_verificacion SET codigo=$2 WHERE idcodigo=$1 RETURNING *",
       values: [idcodigo, codigo]
     }
-    const result = await pool.query(query);
+    const result = await poolClient.query(query);
     return result.rows[0]
   }
 }

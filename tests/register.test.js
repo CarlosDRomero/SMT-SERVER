@@ -1,6 +1,6 @@
 import supertest from "supertest"
 import app from "../app.js"
-import { pool } from "../database/conexion.js"
+import { poolClient } from "../database/conexion.js"
 import { limpiarTablas } from "./test_helper.js"
 
 const api = supertest(app)
@@ -34,12 +34,12 @@ describe("tests de ruta /auth/register", () => {
     }).expect(200)
     
     expect(apires.body.verificationId).toBeDefined();
-    let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
+    let result = await poolClient.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombre_usuario).toEqual("qwer")
     expect(result.rows[0].fecha_confirmado).toBeNull()
     expect(result.rows[0].rol).toEqual("cliente")
   
-    result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+    result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     expect(result.rows[0]).toBeDefined()
   })
@@ -56,11 +56,11 @@ describe("tests de ruta /auth/register", () => {
       "fecha_nac": "2003-08-08"
     }).expect(200)
   
-    let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
+    let result = await poolClient.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombres).toEqual("Carlos")
     expect(result.rows[0].fecha_confirmado).toBeNull()
     expect(result.rows[0].fecha_confirmado).toBeNull()
-    result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+    result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     await api.post("/auth/register").send({
       "clave": "12345",
@@ -70,10 +70,10 @@ describe("tests de ruta /auth/register", () => {
       "email": "qwer@tests.test.t.com",
       "fecha_nac": "2003-08-08"
     }).expect(200)
-    result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
+    result = await poolClient.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombre_usuario).toEqual("qwer")
     expect(result.rows[0].fecha_confirmado).toBeNull()
-    result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+    result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     expect(result).toBeDefined()
   })
@@ -90,10 +90,10 @@ describe("tests de ruta /auth/register", () => {
       "fecha_nac": "2003-08-08"
     }).expect(200)
   
-    let result = await pool.query("UPDATE usuario SET confirmado=true WHERE email='qwer@tests.test.t.com' RETURNING *")
+    let result = await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='qwer@tests.test.t.com' RETURNING *")
     expect(result.rows[0].nombres).toEqual("Carlos")
     expect(result.rows[0].fecha_confirmado).not.toBeNull();
-    result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+    result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
 
     expect(result.rows[0]).toBeUndefined()
     await api.post("/auth/register").send({
@@ -103,10 +103,10 @@ describe("tests de ruta /auth/register", () => {
       "email": "qwer@tests.test.t.com",
       "fecha_nac": "2003-08-08"
     }).expect(409)
-    result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
+    result = await poolClient.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombres).toEqual("Carlos")
     expect(result.rows[0].fecha_confirmado).not.toBeNull();
-    result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
+    result =  await poolClient.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     expect(result.rows[0]).toBeUndefined()
   })
@@ -116,5 +116,5 @@ describe("tests de ruta /auth/register", () => {
 
 afterAll(async () => {
   await limpiarTablas();
-  await pool.end()
+  await poolClient.end()
 })
