@@ -59,6 +59,7 @@ authRouter.post("/verification/:id",
 )
 authRouter.post("/resendcode/:id",
   UUIDParamValidator,
+  checkValidator,
   usuarioController.encontrarUsuarioCodigo,
   generarCodigo,
   mailerController.mailVerificacion,

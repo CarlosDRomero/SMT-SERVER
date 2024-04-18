@@ -9,8 +9,7 @@ CREATE TABLE usuario (
   email varchar(100) NOT NULL UNIQUE,
   nombre_usuario varchar(50) NOT NULL UNIQUE,
   fecha_nac date NOT NULL,
-  
-  confirmado bool DEFAULT FALSE,
+
   fecha_creacion timestamp DEFAULT current_timestamp,
   fecha_confirmado timestamp,
   
@@ -21,11 +20,11 @@ CREATE TABLE usuario (
 CREATE TABLE direccion (
 	iddireccion uuid DEFAULT gen_random_uuid(),
 	idusuario uuid NOT NULL,
-	predeterminada bool,
-	c_dane_departamento integer,
-	c_dane_municipio float,
+	predeterminada bool DEFAULT FALSE NOT NULL,
+	c_dane_departamento varchar(3),
+	c_dane_municipio varchar(5),
 	barrio varchar(50),
-	cadena_direccion varchar(100)
+	cadena_direccion varchar(100),
 	
 	CONSTRAINT direccion_usuario FOREIGN KEY(idusuario) REFERENCES usuario(idusuario)
 	ON DELETE CASCADE

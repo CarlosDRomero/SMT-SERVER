@@ -70,7 +70,7 @@ export const extraerUsuario = async (req, res, next) => {
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, res, next) => {
-    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.status(401).json({ error: "Acceso no permitido" })
+    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.status(403).json({ error: "Acceso no permitido" })
     next()
   }
 }

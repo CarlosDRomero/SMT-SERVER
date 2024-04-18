@@ -32,7 +32,7 @@ describe("Tests ruta /auth/login", () => {
       const credenciales = { email: "testing@tests.test.t.com", clave: "test" }
       let res = await pool.query("SELECT * FROM usuario WHERE nombre_usuario='testing'")
       
-      expect(res.rows[0].confirmado).toEqual(false)
+      expect(res.rows[0].fecha_confirmado).toBeNull()
       
       await api.post("/auth/login").send(credenciales).expect(200)
 
@@ -111,9 +111,9 @@ describe("Tests ruta /auth/login", () => {
       
       let res = await api.post("/auth/login").send(credenciales).expect(200)
       expect(res.body.token).toBeDefined()
-      let res2 = await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(401)
+      await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(401)
       await pool.query("UPDATE usuario SET rol='admin' WHERE email='admin@tests.test.t.com'")
-      res2 = await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(200)
+      await api.post("/auth/register/empleado").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(200)
 
       const result = (await pool.query("SELECT * FROM usuario WHERE email='emp@tests.test.t.com'")).rows[0];
 
