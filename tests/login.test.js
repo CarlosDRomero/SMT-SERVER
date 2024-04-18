@@ -32,7 +32,7 @@ describe("Tests ruta /auth/login", () => {
       const credenciales = { email: "testing@tests.test.t.com", clave: "test" }
       let res = await pool.query("SELECT * FROM usuario WHERE nombre_usuario='testing'")
       
-      expect(res.rows[0].confirmado).toEqual(false)
+      expect(res.rows[0].fecha_confirmado).toBeNull()
       
       await api.post("/auth/login").send(credenciales).expect(200)
 

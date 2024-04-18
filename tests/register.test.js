@@ -38,7 +38,7 @@ describe("tests de ruta /auth/register", () => {
     expect(isUUID(apires.body.verificationId)).toEqual(true);
     let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombre_usuario).toEqual("qwer")
-    expect(result.rows[0].confirmado).toEqual(false)
+    expect(result.rows[0].fecha_confirmado).toBeNull()
     expect(result.rows[0].rol).toEqual("cliente")
   
     result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
@@ -60,7 +60,7 @@ describe("tests de ruta /auth/register", () => {
   
     let result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombres).toEqual("Carlos")
-    expect(result.rows[0].confirmado).toEqual(false)
+    expect(result.rows[0].fecha_confirmado).toBeNull()
     expect(result.rows[0].fecha_confirmado).toBeNull()
     result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
@@ -74,7 +74,7 @@ describe("tests de ruta /auth/register", () => {
     }).expect(200)
     result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombre_usuario).toEqual("qwer")
-    expect(result.rows[0].confirmado).toEqual(false)
+    expect(result.rows[0].fecha_confirmado).toBeNull()
     result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     expect(result).toBeDefined()
@@ -94,7 +94,7 @@ describe("tests de ruta /auth/register", () => {
   
     let result = await pool.query("UPDATE usuario SET confirmado=true WHERE email='qwer@tests.test.t.com' RETURNING *")
     expect(result.rows[0].nombres).toEqual("Carlos")
-    expect(result.rows[0].confirmado).toEqual(true)
+    expect(result.rows[0].fecha_confirmado).not.toBeNull();
     result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
 
     expect(result.rows[0]).toBeUndefined()
@@ -107,7 +107,7 @@ describe("tests de ruta /auth/register", () => {
     }).expect(409)
     result = await pool.query("SELECT * FROM usuario WHERE email='qwer@tests.test.t.com'")
     expect(result.rows[0].nombres).toEqual("Carlos")
-    expect(result.rows[0].confirmado).toEqual(true)
+    expect(result.rows[0].fecha_confirmado).not.toBeNull();
     result =  await pool.query(`SELECT * FROM codigo_verificacion WHERE idusuario='${result.rows[0].idusuario}'`)
   
     expect(result.rows[0]).toBeUndefined()
