@@ -5,7 +5,7 @@ import { tokens } from "./services/tokens.js";
 import { usuarioModel } from "./models/usuario.js";
 
 
-export const claveEncrypt = async (req, res, next) => {
+export const claveEncrypt = async (req, _, next) => {
   req.body.clave = await Encrypt.toHash(req.body.clave);
   next()
 }
@@ -27,7 +27,7 @@ export const extraerNombreUsuario = (req, res, next) => {
   next()
 }
 
-export const generarCodigo = (req, res, next) => {
+export const generarCodigo = (req, _, next) => {
   req.payload = { ...req.payload, codigo: genCode() };
   next();
 }
@@ -41,7 +41,7 @@ export const checkValidator = (req, res, next) => {
 }
 
 
-export const errorHandler = (err, req, res, next) => {
+export const errorHandler = (err, _, res, next) => {
   console.log("err code: ", err)
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
@@ -55,11 +55,11 @@ export const errorHandler = (err, req, res, next) => {
 }
 
 //Middleware para verificar si el usuario esta logeado puede acceder
-export const extraerUsuario = async (req, res, next) => {
+export const extraerUsuario = async (req, _, next) => {
   const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del token decodificado en tokenData
 
-  const userData = await usuarioModel.findUsuarioById(tokenData.idusuario)
+  const userData = await usuarioModel.findUsuarioById(tokenData?.idusuario)
   if (!tokenData || !userData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
   
   req.usuario = userData;
@@ -67,7 +67,7 @@ export const extraerUsuario = async (req, res, next) => {
 }
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
-  return async (req, res, next) => {
+  return async (req, _, next) => {
     if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", content: "Acceso no permitido" })
     next()
   }
