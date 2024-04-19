@@ -17,14 +17,6 @@ describe("Listas para el formulario", () => {
     expect(res.body, `Parece que se obtuvieron ${res.body.length}`).toHaveLength(33);
 
   })
-  test("Al pedir los municipios del departamento 5 por el body, en una propiedad llamada: c_departamento trae una lista que contiene 125 elementos", async () => {
-    const res = await api.get("/domicilio/listamunicipios/5").send({ c_departamento: 5 }).expect(200);
-    expect(res.body, `Parece que se obtuvieron ${res.body.length}`).toHaveLength(125);
-  })
-  test("Al pedir los municipios de un departamento cuyo codigo no existe, por el body, en una propiedad llamada: c_departamento, se obtiene una lista vacia", async () => {
-    const res = await api.get("/domicilio/listamunicipios/1").send({ c_departamento: 1 }).expect(200);
-    expect(res.body, `Parece que se obtuvieron ${res.body.length}`).toHaveLength(0);
-  })
   test("Al pedir los municipios del departamento 5 por parametros trae una lista que contiene 125 elementos", async () => {
     const res = await api.get("/domicilio/listamunicipios/5").expect(200);
     expect(res.body, `Parece que se obtuvieron ${res.body.length}`).toHaveLength(125);
