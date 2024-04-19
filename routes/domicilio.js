@@ -10,8 +10,8 @@ export const domicilioRouter = Router()
 domicilioRouter.get("/listaDepartamentos", colombiaAPIController.obtenerDepartamentos);
 
 domicilioRouter.get("/listaMunicipios/:c_departamento", 
-    // municipioParamValidator,
-    // checkValidator,
+    municipioParamValidator,
+    checkValidator,
     colombiaAPIController.obtenerMunicipiosPorDep
 );
 
