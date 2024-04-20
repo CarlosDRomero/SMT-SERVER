@@ -50,7 +50,7 @@ authRouter.post("/login",
 )
 
 authRouter.post("/verification/:id",
-  UUIDParamValidator,
+  UUIDParamValidator(),
   codigoValidator,
   checkValidator,
   codigoController.validarCodigo,
@@ -58,7 +58,7 @@ authRouter.post("/verification/:id",
   firmarToken
 )
 authRouter.post("/resendcode/:id",
-  UUIDParamValidator,
+  UUIDParamValidator(),
   checkValidator,
   usuarioController.encontrarUsuarioCodigo,
   generarCodigo,

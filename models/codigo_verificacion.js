@@ -1,7 +1,7 @@
 import { poolClient } from "../database/conexion.js";
 
 export const codigoModel = {
-  findCodigoById: async (idcodigo) => {
+  findById: async (idcodigo) => {
     const query = {
       name: "obtener-codigo-id",
       text: "SELECT * FROM codigo_verificacion WHERE idcodigo=$1",

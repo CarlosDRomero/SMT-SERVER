@@ -17,7 +17,7 @@ export const usuarioModel = {
     return result.rows[0]
   },
   
-  findUsuario: async (userInfo) => {
+  findByEmailOrUserName: async (userInfo) => {
     const query = {
       name: "obtener-usuario",
       text: "SELECT * FROM usuario WHERE nombre_usuario=$1 OR email=$2",
@@ -28,7 +28,7 @@ export const usuarioModel = {
     return result.rows[0]
   },
 
-  findUsuarioById: async (idusuario) => {
+  findById: async (idusuario) => {
     const query = {
       name: "obtener-usuario-id",
       text: "SELECT * FROM usuario WHERE idusuario=$1",
@@ -39,7 +39,7 @@ export const usuarioModel = {
     return result.rows[0]
   },
   
-  findUsuarioByIdCodigo: async (idcodigo) => {
+  findByIdCodigo: async (idcodigo) => {
     const query = {
       name: "obtener-usuario-codigo",
       text: "SELECT * FROM usuario AS u JOIN codigo_verificacion AS c ON c.idusuario=u.idusuario WHERE c.idcodigo=$1",

@@ -31,11 +31,11 @@ content-type: application/json
    
 }
 ###
-POST http://localhost:5000/auth/verification/b4d96d5b-775b-4229-b57f-6223c3ca643d
+POST http://localhost:5000/auth/verification/957d55b9-4eca-446f-8e59-8ebe95c929f1
 content-type: application/json
 
 {
-    "codigo": "N2675D"
+    "codigo": "8P5N9T"
 }
 ###
 POST http://localhost:5000/auth/resendcode/8c13016d-886a-4269-b83a-91d534f75a08
@@ -49,7 +49,10 @@ content-type: application/json
 
 ###
 POST http://localhost:5000/auth/register/empleado
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiNjMwZmZhYS1iYTlhLTQyYjktYmU0MC02OGViYWFkZmMxNDUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYUBnbWFpbC5lZHUuY28iLCJpYXQiOjE3MTM0NTYzNjF9.KWxJzqjcnaiI3aspzGUCseqDG8eetQ-OTLA6LEJVWdI
+#authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiNjMwZmZhYS1iYTlhLTQyYjktYmU0MC02OGViYWFkZmMxNDUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYUBnbWFpbC5lZHUuY28iLCJpYXQiOjE3MTM0NTYzNjF9.KWxJzqjcnaiI3aspzGUCseqDG8eetQ-OTLA6LEJVWdI
+
+###
+get http://localhost:5000/componentes/8c13016d-886a-4269-b83a-91d534f75a08
 
 
 

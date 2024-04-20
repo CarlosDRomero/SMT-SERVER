@@ -16,7 +16,7 @@ io.on("connection", socket => {
   socket.join(usuario.idusuario)
   
   if (usuario.rol === "admin" || usuario.rol === "empleado"){
-    console.log("uniendo " + usuario.rol + " a sala")
+    socket.join("empresarial")
     socket.join(usuario.rol)
   }
 

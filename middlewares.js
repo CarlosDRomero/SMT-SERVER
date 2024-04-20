@@ -1,4 +1,4 @@
-import { validationResult } from "express-validator"
+import { matchedData, validationResult } from "express-validator"
 import { Encrypt } from "./services/encryption.js"
 import { genCode } from "./services/random.js";
 import { tokens } from "./services/tokens.js";
@@ -39,7 +39,11 @@ export const checkValidator = (req, res, next) => {
   }
   next()
 }
-
+export const checkNoExtraFields = (req, res, next) => {
+  const matches = matchedData(req);
+  console.log("matches: ", matches)
+  next()
+}
 
 export const errorHandler = (err, _, res, next) => {
   console.log("err code: ", err)
@@ -59,7 +63,7 @@ export const extraerUsuario = async (req, _, next) => {
   const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del token decodificado en tokenData
 
-  const userData = await usuarioModel.findUsuarioById(tokenData?.idusuario)
+  const userData = await usuarioModel.findById(tokenData?.idusuario)
   if (!tokenData || !userData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
   
   req.usuario = userData;
