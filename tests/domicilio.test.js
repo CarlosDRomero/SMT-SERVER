@@ -64,8 +64,8 @@ describe("CRUD de direcciones", () => {
     const jwt = await api.post("/auth/login").send({ clave: "test", email: "testing@tests.test.t.com" }).expect(200);
     const usuario = tokens.verifyToken(jwt.body.token);
     const nuevaDireccion = {
-      c_departamento: "5",
-      c_municipio: "5.001",
+      c_dane_departamento: "5",
+      c_dane_municipio: "5.001",
       barrio: "Comuna 5",
       cadena_direccion: "Calle 13 #11-23, Sur???"
     }

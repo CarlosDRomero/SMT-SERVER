@@ -16,9 +16,9 @@ content-type: application/json
 
 {
     "clave": "12345",
-    "nombres": "Carlos",
-    "apellidos": "2",
-    "email": "a@gmail.edu.co",
+    "nombres": "Luis",
+    "apellidos": "Mora",
+    "email": "andrey12mora@gmail.com",
     "fecha_nac": "2024-02-29"
 }
 ###
@@ -31,11 +31,11 @@ content-type: application/json
    
 }
 ###
-POST http://localhost:5000/auth/verification/b4d96d5b-775b-4229-b57f-6223c3ca643d
+POST http://localhost:5000/auth/verification/b405b3b2-5a6d-4c6e-a0c5-cb3c6f581793
 content-type: application/json
 
 {
-    "codigo": "N2675D"
+    "codigo": "s0iw2g"
 }
 ###
 POST http://localhost:5000/auth/resendcode/8c13016d-886a-4269-b83a-91d534f75a08
