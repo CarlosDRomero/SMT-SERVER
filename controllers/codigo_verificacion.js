@@ -18,7 +18,7 @@ export const codigoController = {
   validarCodigo: async (req,res,next) => {
     const idcodigo = req.params.id
     const { codigo } = req.body
-    const codigo_db = await codigoModel.findCodigoById(idcodigo);
+    const codigo_db = await codigoModel.findById(idcodigo);
     console.log(codigo_db)
     if (!!codigo_db
     && await Encrypt.compareHash(codigo.toUpperCase(), codigo_db.codigo)
