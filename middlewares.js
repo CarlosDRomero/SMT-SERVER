@@ -76,11 +76,5 @@ export const verificarRol = (rolesAdmitidos) => {
     next()
   }
 }
- export const extraerToken = async (req, res, next) =>{
-  const token = req.headers.authorization?.split(" ").pop()
-  const tokenData = tokens.verifyToken(token)
-  if(!token || !tokenData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
-    req.token = tokenData;
-  next();
- }
+
 

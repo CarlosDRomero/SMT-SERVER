@@ -27,15 +27,15 @@ content-type: application/json
 
 {
     "clave": "12345",
-    "email": "a@gmail.edu.co"
+    "email": "andrey12mora@gmail.com"
    
 }
 ###
-POST http://localhost:5000/auth/verification/b405b3b2-5a6d-4c6e-a0c5-cb3c6f581793
+POST http://localhost:5000/auth/verification/c5bec0c8-98f8-49c9-b557-3e3f7078bb7f
 content-type: application/json
 
 {
-    "codigo": "s0iw2g"
+    "codigo": "6AGO2G"
 }
 ###
 POST http://localhost:5000/auth/resendcode/8c13016d-886a-4269-b83a-91d534f75a08
