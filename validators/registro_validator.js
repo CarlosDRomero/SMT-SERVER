@@ -1,5 +1,5 @@
 import { body, param } from "express-validator";
-import { fecha_validator,RolValidator } from "./custom";
+import { fecha_validator,RolValidator } from "./custom/index.js";
 
 
 export const registroValidator = [

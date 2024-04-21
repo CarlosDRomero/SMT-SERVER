@@ -42,7 +42,7 @@ export const checkValidator = (req, res, next) => {
 export const checkNoExtraFields = (req, res, next) => {
   const matches = matchedData(req);
   if (Object.keys(matches).length !== Object.keys({ ...req.body, ...req.params }).length){
-    return res.status(400).json({ error: "Parece que has intentado enviar alguns campos no deseados" })
+    return res.status(400).json({ error: "Parece que has intentado enviar algunos campos no deseados" })
   }
   next()
 }
@@ -52,6 +52,7 @@ export const errorHandler = (err, _, res, next) => {
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
   }else if (err.name === "RolNoPermitido"){
+    console.log("DEVOLVIENDO ROL NO ADMITIDo: ", err.message)
     return res.status(403).json({ error: err.message })
   }else{
     // console.log(`${err.code}: ${err.message}`)
@@ -74,9 +75,29 @@ export const extraerUsuario = async (req, _, next) => {
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, _, next) => {
-    if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", content: "Acceso no permitido" })
+    if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", message: "Acceso no permitido" })
     next()
   }
 }
+
+/**
+*
+* Esta funcion exige primero que nada que las rutas que la usen reciban un parametro llamado "idusuario",
+* con dicho parametro la funcion buscara al usuario en la base de datos y entonces
+* remplazará al req.usuario originario de la peticion por dicho usuario, para lograr gestionar datos sobre
+* este.
+*
+**/
+
+export const gestionarUsuario = async (req, res, next) => {
+  const userData = await usuarioModel.findById(req.params.idusuario)
+  if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
+
+  req.usuarioGestor = req.usuario;
+  req.usuario = userData;
+  next()
+}
+
+
 
 

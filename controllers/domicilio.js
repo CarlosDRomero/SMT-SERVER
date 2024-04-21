@@ -25,11 +25,6 @@ export const domicilioController = {
     const resultado = await domicilioModel.deleteAddressUser(iddireccion, idusuario);
     if(!resultado) return res.status(403).json({ error: "No tiene permisos para esta accion" });
     return res.status(204).json();
-  },
-  obtenerDireccionesAdmin: async(req, res) => {
-    const idusuario = req.params.idusuario
-    const direcciones = await domicilioModel.getAddressUser(idusuario);
-    res.json(direcciones);
-  },
+  }
     
 }

@@ -159,7 +159,7 @@ describe("CRUD de direcciones", () => {
     expect(res.body, `Este usuario deberia tener 2 direcciones pero se obtuvieron ${res.body.length}`).toHaveLength(1)
 
     res = await api.get(`/domicilio/direcciones/administrar/${rows[0].idusuario}`).set("authorization", jwtusuario.body.token).expect(403);
-
+    console.log("res: ", res.body)
     expect(res.body.error).toBeDefined()
   });
   //TODO:IMPORTANTE > TESTS PARA QUE SOLO UN ADMIN PUEDA MODIFICAR LAS DIRECCIONES DE UN USUARIO
