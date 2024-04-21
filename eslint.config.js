@@ -11,7 +11,7 @@ export default {
       "warn", { "before": true, "after": true }
     ],
     "indent": [
-      "error",
+      "warn",
       2
     ],
     "linebreak-style": [

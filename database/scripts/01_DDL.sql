@@ -25,7 +25,7 @@ CREATE TABLE direccion (
 	idusuario uuid NOT NULL,
 	predeterminada bool DEFAULT FALSE NOT NULL,
 	c_dane_departamento varchar(3),
-	c_dane_municipio varchar(5),
+	c_dane_municipio varchar(10),
 	barrio varchar(50),
 	cadena_direccion varchar(100),
 	
