@@ -109,36 +109,40 @@ describe("Componentes para los admins/empleados",() => {
       descripcion: "Una gpu mas en el mercado",
       url_imagen: "https://imagen.com"
     }
-    let { body:componentesb1 } = await api.get("/componentes").expect(200)
+    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
 
     const res = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes").expect(200)
+    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
     expect(componentesb1).toHaveLength(componentesa1.length);
     
-    let { body: componentesb2 } = await api.get("/componentes").expect(200)
+    let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
 
     const res2 = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body: componentesa2 } = await api.get("/componentes").expect(200)
+    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
+    console.log()
     expect(componentesb2).toHaveLength(componentesa2.length - 1);
 
   })
 
   test("Solo un admin al hacer un PUT a la ruta /componentes/catalogo/:idcomponente podra crear un nuevo componente", async () => {
+    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
+    const componenteb1 = componentesb1[0]
     const nuevaInfo = {
+      idcategoria: 4,
       marca: "MSI",
       nombre: "MSIS",
-
+      descripcion: componenteb1.descripcion,
+      url_imagen: componenteb1.url_imagen
     }
-    let { body:componentesb1 } = await api.get("/componentes").expect(200)
     
-    expect(componentesb1[0].idcomponente).toBeDefined();
+    expect(componenteb1.idcomponente).toBeDefined();
     
 
-    const res = await api.put(`/componentes/${componentesb1[0].idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentea1 } = await api.get(`/componentes/catalogo/${componentesb1[0].idcomponente}`).expect(200)
+    let { body:componentea1 } = await api.get(`/componentes/catalogo/${componenteb1.idcomponente}`).expect(200)
 
     expect(componentea1).toEqual(componentesb1[0]);
     

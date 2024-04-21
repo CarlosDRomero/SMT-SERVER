@@ -18,19 +18,19 @@ domicilioRouter.get("/listaMunicipios/:c_departamento",
 );
 
 domicilioRouter
-    .post("/direcciones", //crear direcciones, se queda dando vueltas en la busqueda
+  .post("/direcciones", //crear direcciones, se queda dando vueltas en la busqueda
     extraerToken,
     direccionValidator,
     checkValidator,
     domicilioController.crearDireccion
-    ); 
+  );
 
 domicilioRouter
-    .get("/direcciones" //ver direcciones del usuario
-    ) 
-    .put("/direcciones/:id") //actualizar direcciones solo la de el
-    .delete("/direcciones/:id") //eliminar direcciones del usuario solo la de el
-    .get("/direcciones/:id") //obtener direcciones por id solo siendo admin
+  .get("/direcciones" //ver direcciones del usuario
+  )
+  .put("/direcciones/:id") //actualizar direcciones solo la de el
+  .delete("/direcciones/:id") //eliminar direcciones del usuario solo la de el
+  .get("/direcciones/:id") //obtener direcciones por id solo siendo admin
 
 
 

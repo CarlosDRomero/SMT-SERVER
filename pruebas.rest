@@ -16,9 +16,9 @@ content-type: application/json
 
 {
     "clave": "12345",
-    "nombres": "Luis",
-    "apellidos": "Mora",
-    "email": "andrey12mora@gmail.com",
+    "nombres": "Carlos",
+    "apellidos": "2",
+    "email": "a@gmail.edu.co",
     "fecha_nac": "2024-02-29"
 }
 ###

@@ -8,7 +8,7 @@ export const inventarioController = {
     res.json(inventario);
   },
   obtenerProducto: async (req,res,next) => {
-    const idproducto = req.params.id
+    const { idproducto } = req.params
     const producto = await inventarioModel.findById(idproducto);
     if (!producto) return next()
     res.json(producto);
