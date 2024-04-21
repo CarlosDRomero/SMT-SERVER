@@ -7,7 +7,7 @@ export const domicilioController = {
     const ubicacion = await domicilioModel.insertAddressUser({ idusuario, ...req.body });
     return res.status(201).json(ubicacion)
   },
-  obtenerDirecciones: async(req, res) => {
+  obtenerDireccion: async(req, res) => {
     const idusuario = req.usuario.idusuario
     const direcciones = await domicilioModel.getAddressUser(idusuario);
     res.json(direcciones);

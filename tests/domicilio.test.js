@@ -212,7 +212,7 @@ describe("CRUD de direcciones", () => {
         cadena_direccion: "Calle 13 #11-23, Sur???"
       }
       const { rows: direccionesb } = await poolClient.query(`SELECT * FROM direccion WHERE idusuario='${usuario.idusuario}'`);
-      let res = await api.put(`/domicilio/direcciones/administrar/${usuario.idusuario}/${direccionesb[0].iddireccion}`).send(nuevaDireccion).set("authorization", jwtadmin.body.token).expect(403);
+      let res = await api.put(`/domicilio/direcciones/administrar/${usuario.idusuario}/${direccionesb[0].iddireccion}`).send(nuevaDireccion).set("authorization", jwtusuario.body.token).expect(403);
       expect(res.body.error).toBeDefined()
 
       const q1 = await poolClient.query(`SELECT * FROM direccion WHERE idusuario='${usuario.idusuario}' AND c_dane_municipio='97.001'`);
@@ -268,7 +268,7 @@ describe("CRUD de direcciones", () => {
       const cambio = await poolClient.query("SELECT * FROM direccion WHERE cadena_direccion='CAMBIO MALICIOSO'");
     
       expect(cambio.rows, "Se devolvio 403 pero aun asi hizo el cambio quien no debia").toHaveLength(0)
-      await api.delete(`/domicilio/direcciones/${usuario.idusuario}/${direccionesb[0].iddireccion}`).set("authorization", jwtadmin.body.token).expect(403);
+      await api.delete(`/domicilio/direcciones/administrar/${usuario.idusuario}/${direccionesb[0].iddireccion}`).set("authorization", jwtadmin.body.token).expect(403);
     
       const { rows: direccionesa } = await poolClient.query("SELECT * FROM direccion d JOIN usuario u ON u.idusuario=d.idusuario WHERE u.email='testing@tests.test.t.com'");
 

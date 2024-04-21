@@ -26,13 +26,13 @@ domicilioRouter
   )  //crear direcciones
   .get("/direcciones",
     extraerUsuario,
-    domicilioController.obtenerDirecciones
+    domicilioController.obtenerDireccion
   ) //ver direcciones del usuario
 
   .put("/direcciones/:iddireccion",
     extraerUsuario,
-    direccionValidator,
     UUIDParamValidator("iddireccion"),
+    direccionValidator,
     checkValidator,
     domicilioController.actualizarDireccion
   ) //actualizar direcciones solo la de el
@@ -50,8 +50,39 @@ domicilioRouter
     UUIDParamValidator("idusuario"),
     checkValidator,
     gestionarUsuario,
-    domicilioController.obtenerDirecciones
+    domicilioController.obtenerDireccion
   ) //obtener direcciones por id solo siendo admin
+
+  .post("/direcciones/administrar/:idusuario",
+    extraerUsuario,
+    verificarRol([usuarioController.roles.ADMIN]),
+    direccionValidator,
+    UUIDParamValidator("idusuario"),
+    checkValidator,
+    gestionarUsuario,
+    domicilioController.crearDireccion
+  )
+
+  .put("/direcciones/administrar/:idusuario/:iddireccion",
+    extraerUsuario,
+    verificarRol([usuarioController.roles.ADMIN]),
+    UUIDParamValidator("idusuario", "iddireccion"),
+    direccionValidator,
+    checkValidator,
+    gestionarUsuario,
+    domicilioController.actualizarDireccion
+  )
+
+  .delete("/direcciones/administrar/:idusuario/:iddireccion",
+    extraerUsuario,
+    verificarRol([usuarioController.roles.ADMIN]),
+    UUIDParamValidator("idusuario", "iddireccion"),
+    checkValidator,
+    gestionarUsuario,
+    domicilioController.eliminarDireccion
+  )
+
+  
 
  
 export default domicilioRouter;
