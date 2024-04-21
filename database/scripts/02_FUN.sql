@@ -14,7 +14,7 @@ DECLARE
 BEGIN
     SELECT COUNT(*) = 0 INTO es_primera
     FROM direccion
-    WHERE idusuario = idusuario_creada AND predeterminada=FALSE;
+    WHERE idusuario = idusuario_creada AND predeterminada=TRUE;
 
     RETURN es_primera;
 END;
