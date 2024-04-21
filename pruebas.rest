@@ -31,11 +31,11 @@ content-type: application/json
    
 }
 ###
-POST http://localhost:5000/auth/verification/c5bec0c8-98f8-49c9-b557-3e3f7078bb7f
+POST http://localhost:5000/auth/verification/4922eade-1b33-4b56-85c5-f05695bc09ba
 content-type: application/json
 
 {
-    "codigo": "6AGO2G"
+    "codigo": "X4ASJ2"
 }
 ###
 POST http://localhost:5000/auth/resendcode/8c13016d-886a-4269-b83a-91d534f75a08
@@ -46,10 +46,18 @@ content-type: application/json
 {
  "rol": "admin"
 }
-
 ###
-POST http://localhost:5000/auth/register/empleado
-#authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiNjMwZmZhYS1iYTlhLTQyYjktYmU0MC02OGViYWFkZmMxNDUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYUBnbWFpbC5lZHUuY28iLCJpYXQiOjE3MTM0NTYzNjF9.KWxJzqjcnaiI3aspzGUCseqDG8eetQ-OTLA6LEJVWdI
+PUT http://localhost:5000/domicilio/direcciones/ef5046b0-10d0-4058-b8ca-5a41db926ea9
+authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiI5M2Q5NWViOC03NTY1LTQwZGQtYjg0NS1hY2IwOGJmNWFkMTUiLCJub21icmVzIjoiTHVpcyIsImFwZWxsaWRvcyI6Ik1vcmEiLCJlbWFpbCI6ImFuZHJleTEybW9yYUBnbWFpbC5jb20iLCJpYXQiOjE3MTM2NjY0OTZ9.I-a1Fz3hcY3mVVw4M_WImcUPZsKJX8bKWRoEoeRXzmE
+Content-Type: application/json
+
+{
+    "c_dane_departamento": "97",
+    "c_dane_municipio": "9.001",
+    "barrio": "Comuna 5",
+    "cadena_direccion": "Calle 13 #11-23, Sur???"
+}
+
 
 ###
 get http://localhost:5000/componentes/8c13016d-886a-4269-b83a-91d534f75a08

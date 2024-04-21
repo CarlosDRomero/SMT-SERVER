@@ -13,7 +13,6 @@ const pool = new Pool({
 
 export let poolClient;
 let retryInterval = null;
-
 const initializeRetryInterval = (ms = 7000) => {
   if (!retryInterval){
     console.log("Se reintentará la conexion...")
