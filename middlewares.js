@@ -41,7 +41,9 @@ export const checkValidator = (req, res, next) => {
 }
 export const checkNoExtraFields = (req, res, next) => {
   const matches = matchedData(req);
-  console.log("matches: ", matches)
+  if (Object.keys(matches).length !== Object.keys({ ...req.body, ...req.params }).length){
+    return res.status(400).json({ error: "Parece que has intentado enviar alguns campos no deseados" })
+  }
   next()
 }
 

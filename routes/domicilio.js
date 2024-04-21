@@ -6,6 +6,7 @@ import { direccionValidator } from "../validators/direccion_validator.js";
 import { domicilioController } from "../controllers/domicilio.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
 import { usuarioModel } from "../models/usuario.js";
+import { usuarioController } from "../controllers/usuario.js";
 
 const domicilioRouter = Router()
 
@@ -23,7 +24,7 @@ domicilioRouter
 
   .delete("/direcciones/:iddireccion", extraerUsuario, UUIDParamValidator("iddireccion"), checkValidator, domicilioController.eliminarDireccion) //eliminar direcciones del usuario
 
-  .get("/direcciones/administrar/:idusuario", extraerUsuario, verificarRol([usuarioModel.roles.ADMIN]), UUIDParamValidator("idusuario"),
+  .get("/direcciones/administrar/:idusuario", extraerUsuario, verificarRol([usuarioController.roles.ADMIN]), UUIDParamValidator("idusuario"),
     checkValidator, domicilioController.obtenerDireccionesAdmin) //obtener direcciones por id solo siendo admin
  
 export default domicilioRouter;

@@ -118,6 +118,43 @@ describe("Tests ruta /auth/login", () => {
       expect(result.rol, "Se registro pero seguramente no como empleado").toEqual("empleado");
       // res = await api.post("/auth/login").send(credenciales).expect(200)
     })
+    test("Solo un admin puede crear una cuenta a otro admin en /auth/register/admin", async () => {
+      await poolClient.query("UPDATE usuario SET rol='empleado' WHERE email='admin@tests.test.t.com'")
+      const credenciales = { clave: "admin", email: "admin@tests.test.t.com" }
+      const nuevoEmpleado = {
+        nombres: "otro admin mas",
+        apellidos: "ese otro admin",
+        clave: "admin2",
+        email: "admin2@tests.test.t.com",
+        fecha_nac: "2003-06-06"
+      }
+      
+      let res = await api.post("/auth/login").send(credenciales).expect(200)
+      expect(res.body.token).toBeDefined()
+      await api.post("/auth/register/admin").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(403)
+      await poolClient.query("UPDATE usuario SET rol='admin' WHERE email='admin@tests.test.t.com'")
+      await api.post("/auth/register/admin").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(200)
+
+      const result = (await poolClient.query("SELECT * FROM usuario WHERE email='emp@tests.test.t.com'")).rows[0];
+
+      expect(result.rol, "Se registro pero seguramente no como empleado").toEqual("empleado");
+      // res = await api.post("/auth/login").send(credenciales).expect(200)
+    })
+    test("Aunque sea admin, si intenta crear una cuenta a alguien con un rol inventado no deberia poder hacerlo", async () => {
+      const credenciales = { clave: "admin", email: "admin@tests.test.t.com" }
+      const nuevoEmpleado = {
+        nombres: "otro admin mas",
+        apellidos: "ese otro admin",
+        clave: "admin2",
+        email: "admin2@tests.test.t.com",
+        fecha_nac: "2003-06-06"
+      }
+      
+      let res = await api.post("/auth/login").send(credenciales).expect(200)
+      expect(res.body.token).toBeDefined()
+      await api.post("/auth/register/rolraro").set("Authorization", `Bearer ${res.body.token}`).send(nuevoEmpleado).expect(400)
+      // res = await api.post("/auth/login").send(credenciales).expect(200)
+    })
   })
 })
 

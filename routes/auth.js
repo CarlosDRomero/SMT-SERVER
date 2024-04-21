@@ -2,11 +2,10 @@ import { Router } from "express"
 import { usuarioController } from "../controllers/usuario.js"
 import { registroValidator } from "../validators/registro_validator.js";
 import { loginValidator } from "../validators/login_validator.js";
-import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo } from "../middlewares.js";
+import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, checkNoExtraFields } from "../middlewares.js";
 import { codigoController } from "../controllers/codigo_verificacion.js";
 import { mailerController } from "../controllers/mailer.js";
 import { codigoValidator } from "../validators/codigo_validator.js";
-import { usuarioModel } from "../models/usuario.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
 
 const authRouter = Router()
@@ -24,15 +23,16 @@ authRouter.post("/register",
   codigoController.crearCodigo
 );
 
-authRouter.post("/register/empleado",
+authRouter.post("/register/:rol",
   extraerUsuario,
-  verificarRol([usuarioModel.roles.ADMIN]),
+  verificarRol([usuarioController.roles.ADMIN]),
   registroValidator,
   checkValidator,
+  checkNoExtraFields,
   extraerNombreUsuario,
   claveEncrypt,
   usuarioController.registrar,
-  usuarioController.actualizarRolEmpleado,
+  usuarioController.actualizarRol,
   generarCodigo,
   mailerController.mailVerificacion,
   codigoController.crearCodigo

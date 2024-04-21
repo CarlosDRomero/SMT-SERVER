@@ -1,3 +1,5 @@
+import { usuarioController } from "../../controllers/usuario"
+
 export const fecha_validator = (dateString) => {
   if(!/^([0-9]{2})?[0-9]{2}(\/|-)(1[0-2]|0?[1-9])\2(3[01]|[12][0-9]|0?[1-9])$/.test(dateString))
     return false;
@@ -17,3 +19,8 @@ export const fecha_validator = (dateString) => {
 
   return day > 0 && day <= monthLength[month - 1];
 };
+
+export const RolValidator = (rol) => {
+  // console.log("VALIDANDO ROL: ", rol,!!usuarioController.roles[rol.toUpperCase()])
+  return !!usuarioController.roles[rol.toUpperCase()]
+}

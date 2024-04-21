@@ -1,5 +1,6 @@
-import { body } from "express-validator";
-import { fecha_validator } from "./custom/fecha_validator.js";
+import { body, param } from "express-validator";
+import { fecha_validator,RolValidator } from "./custom";
+
 
 export const registroValidator = [
   body("nombres", "Nombres no validos").notEmpty(),
@@ -7,6 +8,7 @@ export const registroValidator = [
   body("clave", "Clave no valida").notEmpty(),
   body("email", "Email no valido").isEmail(),
   body("fecha_nac", "Fecha Nacimiento no valida").custom(fecha_validator),
+  param("rol", "Este no es un rol valido").custom(RolValidator).optional()
 ]
 
 

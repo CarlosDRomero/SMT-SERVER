@@ -3,6 +3,11 @@ import { calcularExpirado } from "../services/time.js";
 import { Encrypt } from "../services/encryption.js";
 
 export const usuarioController = {
+  roles: Object.freeze({
+    ADMIN: "admin",
+    EMPLEADO: "empleado",
+    CLIENTE: "cliente"
+  }),
   encontrarUsuarioCodigo: async (req, res, next) => {
     const idcodigo = req.params.id;
     const usuario = await usuarioModel.findByIdCodigo(idcodigo);
@@ -29,8 +34,9 @@ export const usuarioController = {
     next()
   
   },
-  actualizarRolEmpleado: async (req, res, next) => {
-    await usuarioModel.actualizarRol(usuarioModel.roles.EMPLEADO, req.payload.idusuario)
+  actualizarRol: async (req, res, next) => {
+    const nuevoRol = req.params.rol.toLowerCase();
+    await usuarioModel.actualizarRol(nuevoRol, req.payload.idusuario)
     next()
   },
   login: async(req, res, next) => {
