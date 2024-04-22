@@ -66,6 +66,8 @@ authRouter.post("/resendcode/:id",
   codigoController.crearCodigo
 )
 
+authRouter.get("/onlineTest", usuarioController.obtenerOnline)
+
 //TODO:IMPORTANTE > RUTA PARA RECUPERACION DE CONTRASEÑA
 
 
