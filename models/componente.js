@@ -1,4 +1,5 @@
 import { poolClient } from "../database/conexion.js";
+import { multiInsertFactory } from "../utils.js";
 
 export const componenteModel = {
   findAll: async () => {
@@ -20,10 +21,25 @@ export const componenteModel = {
     const res = await poolClient.query(query);
     return res.rows[0];
   },
+  findSpecsById: async (idcomponente) => {
+    const query = {
+      name: "obtener-especificaciones-componente",
+      text: `
+        SELECT cae.idcat_espec, atributo,valor FROM componente_espec  coe 
+        JOIN categoria_espec cae  ON coe.idcat_espec =cae.idcat_espec 
+        JOIN atributo_espec ae ON ae.idespec =cae.idespec 
+        WHERE idcomponente=$1;
+      `,
+      values: [idcomponente]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows;
+  },
   create: async (componenteInfo) => {
     const query = {
       name: "crear-componente",
-      text: "INSERT INTO componente (idcategoria, marca, nombre, descripcion, url_imagen) VALUES ($1, $2, $3, $4, $5)",
+      text: "INSERT INTO componente (idcategoria, marca, nombre, descripcion, url_imagen) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       values: [
         componenteInfo.idcategoria,
         componenteInfo.marca,
@@ -35,6 +51,17 @@ export const componenteModel = {
 
     const res = await poolClient.query(query);
     return res.rows[0];
+  },
+  createSpecs: async (idcomponente, listaEspecificaciones) => {
+    const query = {
+      name: "crear-especificaciones-componente",
+      text: "INSERT INTO componente_espec (idcat_espec, idcomponente, valor) VALUES",
+      values: []
+    }
+    multiInsertFactory(query, listaEspecificaciones.map(spec => [spec.idcat_espec, idcomponente, spec.valor]))
+    console.log("QUERY MONTADA: ", query)
+    const res = await poolClient.query(query);
+    return res.rows;
   },
   update: async (idcomponente,componenteInfo) => {
     const query = {
@@ -51,6 +78,17 @@ export const componenteModel = {
     }
 
     const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  delete: async (idcomponente) => {
+    const query = {
+      name: "eliminar-componente",
+      text: "DELETE FROM componente WHERE idcomponente=$1 RETURNING *",
+      values: [idcomponente]
+    }
+
+    const res = await poolClient.query(query);
+
     return res.rows[0];
   }
 }

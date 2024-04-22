@@ -2,7 +2,6 @@ import supertest from "supertest"
 import app from "../app"
 import { limpiarTablas } from "./test_helper"
 import { poolClient } from "../database/conexion"
-import { tokens } from "../services/tokens.js"
 
 app.removeAllListeners()
 const api = supertest(app)
@@ -45,8 +44,8 @@ describe("Componentes para los clientes", () => {
     const res = await api.post("/auth/login").send({ clave: "test",email: "testing@tests.test.t.com" })
     token = res.body.token;
   })
-  test("Un GET a la ruta /componentes obtiene los componentes existentes en el inventario", async () => {
-    const res = await api.get("/componentes").expect(200)
+  test("Un GET a la ruta /componentes/inventario obtiene los componentes existentes en el inventario", async () => {
+    const res = await api.get("/componentes/inventario").expect(200)
     
     expect(res.body).toHaveLength(7)
     expect(res.body[0].marca).toBeDefined();
@@ -63,11 +62,11 @@ describe("Componentes para los clientes", () => {
     expect(res.body[0].sku).not.toBeDefined();
     expect(res.body[0].precio).not.toBeDefined();
   })
-  test("Un GET a la ruta /componentes/categorias obtiene una lista de las categorias posibles", async () => {
-    const res = await api.get("/componentes/categorias").set({ authorization: token }).expect(200)
-    expect(res.body).toHaveLength(7)
-    expect(res.body).toContainEqual({ idcategoria: 3, denominacion: "CPU" })
-    expect(res.body).toContainEqual({ idcategoria: 4, denominacion: "GPU" })
+  test("Un GET a la ruta /componentes/especificaciones/:idcategoria obtiene una lista de las categorias posibles", async () => {
+    const res = await api.get("/componentes/especificaciones/4").expect(200)
+    
+    expect(res.body).toHaveLength(4)
+    expect(res.body.map(a => a.atributo)).toContain("vram");
     
   })
   test("Un GET a la ruta /componentes/catalogo/:idcomponente obtiene el componente general con su id de componente", async () => {
@@ -77,17 +76,17 @@ describe("Componentes para los clientes", () => {
     expect(idcomponente).toBeDefined();
 
     const res2 = await api.get(`/componentes/catalogo/${idcomponente}`).expect(200)
-    
+    delete res2.body.especificaciones
     expect(res2.body).toEqual(res.body[0])
     
   })
-  test("Un GET a la ruta /componentes/:idproducto obtiene el componente el inventario identificado con su id de producto", async () => {
-    const res = await api.get("/componentes").expect(200)
+  test("Un GET a la ruta /componentes/inventario/:idproducto obtiene el componente el inventario identificado con su id de producto", async () => {
+    const res = await api.get("/componentes/inventario").expect(200)
   
     const idproducto = res.body[0].idproducto;
     expect(idproducto).toBeDefined();
 
-    const res2 = await api.get(`/componentes/${idproducto}`).expect(200)
+    const res2 = await api.get(`/componentes/inventario/${idproducto}`).expect(200)
     
     expect(res2.body).toEqual(res.body[0])
     
@@ -107,28 +106,35 @@ describe("Componentes para los admins/empleados",() => {
       marca: "MARCA X",
       nombre: "GPU XD",
       descripcion: "Una gpu mas en el mercado",
-      url_imagen: "https://imagen.com"
+      url_imagen: "https://imagen.com",
+      especificaciones: [
+        { idcat_espec: 13,valor: 4000 },
+        { idcat_espec: 14,valor: "230MHz" },
+        { idcat_espec: 15,valor: "300W" },
+        { idcat_espec: 16,valor: "4GB" }
+      ]
     }
     let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
 
-    const res = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
     let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
     expect(componentesb1).toHaveLength(componentesa1.length);
     
     let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
 
-    const res2 = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    const res = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
     let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
-    console.log()
     expect(componentesb2).toHaveLength(componentesa2.length - 1);
+
+    
 
   })
 
   test("Solo un admin al hacer un PUT a la ruta /componentes/catalogo/:idcomponente podra crear un nuevo componente", async () => {
     let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
-    const componenteb1 = componentesb1[0]
+    const componenteb1 = componentesb1[3]
     const nuevaInfo = {
       idcategoria: 4,
       marca: "MSI",
@@ -142,19 +148,109 @@ describe("Componentes para los admins/empleados",() => {
 
     const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentea1 } = await api.get(`/componentes/catalogo/${componenteb1.idcomponente}`).expect(200)
+    const componentea1 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
 
-    expect(componentea1).toEqual(componentesb1[0]);
+    expect(componentea1).toEqual(componenteb1);
     
 
-    const res2 = await api.put(`/componentes/catalogo/${componentesb1[0].idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body:componentea2 } = await api.get(`/componentes/catalogo/${componentesb1[0].idcomponente}`).expect(200)
+    const componentea2 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
 
     expect(componentea2.marca).toBe("MSI");
     expect(componentea2.nombre).toBe("MSIS");
 
-    expect(componentea2.url_imagen).toEqual(componentesb1[0].url_imagen);
+    expect(componentea2.url_imagen).toEqual(componenteb1.url_imagen);
+
+  })
+
+  test("Solo un admin al hacer un DELETE a la ruta /componentes/catalogo/:idcomponente podra eliminar un componente", async () => {
+    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
+
+    await api.delete("/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.cliente }).expect(403)
+
+    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
+    expect(componentesb1).toHaveLength(componentesa1.length);
+    
+    let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
+
+    await api.delete("/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.admin }).expect(204)
+
+    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
+    
+    expect(componentesa2).toHaveLength(componentesb2.length - 1);
+
+  })
+
+  test("Solo un admin al hacer un POST a la ruta /componentes/inventario podra crear un nuevo componente", async () => {
+    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
+    const componenteb1 = componentesb1[3]
+    const nuevaInfo = {
+      idcomponente: componenteb1.idcomponente,
+      SKU: "XD-1123-SDF",
+      disponibilidad: "40", // puede estar mal que sea string?
+      precio: "1500000"
+    }
+
+
+    await api.post("/componentes/inventario").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+
+    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
+    expect(componentesb1).toHaveLength(componentesa1.length);
+
+    await api.post("/componentes/inventario").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+
+    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
+    expect(componentesa1).toHaveLength(componentesa2.length - 1);
+
+  })
+
+  test("Solo un admin al hacer un PUT a la ruta /componentes/inventario/:idproducto podra crear un nuevo componente", async () => {
+    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
+    const componenteb1 = componentesb1[3]
+    const nuevaInfo = {
+      SKU: "NOXD-1123-SDF",
+      disponibilidad: "21", // puede estar mal que sea string?
+      precio: componenteb1.precio
+    }
+    
+    expect(componenteb1.idcomponente).toBeDefined();
+    
+
+    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+
+    let { body:componentea1 } = await api.get(`/componentes/inventario/${componenteb1.idcomponente}`).expect(200)
+
+    expect(componentea1).toEqual(componenteb1);
+    
+
+    await api.put(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+
+    let { body:componentea2 } = await api.get(`/componentes/inventario/${componenteb1.idcomponente}`).expect(200)
+
+    expect(componentea2.SKU).toBe(nuevaInfo.SKU);
+    expect(componentea2.disponibilidad).toBe(nuevaInfo.disponibilidad);
+
+    expect(componentea2.precio).toEqual(componenteb1.precio);
+
+  })
+
+  test("Solo un admin al hacer un DELETE a la ruta /componentes/inventario/:idproducto podra eliminar un componente", async () => {
+    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
+    const componenteb1 = componentesb1[3]
+
+    await api.delete(`/componentes/inventario/${componenteb1.idproducto}`).set({ authorization: token.cliente }).expect(403)
+
+    let { body:componentesa1 } = await api.get("/componentes/inventario").expect(200)
+    expect(componentesb1).toHaveLength(componentesa1.length);
+    
+    let { body: componentesb2 } = await api.get("/componentes/inventario").expect(200)
+
+    await api.delete(`/componentes/inventario/${componenteb1.idproducto}`).set({ authorization: token.admin }).expect(204)
+
+    let { body: componentesa2 } = await api.get("/componentes/inventario").expect(200)
+    
+    expect(componentesa2).toHaveLength(componentesb2.length - 1);
 
   })
 })

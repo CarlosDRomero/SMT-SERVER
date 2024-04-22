@@ -81,7 +81,13 @@ execute function actualizar_fecha_codigo();
 CREATE OR REPLACE FUNCTION hacer_predeterminada()
 RETURNS TRIGGER AS $$
 BEGIN
-	NEW.predeterminada := TRUE;
+	IF es_primer_direccion(NEW.idusuario) THEN
+		NEW.predeterminada := TRUE;
+	ELSE 
+		IF (NEW.predeterminada=TRUE) THEN
+			UPDATE direccion SET predeterminada=FALSE WHERE predeterminada=TRUE;
+		END IF;
+	END IF;
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -89,7 +95,6 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE TRIGGER primer_direccion
 BEFORE INSERT ON direccion
 FOR EACH ROW
-WHEN (es_primer_direccion(NEW.idusuario))
 EXECUTE FUNCTION hacer_predeterminada();
 
 /*
@@ -142,7 +147,7 @@ BEGIN
 	) THEN
 			RETURN NEW;
 	ELSE
-		RAISE EXCEPTION 'La categoria del producto';
+		RAISE EXCEPTION 'Una especificacion no coincide con la categoria del producto';
 	END IF;
 	
 END;

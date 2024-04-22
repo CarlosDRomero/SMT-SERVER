@@ -5,5 +5,11 @@ export const categoriaController = {
     const categorias = await categoriaModel.findAll();
 
     res.json(categorias);
+  },
+  obetenerEspecificiones: async (req, res) => {
+    const { idcategoria } = req.params;
+
+    const especificaciones = await categoriaModel.findSpecsById(idcategoria);
+    res.json(especificaciones)
   }
 }
