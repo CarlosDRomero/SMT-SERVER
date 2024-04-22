@@ -6,37 +6,40 @@ import { poolClient } from "../database/conexion"
 app.removeAllListeners()
 const api = supertest(app)
 
-beforeAll(async () => {
-  await limpiarTablas();
-  console.log("Registrando usuario de testeo");
-  await api.post("/auth/register").send({
-    nombres: "Test",
-    apellidos: "Test Man",
-    clave: "test",
-    email: "testing@tests.test.t.com",
-    fecha_nac: "2003-06-06"
-  })
-  await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
+beforeAll((done) => {
+  setTimeout(async() => {
+    await limpiarTablas();
+    console.log("Registrando usuario de testeo");
+    await api.post("/auth/register").send({
+      nombres: "Test",
+      apellidos: "Test Man",
+      clave: "test",
+      email: "testing@tests.test.t.com",
+      fecha_nac: "2003-06-06"
+    })
+    await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing@tests.test.t.com'")
 
-  await api.post("/auth/register").send({
-    nombres: "Test",
-    apellidos: "Test O=ther",
-    clave: "test",
-    email: "testing2@tests.test.t.com",
-    fecha_nac: "2003-06-06"
-  })
-  await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing2@tests.test.t.com'")
+    await api.post("/auth/register").send({
+      nombres: "Test",
+      apellidos: "Test O=ther",
+      clave: "test",
+      email: "testing2@tests.test.t.com",
+      fecha_nac: "2003-06-06"
+    })
+    await poolClient.query("UPDATE usuario SET confirmado=true WHERE email='testing2@tests.test.t.com'")
 
-  console.log("Registrando usuario admin");
-  await api.post("/auth/register").send({
-    nombres: "Admin",
-    apellidos: "Admin Man",
-    clave: "admin",
-    email: "admin@tests.test.t.com",
-    fecha_nac: "2003-06-06"
-  })
-  await poolClient.query("UPDATE usuario SET confirmado=true, rol='admin' WHERE email='admin@tests.test.t.com'")
-})
+    console.log("Registrando usuario admin");
+    await api.post("/auth/register").send({
+      nombres: "Admin",
+      apellidos: "Admin Man",
+      clave: "admin",
+      email: "admin@tests.test.t.com",
+      fecha_nac: "2003-06-06"
+    })
+    await poolClient.query("UPDATE usuario SET confirmado=true, rol='admin' WHERE email='admin@tests.test.t.com'")
+    done()
+  },3000)
+},10000)
 
 describe("Componentes para los clientes", () => {
   let token;
@@ -62,8 +65,8 @@ describe("Componentes para los clientes", () => {
     expect(res.body[0].sku).not.toBeDefined();
     expect(res.body[0].precio).not.toBeDefined();
   })
-  test("Un GET a la ruta /componentes/especificaciones/:idcategoria obtiene una lista de las categorias posibles", async () => {
-    const res = await api.get("/componentes/especificaciones/4").expect(200)
+  test("Un GET a la ruta /componentes/especificaciones-categoria/:idcategoria obtiene una lista de las categorias posibles", async () => {
+    const res = await api.get("/componentes/especificaciones-categoria/4").expect(200)
     
     expect(res.body).toHaveLength(4)
     expect(res.body.map(a => a.atributo)).toContain("vram");
@@ -136,25 +139,28 @@ describe("Componentes para los admins/empleados",() => {
     let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
     const componenteb1 = componentesb1[3]
     const nuevaInfo = {
-      idcategoria: 4,
+      idcategoria: 3,
       marca: "MSI",
       nombre: "MSIS",
       descripcion: componenteb1.descripcion,
-      url_imagen: componenteb1.url_imagen
+      url_imagen: componenteb1.url_imagen,
+      especificaciones: [
+        { idcat_espec: 9,valor: "23MHz" },
+        { idcat_espec: 10,valor: "8GB" }
+      ]
     }
     
     expect(componenteb1.idcomponente).toBeDefined();
     
 
-    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
     const componentea1 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
 
     expect(componentea1).toEqual(componenteb1);
     
 
-    await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
-
+    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
     const componentea2 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
 
     expect(componentea2.marca).toBe("MSI");
@@ -183,24 +189,24 @@ describe("Componentes para los admins/empleados",() => {
   })
 
   test("Solo un admin al hacer un POST a la ruta /componentes/inventario podra crear un nuevo componente", async () => {
-    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
-    const componenteb1 = componentesb1[3]
+    let { body:catalogo } = await api.get("/componentes/catalogo").expect(200)
+    const componenteb1 = catalogo[3]
     const nuevaInfo = {
-      idcomponente: componenteb1.idcomponente,
-      SKU: "XD-1123-SDF",
+      sku: "XD-1123-SDF",
       disponibilidad: "40", // puede estar mal que sea string?
       precio: "1500000"
     }
 
+    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
 
-    await api.post("/componentes/inventario").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.post(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
+    let { body:componentesa1 } = await api.get("/componentes/inventario").expect(200)
     expect(componentesb1).toHaveLength(componentesa1.length);
 
-    await api.post("/componentes/inventario").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.post(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
+    let { body: componentesa2 } = await api.get("/componentes/inventario").expect(200)
     expect(componentesa1).toHaveLength(componentesa2.length - 1);
 
   })
@@ -209,27 +215,25 @@ describe("Componentes para los admins/empleados",() => {
     let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
     const componenteb1 = componentesb1[3]
     const nuevaInfo = {
-      SKU: "NOXD-1123-SDF",
+      sku: "NOXD-1123-SDF",
       disponibilidad: "21", // puede estar mal que sea string?
       precio: componenteb1.precio
     }
     
     expect(componenteb1.idcomponente).toBeDefined();
     
-
-    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
-
-    let { body:componentea1 } = await api.get(`/componentes/inventario/${componenteb1.idcomponente}`).expect(200)
+    const res = await api.put(`/componentes/inventario/${componenteb1.idproducto}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    let { body:componentea1 } = await api.get(`/componentes/inventario/${componenteb1.idproducto}`).expect(200)
 
     expect(componentea1).toEqual(componenteb1);
     
 
-    await api.put(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.put(`/componentes/inventario/${componenteb1.idproducto}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body:componentea2 } = await api.get(`/componentes/inventario/${componenteb1.idcomponente}`).expect(200)
+    let { body:componentea2 } = await api.get(`/componentes/inventario/${componenteb1.idproducto}`).expect(200)
 
-    expect(componentea2.SKU).toBe(nuevaInfo.SKU);
-    expect(componentea2.disponibilidad).toBe(nuevaInfo.disponibilidad);
+    expect(componentea2.sku).toBe(nuevaInfo.sku);
+    expect(componentea2.disponibilidad).toBe(Number(nuevaInfo.disponibilidad));
 
     expect(componentea2.precio).toEqual(componenteb1.precio);
 

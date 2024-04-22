@@ -5,8 +5,10 @@ import { componenteController } from "../controllers/componente.js";
 import { categoriaController } from "../controllers/categoria_componente.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
 import { ComponenteValidator } from "../validators/componente_validator.js"
-import { usuarioController } from "../controllers/usuario.js";
+import { ProductoValidator } from "../validators/producto_validator.js"
+import { EspecsValidator } from "../validators/especs_validator.js"
 
+import { usuarioController } from "../controllers/usuario.js";
 const componentesRouter = Router()
 
 
@@ -17,20 +19,47 @@ componentesRouter.get("/inventario/:idproducto",
   checkValidator,
   inventarioController.obtenerProducto
 )
+componentesRouter.post("/inventario/:idcomponente",
+  extraerUsuario,
+  verificarRol(usuarioController.roles.ADMIN),
+  UUIDParamValidator("idcomponente"),
+  ProductoValidator,
+  checkValidator,
+  checkNoExtraFields,
+  inventarioController.crearProducto
+)
+componentesRouter.put("/inventario/:idproducto",
+  extraerUsuario,
+  verificarRol(usuarioController.roles.ADMIN),
+  UUIDParamValidator("idproducto"),
+  ProductoValidator,
+  checkValidator,
+  inventarioController.actualizarProducto
+)
+componentesRouter.delete("/inventario/:idproducto",
+  extraerUsuario,
+  verificarRol(usuarioController.roles.ADMIN),
+  UUIDParamValidator("idproducto"),
+  checkValidator,
+  inventarioController.eliminarProducto
+)
 
+componentesRouter.get("/catalogo", componenteController.obtenerCatalogo)
 componentesRouter.get("/catalogo/:idcomponente",
   UUIDParamValidator("idcomponente"),
   checkValidator,
+  
   componenteController.obtener
 )
-componentesRouter.get("/catalogo", componenteController.obtenerCatalogo)
 
 componentesRouter.post("/catalogo",
   extraerUsuario,
   verificarRol(usuarioController.roles.ADMIN),
   ComponenteValidator,
+  EspecsValidator,
   checkValidator,
   checkNoExtraFields,
+  categoriaController.validarEspecificaciones,
   componenteController.crear
 )
 
@@ -39,8 +68,10 @@ componentesRouter.put("/catalogo/:idcomponente",
   verificarRol(usuarioController.roles.ADMIN),
   UUIDParamValidator("idcomponente"),
   ComponenteValidator,
+  EspecsValidator,
   checkValidator,
   checkNoExtraFields,
+  categoriaController.validarEspecificacionesOpcionales,
   componenteController.actualizar
 )
 
@@ -53,7 +84,13 @@ componentesRouter.delete("/catalogo/:idcomponente",
 )
 
 componentesRouter.get("/categorias", categoriaController.obtenerCategorias)
-componentesRouter.get("/especificaciones/:idcategoria", categoriaController.obetenerEspecificiones)
+componentesRouter.get("/especificaciones-categoria/:idcategoria", categoriaController.obetenerEspecificiones)
+
+componentesRouter.get("/especificaciones-componente/:idcomponente",
+  UUIDParamValidator("idcomponente"),
+  checkValidator,
+  componenteController.obetenerEspecificiones
+)
 
 
 

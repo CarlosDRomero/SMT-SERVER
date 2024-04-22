@@ -35,14 +35,14 @@ export const generarCodigo = (req, _, next) => {
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()){
+    console.log("ERRORES: ", errors.array())
     return res.status(400).json({ errors: errors.array() })
   }
   next()
 }
 export const checkNoExtraFields = (req, res, next) => {
   const matches = matchedData(req);
-  console.log("MATCH: ",matches,Object.keys(matches).length,Object.keys(req.body).length,Object.keys(req.params).length)
-  if (Object.keys(matches).length !== Object.keys({ ...req.body, ...req.params }).length){
+  if (Object.keys(matches).length !== Object.keys(req.body).length + Object.keys(req.params).length){
     return res.status(400).json({ error: "Parece que has intentado enviar algunos campos no deseados" })
   }
   next()
@@ -53,8 +53,9 @@ export const errorHandler = (err, _, res, next) => {
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
   }else if (err.name === "RolNoPermitido"){
-    console.log("DEVOLVIENDO ROL NO ADMITIDo: ", err.message)
     return res.status(403).json({ error: err.message })
+  }else if (err.name === "RecursoNoEncontrado"){
+    return res.status(404).json({ error: err.message })
   }else{
     // console.log(`${err.code}: ${err.message}`)
     res.status(500).json({ error: "Internal server error" });

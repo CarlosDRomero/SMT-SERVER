@@ -60,7 +60,7 @@ Content-Type: application/json
 
 
 ###
-get http://localhost:5000/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a
+get http://localhost:5000/componentes/especificaciones-categoria/3
 
 
 
