@@ -1,9 +1,16 @@
 import { Server } from "socket.io";
 import { createServer } from "http"
 import express from "express"
-import { expressMiddlewareAdapter, useEvents } from "./utilidades.js";
+import {
+  expressMiddlewareAdapter,
+  seDesconecta,
+  unirAOnline,
+  unirSalaRol,
+  useEvents } from "./utilidades.js";
+
 import { extraerUsuario } from "../middlewares.js";
 import notificationEvents from "./events/notificaciones.js";
+import { salas } from "./commons.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -13,14 +20,14 @@ io.use(expressMiddlewareAdapter(extraerUsuario))
 
 io.on("connection", socket => {
   const usuario = socket.handshake.usuario;
-  socket.join(usuario.idusuario)
-  
-  if (usuario.rol === "admin" || usuario.rol === "empleado"){
-    socket.join("empresarial")
-    socket.join(usuario.rol)
-  }
+  unirAOnline(socket, usuario.idusuario)
+  unirSalaRol(socket, usuario.rol)
 
   useEvents(socket, "notificaciones", notificationEvents)
+
+  socket.on("disconnect", (r) => {
+    seDesconecta(usuario.idusuario);
+  })
   console.log("BIENVENIDO: ", usuario.nombre_usuario)
   socket.use(([event, ...data], next) => {
 

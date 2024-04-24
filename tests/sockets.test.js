@@ -7,9 +7,19 @@ import { io as ioc } from "socket.io-client";
 import { httpServer } from "../socket/socket.js";
 
 app.removeAllListeners()
-const api = supertest(app)
+let api;
 let io, url, jwts, clientSockets;
 
+beforeAll((done) => {
+
+
+  httpServer.listen(() => {
+    const port = httpServer.address().port;
+    url = `http://localhost:${port}`
+    api = supertest(app)
+    done();
+  });
+});
 
 
 beforeAll(async () => {
@@ -51,16 +61,6 @@ beforeAll(async () => {
   
 })
 
-beforeAll((done) => {
-
-
-  httpServer.listen(() => {
-    const port = httpServer.address().port;
-    url = `http://localhost:${port}`
-    
-    done();
-  });
-});
 
 describe("Autenticacion de sockets", () => {
 
@@ -109,4 +109,8 @@ describe("Autenticacion de sockets", () => {
 
 
   }, 12000)
+  test("Debe haber hasta el momento unos 2 usuario online", async () => {
+    const res = await api.get("/auth/onlinetest");
+    expect(res.body).toHaveLength(2)
+  })
 })

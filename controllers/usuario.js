@@ -1,6 +1,7 @@
 import { usuarioModel } from "../models/usuario.js";
 import { calcularExpirado } from "../services/time.js";
 import { Encrypt } from "../services/encryption.js";
+import { verOnlineIds } from "../socket/utilidades.js";
 
 export const usuarioController = {
   roles: Object.freeze({
@@ -58,7 +59,15 @@ export const usuarioController = {
     console.log(confirmado)
     req.usuario = confirmado
     next()
-  }
+  },
+  obtenerOnline: async (req, res) => {
+    const socketOnline = verOnlineIds()
+    const usuariosOnline = await Promise.all(socketOnline.map(
+      async id => await usuarioModel.findById(id)
+    ));
 
+    console.log(usuariosOnline)
+    res.json(usuariosOnline)
+  }
 }
 
