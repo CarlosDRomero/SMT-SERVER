@@ -1,7 +1,6 @@
 import pg from "pg"
 import { env } from "../environment.js"
-import { getTimeZone } from "../services/time.js"
-const { Pool,Connection } = pg
+const { Pool } = pg
 
 const pool = new Pool({
   user: env.DB_USER,
@@ -13,6 +12,11 @@ const pool = new Pool({
 
 export let poolClient;
 let retryInterval = null;
+const clearRetryInterval = () => {
+  clearInterval(retryInterval)
+  retryInterval = null;
+}
+
 const initializeRetryInterval = (ms = 7000) => {
   if (!retryInterval){
     console.log("Se reintentará la conexion...")
@@ -26,23 +30,14 @@ const initializeRetryInterval = (ms = 7000) => {
     }, ms);
   }
 }
-const clearRetryInterval = () => {
-  clearInterval(retryInterval)
-  retryInterval = null;
-}
 
 
 pool.on("connect", async (client) => {
-  client.on("error", (error) => {
+  client.on("error", () => {
     console.log("Error al conectar con la base de datos")
     initializeRetryInterval();
   })
   clearRetryInterval();
-  const query = {
-    name: "sync-timezone",
-    text: `SET timezone TO '${getTimeZone()}'`,
-  }
-  await client.query(query);
   console.log("Conectado a postgres:\n",{ ...(await client.query("show timezone")).rows[0],...(await client.query("SELECT NOW()")).rows[0] })
 
 })

@@ -160,3 +160,25 @@ EXECUTE FUNCTION verificar_especificacion();
 
 /*TODO:IMPORTANTE > MANEJAR EL CASO EN QUE SE CAMBIE LA CATEGORIA DE UN PRODUCTO*/
 
+/*
+ * 
+ * esta funcion junto con el trigger "cambio_categoria" se ejecutara para
+ * buscar las especificaciones de la nueva categoria que aun se pueden mantener
+ * 
+ * */
+
+
+
+CREATE OR REPLACE FUNCTION trasladar_especificaciones()
+RETURNS TRIGGER AS $$
+BEGIN
+	
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER cambio_categoria
+AFTER UPDATE OF idcategoria ON componente
+FOR EACH ROW
+WHEN (NEW.idcategoria <> OLD.idcategoria)
+EXECUTE FUNCTION trasladar_especificaciones();
+

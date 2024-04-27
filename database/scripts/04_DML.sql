@@ -27,3 +27,13 @@ COPY componente_espec(idcat_espec,idcomponente,valor)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(componente_especificacion).csv'
 DELIMITER ','
 CSV HEADER;
+
+COPY evento_notificacion(idevento,evento)
+FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(evento_notificacion).csv'
+DELIMITER ','
+CSV HEADER;
+
+INSERT INTO tipo_receptor (idtipo, tipo) VALUES
+(1,'directo'),
+(2,'rol')
+;
