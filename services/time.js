@@ -19,5 +19,3 @@ export const calcularExpirado = (fecha, tiempo = 1, unidad = "m") => {
   const fecha_calculada = moment(fecha).add(tiempo, unidad)
   return moment().isAfter(fecha_calculada)
 }
-
-export const getTimeZone = () => moment.tz.guess();

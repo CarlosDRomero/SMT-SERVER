@@ -8,7 +8,7 @@ import { ComponenteValidator } from "../validators/componente_validator.js"
 import { ProductoValidator } from "../validators/producto_validator.js"
 import { EspecsValidator } from "../validators/especs_validator.js"
 
-import { usuarioController } from "../controllers/usuario.js";
+import { rolesUsuario } from "../controllers/usuario.js";
 const componentesRouter = Router()
 
 
@@ -21,7 +21,7 @@ componentesRouter.get("/inventario/:idproducto",
 )
 componentesRouter.post("/inventario/:idcomponente",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   UUIDParamValidator("idcomponente"),
   ProductoValidator,
   checkValidator,
@@ -30,7 +30,7 @@ componentesRouter.post("/inventario/:idcomponente",
 )
 componentesRouter.put("/inventario/:idproducto",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   UUIDParamValidator("idproducto"),
   ProductoValidator,
   checkValidator,
@@ -38,7 +38,7 @@ componentesRouter.put("/inventario/:idproducto",
 )
 componentesRouter.delete("/inventario/:idproducto",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   UUIDParamValidator("idproducto"),
   checkValidator,
   inventarioController.eliminarProducto
@@ -54,7 +54,7 @@ componentesRouter.get("/catalogo/:idcomponente",
 
 componentesRouter.post("/catalogo",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   ComponenteValidator,
   EspecsValidator,
   checkValidator,
@@ -65,7 +65,7 @@ componentesRouter.post("/catalogo",
 
 componentesRouter.put("/catalogo/:idcomponente",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   UUIDParamValidator("idcomponente"),
   ComponenteValidator,
   EspecsValidator,
@@ -77,7 +77,7 @@ componentesRouter.put("/catalogo/:idcomponente",
 
 componentesRouter.delete("/catalogo/:idcomponente",
   extraerUsuario,
-  verificarRol(usuarioController.roles.ADMIN),
+  verificarRol(rolesUsuario.ADMIN),
   UUIDParamValidator("idcomponente"),
   checkValidator,
   componenteController.eliminar

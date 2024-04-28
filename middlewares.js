@@ -52,7 +52,7 @@ export const errorHandler = (err, _, res, next) => {
   console.log("err code: ", err)
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
-  }else if (err.name === "RolNoPermitido"){
+  }else if (err.name === "RolNoPermitido" || err.name === "RolNoDebido"){
     return res.status(403).json({ error: err.message })
   }else if (err.name === "RecursoNoEncontrado"){
     return res.status(404).json({ error: err.message })
@@ -78,6 +78,7 @@ export const extraerUsuario = async (req, _, next) => {
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, _, next) => {
     if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", message: "Acceso no permitido" })
+    
     next()
   }
 }
@@ -91,9 +92,10 @@ export const verificarRol = (rolesAdmitidos) => {
 *
 **/
 
-export const gestionarUsuario = async (req, res, next) => {
+export const gestionarUsuario = (rolObjetivo) => async (req, res, next) => {
   const userData = await usuarioModel.findById(req.params.idusuario)
   if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
+  if (userData.rol !== rolObjetivo) return next({ name: "RolNoDebido", message: "Este usuario no aplica para esta caracteristica" })
 
   req.usuarioGestor = req.usuario;
   req.usuario = userData;
