@@ -29,20 +29,21 @@ export const extraerNombreUsuario = (req, res, next) => {
 
 export const generarCodigo = (req, _, next) => {
   req.payload = { ...req.payload, codigo: genCode() };
+  console.log("CODIGO: ",req.payload.codigo)
   next();
 }
 //TODO:OPCIONAL > return map de la propiedad del mensaje del error
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()){
+    console.log("ERRORES: ", errors.array())
     return res.status(400).json({ errors: errors.array() })
   }
   next()
 }
 export const checkNoExtraFields = (req, res, next) => {
   const matches = matchedData(req);
-  console.log("MATCH: ",matches,Object.keys(matches).length,Object.keys(req.body).length,Object.keys(req.params).length)
-  if (Object.keys(matches).length !== Object.keys({ ...req.body, ...req.params }).length){
+  if (Object.keys(matches).length !== Object.keys(req.body).length + Object.keys(req.params).length){
     return res.status(400).json({ error: "Parece que has intentado enviar algunos campos no deseados" })
   }
   next()
@@ -52,9 +53,10 @@ export const errorHandler = (err, _, res, next) => {
   console.log("err code: ", err)
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
-  }else if (err.name === "RolNoPermitido"){
-    console.log("DEVOLVIENDO ROL NO ADMITIDo: ", err.message)
+  }else if (err.name === "RolNoPermitido" || err.name === "RolNoDebido"){
     return res.status(403).json({ error: err.message })
+  }else if (err.name === "RecursoNoEncontrado"){
+    return res.status(404).json({ error: err.message })
   }else{
     // console.log(`${err.code}: ${err.message}`)
     res.status(500).json({ error: "Internal server error" });
@@ -66,17 +68,18 @@ export const errorHandler = (err, _, res, next) => {
 export const extraerUsuario = async (req, _, next) => {
   const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del token decodificado en tokenData
-
+  
   const userData = await usuarioModel.findById(tokenData?.idusuario)
   if (!tokenData || !userData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
-  
   req.usuario = userData;
   next()
 }
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, _, next) => {
+    console.log("VALIDANDO ROLES: ", rolesAdmitidos)
     if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", message: "Acceso no permitido" })
+    
     next()
   }
 }
@@ -90,9 +93,10 @@ export const verificarRol = (rolesAdmitidos) => {
 *
 **/
 
-export const gestionarUsuario = async (req, res, next) => {
+export const gestionarUsuario = (rolObjetivo) => async (req, res, next) => {
   const userData = await usuarioModel.findById(req.params.idusuario)
   if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
+  if (userData.rol !== rolObjetivo) return next({ name: "RolNoDebido", message: "Este usuario no aplica para esta caracteristica" })
 
   req.usuarioGestor = req.usuario;
   req.usuario = userData;

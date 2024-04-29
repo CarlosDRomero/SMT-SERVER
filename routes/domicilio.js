@@ -5,7 +5,7 @@ import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol } from "
 import { direccionValidator } from "../validators/direccion_validator.js";
 import { domicilioController } from "../controllers/domicilio.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
-import { usuarioController } from "../controllers/usuario.js";
+import { rolesUsuario } from "../controllers/usuario.js";
 
 const domicilioRouter = Router()
 
@@ -46,7 +46,7 @@ domicilioRouter
 
   .get("/direcciones/administrar/:idusuario",
     extraerUsuario,
-    verificarRol([usuarioController.roles.ADMIN]),
+    verificarRol([rolesUsuario.ADMIN]),
     UUIDParamValidator("idusuario"),
     checkValidator,
     gestionarUsuario,
@@ -55,7 +55,7 @@ domicilioRouter
 
   .post("/direcciones/administrar/:idusuario",
     extraerUsuario,
-    verificarRol([usuarioController.roles.ADMIN]),
+    verificarRol([rolesUsuario.ADMIN]),
     direccionValidator,
     UUIDParamValidator("idusuario"),
     checkValidator,
@@ -65,7 +65,7 @@ domicilioRouter
 
   .put("/direcciones/administrar/:idusuario/:iddireccion",
     extraerUsuario,
-    verificarRol([usuarioController.roles.ADMIN]),
+    verificarRol([rolesUsuario.ADMIN]),
     UUIDParamValidator("idusuario", "iddireccion"),
     direccionValidator,
     checkValidator,
@@ -75,7 +75,7 @@ domicilioRouter
 
   .delete("/direcciones/administrar/:idusuario/:iddireccion",
     extraerUsuario,
-    verificarRol([usuarioController.roles.ADMIN]),
+    verificarRol([rolesUsuario.ADMIN]),
     UUIDParamValidator("idusuario", "iddireccion"),
     checkValidator,
     gestionarUsuario,

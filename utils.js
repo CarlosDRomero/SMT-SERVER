@@ -1,5 +1,4 @@
 export const multiInsertFactory = (query, dataMatrix, returning = true) => {
-  console.log(dataMatrix)
   const dataMatrixLM = dataMatrix.length
   for (let i = 0;i < dataMatrixLM ; i++){
     query.text += " ("

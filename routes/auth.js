@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { usuarioController } from "../controllers/usuario.js"
+import { rolesUsuario, usuarioController } from "../controllers/usuario.js"
 import { registroValidator } from "../validators/registro_validator.js";
 import { loginValidator } from "../validators/login_validator.js";
 import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, checkNoExtraFields } from "../middlewares.js";
@@ -25,7 +25,7 @@ authRouter.post("/register",
 
 authRouter.post("/register/:rol",
   extraerUsuario,
-  verificarRol([usuarioController.roles.ADMIN]),
+  verificarRol([rolesUsuario.ADMIN]),
   registroValidator,
   checkValidator,
   checkNoExtraFields,
@@ -65,6 +65,10 @@ authRouter.post("/resendcode/:id",
   mailerController.mailVerificacion,
   codigoController.crearCodigo
 )
+
+authRouter.get("/onlineTest", extraerUsuario, usuarioController.obtenerOnline)
+
+authRouter.get("/onlineTest", usuarioController.obtenerOnline)
 
 //TODO:IMPORTANTE > RUTA PARA RECUPERACION DE CONTRASEÑA
 

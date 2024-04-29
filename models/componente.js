@@ -59,14 +59,13 @@ export const componenteModel = {
       values: []
     }
     multiInsertFactory(query, listaEspecificaciones.map(spec => [spec.idcat_espec, idcomponente, spec.valor]))
-    console.log("QUERY MONTADA: ", query)
     const res = await poolClient.query(query);
     return res.rows;
   },
   update: async (idcomponente,componenteInfo) => {
     const query = {
       name: "actualizar-componente",
-      text: "UPDATE componente SET idcategoria=$1, marca=$2, nombre=$3, descripcion=$4, url_imagen=$5 WHERE idcomponente=$6",
+      text: "UPDATE componente SET idcategoria=$1, marca=$2, nombre=$3, descripcion=$4, url_imagen=$5 WHERE idcomponente=$6 RETURNING *",
       values: [
         componenteInfo.idcategoria,
         componenteInfo.marca,
@@ -74,6 +73,20 @@ export const componenteModel = {
         componenteInfo.descripcion,
         componenteInfo.url_imagen,
         idcomponente
+      ]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  updateSpec: async (idcomponente, idcat_espec,valor) => {
+    const query = {
+      name: "actualizar-especificaciones-componente",
+      text: "UPDATE componente_espec SET valor=$1 WHERE idcomponente=$2 AND idcat_espec=$3 RETURNING *",
+      values: [
+        valor,
+        idcomponente,
+        idcat_espec
       ]
     }
 

@@ -1,6 +1,10 @@
 /* INICIAL DEL SISTEMA DE USUARIOS */
 
 CREATE TYPE rolesUsuario AS ENUM ('admin', 'empleado', 'cliente');
+CREATE TYPE estadoOrden AS ENUM ('pedido', 'enviado', 'recibido');
+CREATE TYPE estadosTicket AS ENUM ('nuevo', 'aceptado', 'listo', 'en-proceso', 'resuelto', 'cerrado');
+CREATE TYPE prioridadTicket AS ENUM ('baja', 'media', 'alta');
+CREATE TYPE estadoMensaje AS ENUM ('enviado', 'recibido', 'leido');
 
 CREATE TABLE usuario (
   idusuario uuid DEFAULT gen_random_uuid(),
@@ -13,15 +17,15 @@ CREATE TABLE usuario (
   fecha_nac date NOT NULL,
 
   confirmado bool DEFAULT FALSE,
-  fecha_creacion timestamp DEFAULT current_timestamp,
-  fecha_confirmado timestamp,
+  fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
+  fecha_confirmado timestamp WITH TIME ZONE,
   
   
   PRIMARY KEY(idUsuario)
 );
 
 CREATE TABLE direccion (
-	iddireccion uuid DEFAULT gen_random_uuid(),
+	iddireccion uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idusuario uuid NOT NULL,
 	predeterminada bool DEFAULT FALSE NOT NULL,
 	c_dane_departamento varchar(3),
@@ -37,7 +41,7 @@ CREATE TABLE codigo_verificacion(
   idcodigo uuid DEFAULT gen_random_uuid(),
   idusuario uuid UNIQUE NOT NULL,
   codigo varchar(256),
-  fecha_creacion timestamp DEFAULT current_timestamp,
+  fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
   PRIMARY KEY(idcodigo),
   CONSTRAINT codigo_usuario FOREIGN KEY(idUsuario) REFERENCES usuario(idUsuario) 
   ON DELETE CASCADE
@@ -58,7 +62,7 @@ CREATE TABLE atributo_espec(
 
 CREATE TABLE categoria_componente(
 	idcategoria serial PRIMARY KEY,
-	denominacion varchar(30) UNIQUE
+	denominacion varchar(30) NOT NULL UNIQUE
 );
 
 CREATE TABLE categoria_espec(
@@ -102,6 +106,163 @@ CREATE TABLE inventario(
 	CONSTRAINT unique_sku_componente UNIQUE(idcomponente, SKU),
 	CONSTRAINT inventario_componente FOREIGN KEY (idcomponente) REFERENCES componente(idcomponente) ON DELETE CASCADE
 );
+CREATE TABLE promocion(
+	idpromocion serial PRIMARY KEY,
+	idusuario uuid,
+	
+	asunto varchar(30) NOT NULL,
+	descripcion varchar(500),
+	porcentaje float,
+	fecha_inicio timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	fecha_fin timestamp WITH TIME ZONE,
+	
+	CONSTRAINT cupon_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+);
+
+CREATE TABLE promocion_categoria(
+	idpromocion integer NOT NULL,
+	idcategoria integer NOT NULL,
+	
+	PRIMARY KEY (idpromocion, idcategoria),
+	CONSTRAINT promocion_categoria FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
+	CONSTRAINT categoria_promocion FOREIGN KEY (idcategoria) REFERENCES categoria_componente(idcategoria)
+);
+
+/*
+ * 
+ * TABLAS DE PROCESO DE COMPRAS
+ * 
+ * */
+
+CREATE TABLE carrito_compras(
+	idcarrito uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	idusuario uuid NOT NULL,
+	
+	CONSTRAINT carrito_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+);
+
+CREATE TABLE producto_carrito(
+	idcarrito uuid NOT NULL,
+	idproducto uuid NOT NULL,
+	cantidad integer NOT NULL,
+	
+	PRIMARY KEY (idcarrito, idproducto),
+	CONSTRAINT carrito_producto FOREIGN KEY (idcarrito) REFERENCES carrito_compras(idcarrito),
+	CONSTRAINT producto_carrito FOREIGN KEY (idproducto) REFERENCES inventario(idproducto)
+);
+
+CREATE TABLE orden_compra(
+	idorden uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	idusuario uuid NOT NULL,
+	iddireccion uuid NOT NULL,
+	estado estadoOrden DEFAULT 'pedido'::estadoOrden,
+	costo_total integer DEFAULT 0,
+	fecha_orden timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	
+	CONSTRAINT orden_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
+	CONSTRAINT orden_direccion FOREIGN KEY (iddireccion) REFERENCES direccion(iddireccion)
+	
+);
+
+CREATE TABLE producto_orden(
+	id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	idorden uuid NOT NULL,
+	idproducto uuid NOT NULL,
+	cantidad integer DEFAULT 1,
+	costo integer DEFAULT 0,
+	
+	CONSTRAINT orden_producto FOREIGN KEY (idorden) REFERENCES orden_compra(idorden),
+	CONSTRAINT producto_orden FOREIGN KEY (idproducto) REFERENCES inventario(idproducto)
+);
+
+CREATE TABLE evento_notificacion(
+	idevento serial PRIMARY KEY,
+	evento varchar(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE tipo_receptor(
+	idtipo serial PRIMARY KEY,
+	tipo varchar(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE notificacion(
+	idnotificacion uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	idevento integer NOT NULL,
+	idtipo integer NOT NULL,
+	idusuario_iniciador uuid,
+	idusuario_notificado uuid,
+	rol_notificado rolesUsuario,
+	
+	idfuente uuid,
+	mensaje varchar(500),
+	
+	CONSTRAINT notificacion_evento FOREIGN KEY (idevento) REFERENCES evento_notificacion(idevento),
+	CONSTRAINT notificacion_tipo FOREIGN KEY (idtipo) REFERENCES tipo_receptor(idtipo),
+	CONSTRAINT usuario_notificante FOREIGN KEY (idusuario_iniciador) REFERENCES usuario(idusuario),
+	CONSTRAINT usuario_notificado FOREIGN KEY (idusuario_notificado) REFERENCES usuario(idusuario)
+);
+
+CREATE TABLE vistas_notificacion(
+	idnotificacion uuid NOT NULL,
+	idusuario uuid NOT NULL,
+	
+	PRIMARY KEY (idnotificacion, idusuario),
+	CONSTRAINT notificacion_vista FOREIGN KEY (idnotificacion) REFERENCES notificacion(idnotificacion),
+	CONSTRAINT visto_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+);
+
+
+/*
+ * 
+ * TABLAS PARA TICKETS Y CONVERSACIONES
+ * 
+ * */
+
+CREATE TABLE clasificacion_ticket(
+	idclasificacion serial PRIMARY KEY,
+	clasificacion varchar(50) NOT NULL UNIQUE
+);
+
+CREATE TABLE ticket(
+	idticket uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	empleado_asignado uuid,
+	idclasificacion integer,
+	
+	email varchar(100) NOT NULL,
+	asunto varchar(100) NOT NULL,
+	contenido varchar(2000) NOT NULL,
+	estado estadosTicket DEFAULT 'nuevo'::estadosTicket,
+	prioridad prioridadTicket,
+	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	
+	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
+	CONSTRAINT ticket_clasificacion FOREIGN KEY (idclasificacion) REFERENCES clasificacion_ticket(idclasificacion)
+);
+
+CREATE TABLE conversacion(
+	idticket uuid PRIMARY KEY,
+	idusuario_1 uuid NOT NULL,
+	idusuario_2 uuid NOT NULL,
+	
+	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket),
+	CONSTRAINT usuario_conversacion_1 FOREIGN KEY (idusuario_1) REFERENCES usuario(idusuario),
+	CONSTRAINT usuario_conversacion_2 FOREIGN KEY (idusuario_2) REFERENCES usuario(idusuario)
+);
+
+CREATE TABLE mensaje(
+	idmensaje uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	idemisor uuid,
+	idreceptor uuid NOT NULL,
+	
+	contenido varchar(500) NOT NULL,
+	estado estadoMensaje NOT NULL,
+	fecha_envio timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	
+	CONSTRAINT emisor_mensaje FOREIGN KEY (idemisor) REFERENCES usuario(idusuario),
+	CONSTRAINT receptor_mensaje FOREIGN KEY (idreceptor) REFERENCES usuario(idusuario)
+	
+);
+
 
 CREATE VIEW vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
 CREATE VIEW vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';

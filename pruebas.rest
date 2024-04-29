@@ -18,7 +18,7 @@ content-type: application/json
     "clave": "12345",
     "nombres": "Carlos",
     "apellidos": "2",
-    "email": "a@gmail.edu.co",
+    "email": "prueba@gmail.edu.co",
     "fecha_nac": "2024-02-29"
 }
 ###
@@ -47,20 +47,32 @@ content-type: application/json
  "rol": "admin"
 }
 ###
-PUT http://localhost:5000/domicilio/direcciones/ef5046b0-10d0-4058-b8ca-5a41db926ea9
-authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiI5M2Q5NWViOC03NTY1LTQwZGQtYjg0NS1hY2IwOGJmNWFkMTUiLCJub21icmVzIjoiTHVpcyIsImFwZWxsaWRvcyI6Ik1vcmEiLCJlbWFpbCI6ImFuZHJleTEybW9yYUBnbWFpbC5jb20iLCJpYXQiOjE3MTM2NjY0OTZ9.I-a1Fz3hcY3mVVw4M_WImcUPZsKJX8bKWRoEoeRXzmE
+PUT http://localhost:5000/tickets/aceptar/09e408ee-a22f-4580-a452-cc8c0b11d47e
+#admin
+# 
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiIwNmE2OTI1MS02ZTc0LTQzM2ItYjZjOS01YTYwZGM0ODM1YWMiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYUBnbWFpbC5lZHUuY28iLCJpYXQiOjE3MTQzNTUxMTR9.yClFPEGoLORoK_T9AYD5sL8waXOhbht0iIbG_5pdaec
+#cliente
+# authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiI5YzJkMWUyYy04NzVmLTRmZGUtYjE2NS1kMzc3OGQ1OWI5ZWUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYWJAZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0MzQ4MjkwfQ.SWQr_3tz_HwFyfbkHfkmqPtVUdlLvhwRjWSDBdRxmDM
 Content-Type: application/json
 
 {
-    "c_dane_departamento": "97",
-    "c_dane_municipio": "9.001",
-    "barrio": "Comuna 5",
-    "cadena_direccion": "Calle 13 #11-23, Sur???"
+    "prioridad": "media",
+    "idclasificacion": "3" 
 }
 
 
 ###
-get http://localhost:5000/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a
+POST http://localhost:5000/tickets/
+Content-Type: application/json
+
+{
+    "email": "prueba@gmail.edu.co",
+    "asunto": "Mi asunto",
+    "contenido": "Esto me paso y pues aja"
+}
+
+###
+get http://localhost:5000/componentes/especificaciones-categoria/3
 
 
 

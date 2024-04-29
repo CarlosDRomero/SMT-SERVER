@@ -7,9 +7,19 @@ import { io as ioc } from "socket.io-client";
 import { httpServer } from "../socket/socket.js";
 
 app.removeAllListeners()
-const api = supertest(app)
+let api;
 let io, url, jwts, clientSockets;
 
+beforeAll((done) => {
+
+
+  httpServer.listen(() => {
+    const port = httpServer.address().port;
+    url = `http://localhost:${port}`
+    api = supertest(app)
+    done();
+  });
+});
 
 
 beforeAll(async () => {
@@ -51,22 +61,13 @@ beforeAll(async () => {
   
 })
 
-beforeAll((done) => {
-
-
-  httpServer.listen(() => {
-    const port = httpServer.address().port;
-    url = `http://localhost:${port}`
-    
-    done();
-  });
-});
 
 describe("Autenticacion de sockets", () => {
 
   test("Un canal que solo le permite unirse a los admins", (done) => {
     const cliente = ioc(url, { autoConnect:false, extraHeaders: { authorization: jwts.cliente } })
     cliente.on("connect", () => {
+      cliente.disconnect()
       done();
     })
     cliente.connect();
@@ -86,7 +87,7 @@ describe("Autenticacion de sockets", () => {
       expect(e).toBeDefined();
       expect(e.message).toEqual(expect.any(String))
       expect(e.message.toLowerCase()).toContain("no es valido")
-      
+      cliente.disconnect()
       done();
     })
     cliente.connect();
@@ -95,18 +96,24 @@ describe("Autenticacion de sockets", () => {
   test("Un usuario puede notificar a los admins por el canal notificaciones/notificar-compra", (done) => {
     const admin = ioc(url, { extraHeaders: { authorization: jwts.admin } })
     const cliente = ioc(url, { extraHeaders: { authorization: jwts.cliente } })
-    admin.on("notificaciones/notificar-compra", () => {
+    admin.on("chat:enviar-mensaje", () => {
       console.log("admin notificado")
-      done()
     })
     cliente.on("connect", () => {
-      cliente.emit("notificaciones/notificar-compra", (m) => {
-        expect(m).toEqual("Compra confirmada")
+      cliente.emit("chat:enviar-mensaje", { idconversacion: "ea2d699e-2d0d-4a25-8173-7d82bb742a9f", contenido: "xDDD" }, (m) => {
+        console.log("Ejectudao", m)
+        expect(m).toEqual("mensaje enviado")
+        cliente.disconnect();
+        admin.disconnect();
+        done()
       })
       
 
     })
 
-
   }, 12000)
+  test("Debe haber hasta el momento unos 2 usuario online", async () => {
+    const res = await api.get("/auth/onlinetest");
+    expect(res.body).toHaveLength(2)
+  })
 })

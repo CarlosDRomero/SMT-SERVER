@@ -1,13 +1,16 @@
 import { usuarioModel } from "../models/usuario.js";
 import { calcularExpirado } from "../services/time.js";
 import { Encrypt } from "../services/encryption.js";
+import { verOnlineIds } from "../socket/utilidades.js";
+
+export const rolesUsuario = Object.freeze({
+  ADMIN: "admin",
+  EMPLEADO: "empleado",
+  CLIENTE: "cliente"
+})
 
 export const usuarioController = {
-  roles: Object.freeze({
-    ADMIN: "admin",
-    EMPLEADO: "empleado",
-    CLIENTE: "cliente"
-  }),
+  
   encontrarUsuarioCodigo: async (req, res, next) => {
     const idcodigo = req.params.id;
     const usuario = await usuarioModel.findByIdCodigo(idcodigo);
@@ -19,11 +22,10 @@ export const usuarioController = {
 
     const existingUser = await usuarioModel.findByEmailOrUserName(req.body)
     if (!!existingUser){
-      if (!!existingUser.fecha_confirmado) {
+      if (!!existingUser.fecha_confirmado || existingUser.rol !== rolesUsuarioCLIENTE)
         return res.status(409).json({ error: "Correo en uso" })
-      }
-      await usuarioModel.limpiarUsuario(existingUser.idusuario)
 
+      await usuarioModel.limpiarUsuario(existingUser.idusuario)
     }
     const usuario = await usuarioModel.registrar(req.body);
   
@@ -58,7 +60,28 @@ export const usuarioController = {
     console.log(confirmado)
     req.usuario = confirmado
     next()
-  }
+  },
+  obtenerRol: (req, res) => {
+    const { rol } = req.usuario
+    res.json({ rol })
+  },
+  obtenerOnline: async (req, res) => {
+    const socketOnline = verOnlineIds()
+    const usuariosOnline = await Promise.all(socketOnline.map(
+      async id => {
+        const { idusuario, nombres, apellidos, email, nombre_usuario } = await usuarioModel.findById(id)
+        return { idusuario, nombres, apellidos, email, nombre_usuario }
+      }
+    ));
+    console.log("USUARIOS ONLINE: ", usuariosOnline)
+    res.json(usuariosOnline)
+  },
+  validarEmailCliente: async (req, res, next) => {
+    const { email } = req.body
+    const usuario = await usuarioModel.validateEnterpriseEmail(email)
+    if (!usuario)return next()
+    next({ name: "RolNoDebido", message: "No tiene permitida esta accion" })
 
+  }
 }
 
