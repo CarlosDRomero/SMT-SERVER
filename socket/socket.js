@@ -9,8 +9,7 @@ import {
   useEvents } from "./utilidades.js";
 
 import { extraerUsuario } from "../middlewares.js";
-import notificationEvents from "./events/notificaciones.js";
-import { salas } from "./commons.js";
+import chatEvents from "./events/chat.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -23,19 +22,12 @@ io.on("connection", socket => {
   unirAOnline(socket, usuario.idusuario)
   unirSalaRol(socket, usuario.rol)
 
-  useEvents(socket, "notificaciones", notificationEvents)
-
+  useEvents(socket, "chat", chatEvents)
+  
   socket.on("disconnect", (r) => {
-    seDesconecta(usuario.idusuario);
+    seDesconecta(socket,usuario.idusuario);
   })
-  console.log("BIENVENIDO: ", usuario.nombre_usuario)
-  socket.use(([event, ...data], next) => {
 
-    if (!event.startsWith("notificaciones/")){
-      return next({ name: "TEST", message: "XD", data: data[0] })
-    }
-    next()
-  })
   socket.on("error", (e) => {
     console.log("Error: ", e);
   })

@@ -29,6 +29,7 @@ export const extraerNombreUsuario = (req, res, next) => {
 
 export const generarCodigo = (req, _, next) => {
   req.payload = { ...req.payload, codigo: genCode() };
+  console.log("CODIGO: ",req.payload.codigo)
   next();
 }
 //TODO:OPCIONAL > return map de la propiedad del mensaje del error
@@ -67,16 +68,16 @@ export const errorHandler = (err, _, res, next) => {
 export const extraerUsuario = async (req, _, next) => {
   const token = req.headers.authorization?.split(" ").pop() //El token viene concatenado y esto obtiene el token no mas
   const tokenData = tokens.verifyToken(token) // Al hacer la verificacion se almacena la informacion del token decodificado en tokenData
-
+  
   const userData = await usuarioModel.findById(tokenData?.idusuario)
   if (!tokenData || !userData) return next({ name: "JsonWebTokenError", message: "El token no es valido" })
-  
   req.usuario = userData;
   next()
 }
 //Middleware para verificar a que rol pertenece el logeado
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, _, next) => {
+    console.log("VALIDANDO ROLES: ", rolesAdmitidos)
     if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", message: "Acceso no permitido" })
     
     next()

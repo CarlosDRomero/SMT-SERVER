@@ -62,7 +62,7 @@ CREATE TABLE atributo_espec(
 
 CREATE TABLE categoria_componente(
 	idcategoria serial PRIMARY KEY,
-	denominacion varchar(30) UNIQUE
+	denominacion varchar(30) NOT NULL UNIQUE
 );
 
 CREATE TABLE categoria_espec(
@@ -194,6 +194,7 @@ CREATE TABLE notificacion(
 	rol_notificado rolesUsuario,
 	
 	idfuente uuid,
+	mensaje varchar(500),
 	
 	CONSTRAINT notificacion_evento FOREIGN KEY (idevento) REFERENCES evento_notificacion(idevento),
 	CONSTRAINT notificacion_tipo FOREIGN KEY (idtipo) REFERENCES tipo_receptor(idtipo),
@@ -219,17 +220,17 @@ CREATE TABLE vistas_notificacion(
 
 CREATE TABLE clasificacion_ticket(
 	idclasificacion serial PRIMARY KEY,
-	clasificacion varchar(50)
+	clasificacion varchar(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE ticket(
 	idticket uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	empleado_asignado uuid,
-	idclasificacion integer NOT NULL,
+	idclasificacion integer,
 	
 	email varchar(100) NOT NULL,
 	asunto varchar(100) NOT NULL,
-	contenido varchar(1000) NOT NULL,
+	contenido varchar(2000) NOT NULL,
 	estado estadosTicket DEFAULT 'nuevo'::estadosTicket,
 	prioridad prioridadTicket,
 	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,

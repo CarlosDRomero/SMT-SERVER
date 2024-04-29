@@ -12,7 +12,16 @@ export const usuarioModel = {
     const result = await poolClient.query(query);
     return result.rows[0]
   },
-  
+  validateEnterpriseEmail: async (email) => {
+    const query = {
+      name: "validar-miembro-empresa",
+      text: "SELECT * FROM usuario WHERE email=$1 AND (rol='admin' OR rol='empleado')",
+      values: [email]
+    }
+    
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   findByEmailOrUserName: async (userInfo) => {
     const query = {
       name: "obtener-usuario",
