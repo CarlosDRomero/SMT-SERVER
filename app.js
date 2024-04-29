@@ -7,9 +7,11 @@ import domicilioRouter from "./routes/domicilio.js";
 import componentesRouter from "./routes/componentes.js";
 
 import { errorHandler } from "./middlewares.js";
+import cors from "cors";
 
 //MIDLEWARES INICIALES
 app.use(express.json());
+app.use(cors());
 
 //RUTAS
 
