@@ -1,6 +1,7 @@
 import { app } from "./socket/socket.js";
 import express from "express"
 import "express-async-errors";
+import cors from "cors"
 
 import authRouter from "./routes/auth.js";
 import domicilioRouter from "./routes/domicilio.js";

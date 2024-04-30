@@ -65,6 +65,7 @@ authRouter.post("/resendcode/:id",
   mailerController.mailVerificacion,
   codigoController.crearCodigo
 )
+authRouter.get("/rol", extraerUsuario, usuarioController.obtenerRol)
 
 authRouter.get("/onlineTest", extraerUsuario, usuarioController.obtenerOnline)
 

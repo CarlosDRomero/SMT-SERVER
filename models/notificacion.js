@@ -29,7 +29,7 @@ export const notificacionModel = {
       name: "crear-notificacion",
       text:
       `INSERT INTO notificacion 
-      (idtipo,idevento, idusuario_iniciado, rol_notificado, idfuente, mensaje) 
+      (idtipo,idevento, idusuario_iniciador, rol_notificado, idfuente, mensaje) 
       VALUES (2,$1, $2, $3, $4, $5) RETURNING *`,
       values: [
         notificacionInfo.idevento,

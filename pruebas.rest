@@ -18,7 +18,7 @@ content-type: application/json
     "clave": "12345",
     "nombres": "Carlos",
     "apellidos": "2",
-    "email": "prueba@gmail.edu.co",
+    "email": "a@gmail.edu.co",
     "fecha_nac": "2024-02-29"
 }
 ###
@@ -27,7 +27,7 @@ content-type: application/json
 
 {
     "clave": "12345",
-    "email": "andrey12mora@gmail.com"
+    "email": "a@gmail.edu.co"
    
 }
 ###
@@ -41,16 +41,14 @@ content-type: application/json
 POST http://localhost:5000/auth/resendcode/21c705b6-a8fc-4a1d-884f-bcbd5f68a138
 
 ###
-POST http://localhost:5000/auth/register/empleado
-content-type: application/json
-{
- "rol": "admin"
-}
+get http://localhost:5000/tickets/gestionar
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiYTVmMzdmZi1jZDFmLTQ2NTEtOTIzOS05ZGE4YzliY2NhNGUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiZW1wbGVhZG9AZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0NDQ5OTQ1fQ.UwGMFkzphUXVKnjaHvIWHPRZgXYQRMeBTmpdoVCiJ4I
+
 ###
-PUT http://localhost:5000/tickets/aceptar/09e408ee-a22f-4580-a452-cc8c0b11d47e
+PUT http://localhost:5000/tickets/aceptar/4eda7a5c-c557-4e9a-a5b9-ca9b58da4c30
 #admin
 # 
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiIwNmE2OTI1MS02ZTc0LTQzM2ItYjZjOS01YTYwZGM0ODM1YWMiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYUBnbWFpbC5lZHUuY28iLCJpYXQiOjE3MTQzNTUxMTR9.yClFPEGoLORoK_T9AYD5sL8waXOhbht0iIbG_5pdaec
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiYTVmMzdmZi1jZDFmLTQ2NTEtOTIzOS05ZGE4YzliY2NhNGUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiZW1wbGVhZG9AZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0NDQ5OTQ1fQ.UwGMFkzphUXVKnjaHvIWHPRZgXYQRMeBTmpdoVCiJ4I
 #cliente
 # authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiI5YzJkMWUyYy04NzVmLTRmZGUtYjE2NS1kMzc3OGQ1OWI5ZWUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYWJAZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0MzQ4MjkwfQ.SWQr_3tz_HwFyfbkHfkmqPtVUdlLvhwRjWSDBdRxmDM
 Content-Type: application/json
