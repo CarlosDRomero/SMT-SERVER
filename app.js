@@ -1,6 +1,7 @@
 import { app } from "./socket/socket.js";
 import express from "express"
 import "express-async-errors";
+import cors from "cors"
 
 import authRouter from "./routes/auth.js";
 import domicilioRouter from "./routes/domicilio.js";
@@ -11,7 +12,7 @@ import { errorHandler } from "./middlewares.js";
 
 //MIDLEWARES INICIALES
 app.use(express.json());
-
+app.use(cors())
 //RUTAS
 
 app.use("/auth", authRouter)

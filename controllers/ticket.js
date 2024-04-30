@@ -1,6 +1,21 @@
 import { ticketModel } from "../models/ticket.js"
 import { notificacionPayloadFactory, notificacionService } from "../services/notificaciones.js"
 
+const crearNotificacionNuevo = (cliente, roles, idticket, mensaje) => {
+  return notificacionPayloadFactory({
+    tipo: "rol",
+    idevento: 3,
+    emailPayload:{
+      // email: ticket.email,
+      asunto: "Solicitud de servicio aceptada"
+    },
+    fuente: idticket,
+    iniciador: cliente?.idusuario,
+    objetivo: roles,
+    mensaje
+  })
+}
+
 const crearNotificacionAsignacion = (tecnico, cliente, ticket) => {
   return notificacionPayloadFactory({
     tipo: "directa",
@@ -17,10 +32,14 @@ const crearNotificacionAsignacion = (tecnico, cliente, ticket) => {
 }
 
 export const ticketController = {
-  crearTicket: async (req, res) => {
+  crearTicket: async (req, res, next) => {
     const ticketNuevo = await ticketModel.createTicket(req.body)
 
     res.status(201).json(ticketNuevo)
+    const usuarioTicket = await ticketModel.findUsuarioTicket(ticketNuevo.idticket);
+    //TODO NOTIFICACIONES A VARIOS ROLES A LA VEZ y VARIOS CORREOS
+    req.payload = crearNotificacionNuevo(usuarioTicket,  "empleado", ticketNuevo.idticket, `Hay un nuevo ticket: ${ticketNuevo.asunto}`)
+    next()
   },
   obtenerTickets: async (req, res) => {
     const tickets = await ticketModel.findAll()

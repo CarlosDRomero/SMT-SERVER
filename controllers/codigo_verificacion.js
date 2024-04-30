@@ -22,7 +22,7 @@ export const codigoController = {
     console.log(codigo_db)
     if (!!codigo_db
     && await Encrypt.compareHash(codigo.toUpperCase(), codigo_db.codigo)
-    && !calcularExpirado(codigo_db.fecha_creacion, 1, "m") //ESTO SIGNIFICA QUE NO HAYA PASADO UN MINUTO
+    && !calcularExpirado(codigo_db.fecha_creacion, 2, "m") //ESTO SIGNIFICA QUE NO HAYA PASADO UN MINUTO
     ){
     
       req.idusuario = codigo_db.idusuario;

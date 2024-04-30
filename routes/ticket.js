@@ -11,7 +11,8 @@ ticketRouter.post("/",
   ticketNuevoValidator,
   checkValidator,
   usuarioController.validarEmailCliente,
-  ticketController.crearTicket
+  ticketController.crearTicket,
+  notificacionController.notificar
 );
 
 ticketRouter.get("/",

@@ -13,12 +13,15 @@ import chatEvents from "./events/chat.js";
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer)
+const io = new Server(httpServer,{
+  cors: "*"
+})
 //TODO: funciones para comprobar online
 io.use(expressMiddlewareAdapter(extraerUsuario))
 
 io.on("connection", socket => {
   const usuario = socket.handshake.usuario;
+  console.log(`${usuario.nombre_usuario} se ha conectado`)
   unirAOnline(socket, usuario.idusuario)
   unirSalaRol(socket, usuario.rol)
 
