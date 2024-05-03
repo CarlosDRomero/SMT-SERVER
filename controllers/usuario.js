@@ -3,11 +3,12 @@ import { calcularExpirado } from "../services/time.js";
 import { Encrypt } from "../services/encryption.js";
 import { verOnlineIds } from "../socket/utilidades.js";
 
-export const rolesUsuario = Object.freeze({
+export const rolesUsuario = {
   ADMIN: "admin",
   EMPLEADO: "empleado",
   CLIENTE: "cliente"
-})
+}
+rolesUsuario.ADMINISTRADOR = rolesUsuario.ADMIN
 
 export const usuarioController = {
   
@@ -22,7 +23,7 @@ export const usuarioController = {
 
     const existingUser = await usuarioModel.findByEmailOrUserName(req.body)
     if (!!existingUser){
-      if (!!existingUser.fecha_confirmado || existingUser.rol !== rolesUsuarioCLIENTE)
+      if (!!existingUser.fecha_confirmado || existingUser.rol !== rolesUsuario.CLIENTE)
         return res.status(409).json({ error: "Correo en uso" })
 
       await usuarioModel.limpiarUsuario(existingUser.idusuario)
@@ -37,8 +38,8 @@ export const usuarioController = {
   
   },
   actualizarRol: async (req, res, next) => {
-    const nuevoRol = req.params.rol.toLowerCase();
-    await usuarioModel.actualizarRol(nuevoRol, req.payload.idusuario)
+    const nuevoRol = req.params.rol.toUpperCase();
+    await usuarioModel.actualizarRol(rolesUsuario[nuevoRol], req.payload.idusuario)
     next()
   },
   login: async(req, res, next) => {

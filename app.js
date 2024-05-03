@@ -9,7 +9,6 @@ import componentesRouter from "./routes/componentes.js";
 import ticketRouter from "./routes/ticket.js";
 
 import { errorHandler } from "./middlewares.js";
-import cors from "cors";
 
 //MIDLEWARES INICIALES
 app.use(express.json());
