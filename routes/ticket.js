@@ -3,15 +3,25 @@ import { ticketController } from "../controllers/ticket.js";
 import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol } from "../middlewares.js";
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
-import { ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
+import { ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
 
 const ticketRouter = Router();
 ticketRouter.post("/",
+  extraerUsuario,
+  verificarRol([rolesUsuario.CLIENTE]),
+  ticketNuevoValidator,
+  checkValidator,
+  ticketController.crearTicketUsuario,
+  notificacionController.notificar
+);
+
+ticketRouter.post("/email",
+  ticketEmailValidator,
   ticketNuevoValidator,
   checkValidator,
   usuarioController.validarEmailCliente,
-  ticketController.crearTicket,
+  ticketController.crearTicketEmail,
   notificacionController.notificar
 );
 

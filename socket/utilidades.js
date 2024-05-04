@@ -3,6 +3,7 @@ import { io } from "./socket.js"
 
 export const expressMiddlewareAdapter = (middleware) => async (socket, next) => {
   try{
+    console.log("Intento de conexion")
     if (!socket.handshake.headers.authorization)
       socket.handshake.headers.authorization = socket.handshake.auth.token
     await middleware(socket.handshake, {}, next);

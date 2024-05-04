@@ -1,17 +1,13 @@
 import { ticketModel } from "../models/ticket.js"
-import { notificacionPayloadFactory, notificacionService } from "../services/notificaciones.js"
+import { notificacionPayloadFactory } from "../services/notificaciones.js"
 
-const crearNotificacionNuevo = (cliente, roles, idticket, mensaje) => {
+const crearNotificacionNuevo = (cliente, idticket, mensaje) => {
   return notificacionPayloadFactory({
     tipo: "rol",
     idevento: 3,
-    emailPayload:{
-      // email: ticket.email,
-      asunto: "Solicitud de servicio aceptada"
-    },
     fuente: idticket,
     iniciador: cliente?.idusuario,
-    objetivo: roles,
+    objetivo: ["admin", "empleado"],
     mensaje
   })
 }
@@ -30,15 +26,26 @@ const crearNotificacionAsignacion = (tecnico, cliente, ticket) => {
     mensaje: `El tecnico ${tecnico.nombres} ha aceptado su solicitud`
   })
 }
+const generarNotificacionNuevo = async (ticketNuevo) => {
+  const usuarioTicket = await ticketModel.findUsuarioTicket(ticketNuevo.idticket);
+  return crearNotificacionNuevo(usuarioTicket, ticketNuevo.idticket, `Hay un nuevo ticket: ${ticketNuevo.asunto}`)
+}
+
 
 export const ticketController = {
-  crearTicket: async (req, res, next) => {
-    const ticketNuevo = await ticketModel.createTicket(req.body)
+  crearTicketUsuario: async (req, res, next) => {
+    const { idusuario } = req.usuario;
+    const ticketNuevo = await ticketModel.createTicketUser(idusuario,req.body)
 
     res.status(201).json(ticketNuevo)
-    const usuarioTicket = await ticketModel.findUsuarioTicket(ticketNuevo.idticket);
-    //TODO NOTIFICACIONES A VARIOS ROLES A LA VEZ y VARIOS CORREOS
-    req.payload = crearNotificacionNuevo(usuarioTicket,  "empleado", ticketNuevo.idticket, `Hay un nuevo ticket: ${ticketNuevo.asunto}`)
+    req.payload = await generarNotificacionNuevo(ticketNuevo)
+    next()
+  },
+  crearTicketEmail: async (req, res, next) => {
+    const ticketNuevo = await ticketModel.createTicketEmail(req.body)
+
+    res.status(201).json(ticketNuevo)
+    req.payload = await generarNotificacionNuevo(ticketNuevo)
     next()
   },
   obtenerTickets: async (req, res) => {
@@ -51,9 +58,9 @@ export const ticketController = {
     res.json(ticket)
   },
   obtenerTicketUsuario: async (req, res) => {
-    const { email } = req.usuario
+    const { idusuario } = req.usuario
     const { idticket } = req.params
-    const ticket = await ticketModel.findByUsuario(email, idticket)
+    const ticket = await ticketModel.findByUsuario(idusuario, idticket)
     if (!ticket) return res.status(403).json({ error: "No tiene permisos para esta accion" })
     res.json(ticket)
   },
@@ -64,8 +71,8 @@ export const ticketController = {
     res.json(ticket)
   },
   obtenerTicketsUsuario: async (req, res) => {
-    const { email } = req.usuario
-    const ticket = await ticketModel.findByUsuario(email)
+    const { idusuario } = req.usuario
+    const ticket = await ticketModel.findByUsuario(idusuario)
     res.json(ticket)
   },
   validarNoAceptado: async (req, res, next) => {
@@ -83,7 +90,7 @@ export const ticketController = {
     res.status(201).json(ticket)
 
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    req.payload = crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket);
+    req.payload = await crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket);
     next();
   },
   agregarClasificacion: async (req,res) => {

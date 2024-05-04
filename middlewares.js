@@ -14,7 +14,7 @@ export const firmarToken = (req,res, next) => {
 
   if (!req.usuario) return next();
 
-  const payload = { idusuario: req.usuario.idusuario, nombres: req.usuario.nombres, apellidos: req.usuario.apellidos, email: req.usuario.email }
+  const payload = { idusuario: req.usuario.idusuario, nombres: req.usuario.nombres, apellidos: req.usuario.apellidos, email: req.usuario.email, nombreUsuario: req.usuario.nombre_usuario }
   const token = tokens.tokenSign(payload);
   return res.json({ token });
 }
@@ -51,6 +51,7 @@ export const checkNoExtraFields = (req, res, next) => {
 
 export const errorHandler = (err, _, res, next) => {
   console.log("err code: ", err)
+  if (res.finished) return;
   if (err.name === "JsonWebTokenError"){
     return res.status(401).json({ error: err.message });
   }else if (err.name === "RolNoPermitido" || err.name === "RolNoDebido"){

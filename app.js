@@ -7,6 +7,7 @@ import authRouter from "./routes/auth.js";
 import domicilioRouter from "./routes/domicilio.js";
 import componentesRouter from "./routes/componentes.js";
 import ticketRouter from "./routes/ticket.js";
+import notificacionesRouter from "./routes/notificaciones.js";
 
 import { errorHandler } from "./middlewares.js";
 
@@ -20,6 +21,7 @@ app.use("/auth", authRouter)
 app.use("/domicilio", domicilioRouter)
 app.use("/componentes", componentesRouter)
 app.use("/tickets", ticketRouter)
+app.use("/notificaciones", notificacionesRouter)
 
 //MIDDLEWARES FINALES
 

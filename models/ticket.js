@@ -31,18 +31,37 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows[0];
   },
-  
-  findByUsuario: async (email) => {
+  findByUsuario: async (idusuario) => {
     const query = {
       name: "obtener-tickets-usuario",
-      text: "SELECT * FROM ticket WHERE email=$1",
+      text: "SELECT * FROM ticket WHERE idusuario=$1",
+      values: [idusuario]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows;
+  },
+  findByEmail: async (email) => {
+    const query = {
+      name: "obtener-tickets-email",
+      text: "SELECT * FROM ticket WHERE idusuario=$1",
       values: [email]
     }
 
     const result = await poolClient.query(query);
     return result.rows;
   },
-  findOneByUsuario: async (email, idticket) => {
+  findOneByUsuario: async (idusuario, idticket) => {
+    const query = {
+      name: "obtener-tickets-usuario",
+      text: "SELECT * FROM ticket WHERE idusuario=$1 AND idticket=$2",
+      values: [idusuario, idticket]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  findOneByEmail: async (email, idticket) => {
     const query = {
       name: "obtener-tickets-usuario",
       text: "SELECT * FROM ticket WHERE email=$1 AND idticket=$2",
@@ -61,12 +80,26 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows;
   },
-  createTicket: async (ticketInfo) => {
+  createTicketEmail: async (ticketInfo) => {
     const query = {
-      name: "crear-ticket",
+      name: "crear-ticket-email",
       text: "INSERT INTO ticket (email, asunto, contenido) VALUES ($1, $2, $3) RETURNING *",
       values: [
         ticketInfo.email,
+        ticketInfo.asunto,
+        ticketInfo.contenido
+      ]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  createTicketUser: async (idusuario,ticketInfo) => {
+    const query = {
+      name: "crear-ticket-usuario",
+      text: "INSERT INTO ticket (idusuario, asunto, contenido) VALUES ($1, $2, $3) RETURNING *",
+      values: [
+        idusuario,
         ticketInfo.asunto,
         ticketInfo.contenido
       ]

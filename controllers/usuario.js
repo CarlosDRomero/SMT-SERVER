@@ -79,9 +79,9 @@ export const usuarioController = {
   },
   validarEmailCliente: async (req, res, next) => {
     const { email } = req.body
-    const usuario = await usuarioModel.validateEnterpriseEmail(email)
+    const usuario = await usuarioModel.findByEmailOrUserName(email)
     if (!usuario)return next()
-    next({ name: "RolNoDebido", message: "No tiene permitida esta accion" })
+    next({ name: "RolNoDebido", message: "Inicia sesion para crear un ticket" })
 
   }
 }

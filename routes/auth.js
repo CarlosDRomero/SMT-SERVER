@@ -65,6 +65,7 @@ authRouter.post("/resendcode/:id",
   codigoController.crearCodigo
 )
 authRouter.get("/rol", extraerUsuario, usuarioController.obtenerRol)
+authRouter.get("/validar-sesion", extraerUsuario, (_,res) => res.send())
 
 authRouter.get("/onlineTest", extraerUsuario, usuarioController.obtenerOnline)
 
