@@ -10,6 +10,10 @@ RETURNS TRIGGER AS $$
 BEGIN
   DELETE FROM	codigo_verificacion WHERE	idUsuario = new.idUsuario;
 	NEW.fecha_confirmado = current_timestamp;
+	IF NEW.rol = 'cliente' THEN
+		RAISE NOTICE 'Nuevo correo electrónico: %', NEW.email;
+		UPDATE ticket SET idusuario=NEW.idusuario, email=NULL WHERE email=NEW.email;
+	END IF;
 	RETURN NEW;
 END;
 
@@ -21,6 +25,32 @@ BEFORE UPDATE OF confirmado ON usuario
 FOR EACH ROW
 WHEN (old.confirmado = FALSE AND new.confirmado = TRUE)
 EXECUTE FUNCTION eliminar_codigo_confirmacion();
+
+/*
+ * 
+ * esta funcion junto con el trigger "usuario_eliminado" se ejecutara para limpiar
+ * el codigo de verificacion de la tabla una vez su dueño lo haya redimido
+ * 
+ * */
+CREATE OR REPLACE
+FUNCTION cambiar_ticket_correo()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF NEW.rol = 'cliente' THEN
+		UPDATE ticket SET idusuario=NULL, email=NEW.email WHERE idusuario=NEW.idusuario;
+	END IF;
+	RETURN NEW;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE
+TRIGGER usuario_eliminado
+BEFORE UPDATE OF confirmado ON usuario
+FOR EACH ROW
+WHEN (old.confirmado = FALSE AND new.confirmado = TRUE)
+EXECUTE FUNCTION eliminar_codigo_confirmacion();
+
 
 /*
  * 

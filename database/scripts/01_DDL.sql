@@ -191,10 +191,11 @@ CREATE TABLE notificacion(
 	idtipo integer NOT NULL,
 	idusuario_iniciador uuid,
 	idusuario_notificado uuid,
-	rol_notificado rolesUsuario,
+	roles_notificados rolesUsuario[],
 	
 	idfuente uuid,
 	mensaje varchar(500),
+	fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT current_timestamp,
 	
 	CONSTRAINT notificacion_evento FOREIGN KEY (idevento) REFERENCES evento_notificacion(idevento),
 	CONSTRAINT notificacion_tipo FOREIGN KEY (idtipo) REFERENCES tipo_receptor(idtipo),
@@ -228,7 +229,8 @@ CREATE TABLE ticket(
 	empleado_asignado uuid,
 	idclasificacion integer,
 	
-	email varchar(100) NOT NULL,
+	email varchar(100),
+	idusuario uuid,
 	asunto varchar(100) NOT NULL,
 	contenido varchar(2000) NOT NULL,
 	estado estadosTicket DEFAULT 'nuevo'::estadosTicket,
@@ -236,6 +238,7 @@ CREATE TABLE ticket(
 	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	
 	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
+	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
 	CONSTRAINT ticket_clasificacion FOREIGN KEY (idclasificacion) REFERENCES clasificacion_ticket(idclasificacion)
 );
 

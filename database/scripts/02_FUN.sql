@@ -23,6 +23,63 @@ $$ LANGUAGE plpgsql;
 /*
  * 
  * TODO:IMPORTANTE > FUNCION o FUNCIONES PARA RECUPERAR LAS NOTIFICACIONES DE UN USUARIO
- * SEGUN EL EVENTO A NOTIFICAR ¿QUE ARME LAS NOTIFICACIONES?
  * 
  * */
+CREATE TYPE data_notificacion AS (
+	idnotificacion UUID,
+  idevento INTEGER,
+  idtipo INTEGER,
+  idusuario_iniciador UUID,
+  idusuario_notificado UUID,
+  roles_notificados rolesUsuario[],
+  idfuente UUID,
+  mensaje VARCHAR(500),
+  fecha_creacion TIMESTAMP WITH TIME ZONE,
+  visto BOOLEAN   
+ );
+CREATE OR REPLACE FUNCTION obtener_notificaciones_usuario(idusuario_peticion UUID)
+RETURNS SETOF data_notificacion
+AS $$
+DECLARE
+	rol_usuario rolesUsuario;
+BEGIN
+	
+		SELECT rol INTO rol_usuario FROM usuario WHERE idusuario=idusuario_peticion;
+    RETURN QUERY
+    SELECT n.*, 
+        CASE 
+            WHEN v.idusuario IS NOT NULL THEN TRUE 
+            ELSE FALSE 
+        END AS visto
+    FROM notificacion n
+    LEFT JOIN (
+        SELECT *
+        FROM vistas_notificacion vn
+        WHERE vn.idusuario = idusuario_peticion
+    ) v ON n.idnotificacion = v.idnotificacion
+    WHERE n.idusuario_notificado = idusuario_peticion OR rol_usuario = ANY(n.roles_notificados)
+   ORDER BY n.fecha_creacion DESC;
+END;
+$$ LANGUAGE plpgsql;
+
+/*
+ * 
+ * FUNCION QUE PERMITIRA HACER QUE UNA NOTIFICACION SEA 'VISTA' POR UN USUARIO
+ * 
+ */
+
+CREATE OR REPLACE FUNCTION marcar_notificacion_vista(idusuario_peticion UUID, idnotificacion_vista UUID) 
+RETURNS SETOF data_notificacion
+AS $$
+#variable_conflict use_column
+DECLARE
+	fila_notif data_notificacion;
+BEGIN
+	SELECT * INTO STRICT fila_notif FROM obtener_notificaciones_usuario(idusuario_peticion) 
+ 	WHERE idnotificacion=idnotificacion_vista;
+ 
+  INSERT INTO vistas_notificacion (idnotificacion, idusuario) VALUES (idnotificacion_vista, idusuario_peticion);
+ 	fila_notif.visto := TRUE;
+	RETURN NEXT fila_notif;
+END;
+$$ LANGUAGE plpgsql;
