@@ -31,16 +31,14 @@ ticketRouter.get("/",
   ticketController.obtenerTicketsUsuario
 );
 
-ticketRouter.get("/clasificaciones",
-  extraerUsuario,
-  verificarRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
-  ticketController.obtenerClasificaciones
+ticketRouter.get("/servicios",
+  ticketController.obtenerTiposServicio
 );
 
-ticketRouter.post("/clasificaciones",
+ticketRouter.post("/servicios",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),
-  ticketController.agregarClasificacion
+  ticketController.agregarTipoServicio
 );
 
 ticketRouter.get("/gestionar",

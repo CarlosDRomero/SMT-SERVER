@@ -94,12 +94,12 @@ export const ticketController = {
     req.payload = await crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket);
     next();
   },
-  agregarClasificacion: async (req,res) => {
-    const tag = await ticketModel.addTicketTag(req.body.clasificacion)
+  agregarTipoServicio: async (req,res) => {
+    const tag = await ticketModel.addTicketTag(req.body.tipo_servicio, req.body.descripcion)
     console.log(tag)
     res.json(tag)
   },
-  obtenerClasificaciones: async (req,res) => {
+  obtenerTiposServicio: async (req,res) => {
     const tags = await ticketModel.getTicketTags()
     res.json(tags)
   }

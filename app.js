@@ -11,6 +11,10 @@ import notificacionesRouter from "./routes/notificaciones.js";
 
 import { errorHandler } from "./middlewares.js";
 
+
+import "./devdefault.js"
+
+
 //MIDLEWARES INICIALES
 app.use(express.json());
 app.use(cors());

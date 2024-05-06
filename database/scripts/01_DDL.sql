@@ -219,15 +219,16 @@ CREATE TABLE vistas_notificacion(
  * 
  * */
 
-CREATE TABLE clasificacion_ticket(
-	idclasificacion serial PRIMARY KEY,
-	clasificacion varchar(50) NOT NULL UNIQUE
+CREATE TABLE tipo_servicio(
+	idtipo_servicio serial PRIMARY KEY,
+	tipo_servicio varchar(50) NOT NULL UNIQUE,
+	descripcion varchar(2000) NOT NULL
 );
 
 CREATE TABLE ticket(
 	idticket uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	empleado_asignado uuid,
-	idclasificacion integer,
+	idtipo_servicio integer,
 	
 	email varchar(100),
 	idusuario uuid,
@@ -239,7 +240,7 @@ CREATE TABLE ticket(
 	
 	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
 	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
-	CONSTRAINT ticket_clasificacion FOREIGN KEY (idclasificacion) REFERENCES clasificacion_ticket(idclasificacion)
+	CONSTRAINT ticket_tipo_servicio FOREIGN KEY (idtipo_servicio) REFERENCES tipo_servicio(idtipo_servicio)
 );
 
 CREATE TABLE conversacion(

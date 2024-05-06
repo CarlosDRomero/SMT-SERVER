@@ -55,7 +55,7 @@ Content-Type: application/json
 
 {
     "prioridad": "media",
-    "idclasificacion": "3" 
+    "idtipo_servicio": "3" 
 }
 
 

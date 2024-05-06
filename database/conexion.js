@@ -1,5 +1,7 @@
 import pg from "pg"
 import { env } from "../environment.js"
+
+import { Encrypt } from "../services/encryption.js";
 const { Pool } = pg
 
 const pool = new Pool({
@@ -10,7 +12,7 @@ const pool = new Pool({
   port: env.DB_PORT
 })
 
-export let poolClient;
+export let poolClient = null;
 let retryInterval = null;
 const clearRetryInterval = () => {
   clearInterval(retryInterval)
@@ -47,7 +49,6 @@ pool.on("error", () => {
 })
 try{
   poolClient = await pool.connect();
-  
 }catch{
   console.log("Error al conectar con la base datos")
   initializeRetryInterval();

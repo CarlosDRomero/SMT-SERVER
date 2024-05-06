@@ -3,6 +3,7 @@ import "dotenv/config"
 const IS_TEST = process.env.NODE_ENV.trim() === "test"
 
 export const env = {
+  NODE_ENV: process.env.NODE_ENV,
   IS_TEST,
   PORT:    process.env.PORT,
   JWT_SECRET: process.env.JWT_SECRET,
