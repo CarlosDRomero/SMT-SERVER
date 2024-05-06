@@ -17,7 +17,7 @@ const crearNotificacionAsignacion = (tecnico, cliente, ticket) => {
     tipo: "directa",
     idevento: 4,
     emailPayload:{
-      email: ticket.email,
+      email: cliente.email,
       asunto: "Solicitud de servicio aceptada"
     },
     fuente: ticket.idticket,
@@ -90,6 +90,7 @@ export const ticketController = {
     res.status(201).json(ticket)
 
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
+    console.log(usuario_notificar)
     req.payload = await crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket);
     next();
   },

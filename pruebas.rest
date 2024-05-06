@@ -26,8 +26,8 @@ POST http://localhost:5000/auth/login
 content-type: application/json
 
 {
-    "clave": "12345",
-    "email": "a@gmail.edu.co"
+    "clave": "' 1=1 --",
+    "email": "c@com.co' OR 1=1 /*"
    
 }
 ###
@@ -42,13 +42,13 @@ POST http://localhost:5000/auth/resendcode/21c705b6-a8fc-4a1d-884f-bcbd5f68a138
 
 ###
 get http://localhost:5000/tickets/gestionar
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiYTVmMzdmZi1jZDFmLTQ2NTEtOTIzOS05ZGE4YzliY2NhNGUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiZW1wbGVhZG9AZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0NDQ5OTQ1fQ.UwGMFkzphUXVKnjaHvIWHPRZgXYQRMeBTmpdoVCiJ4I
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiIzYWIzNTYwOC01MDkyLTRmMDEtOTY1MS1jYWMzNGQzOTIwOGIiLCJub21icmVzIjoiQ2FybG9zIERhdmlkIiwiYXBlbGxpZG9zIjoiUm9tZXJvIHJlc3RyZXBvIiwiZW1haWwiOiJlbXBsZWFkb0BnbWFpbC5lZHUuY29tIiwibm9tYnJlVXN1YXJpbyI6ImVtcGxlYWRvIiwiaWF0IjoxNzE0ODAwNzcyfQ.oQjd-lpF4Hwas2GyyQx8y-FXHoqjhKB4FkgwETMTJ70
 
 ###
-PUT http://localhost:5000/tickets/aceptar/4eda7a5c-c557-4e9a-a5b9-ca9b58da4c30
+PUT http://localhost:5000/tickets/aceptar/56eec0e9-54f7-450a-ae75-622659436d55
 #admin
 # 
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJiYTVmMzdmZi1jZDFmLTQ2NTEtOTIzOS05ZGE4YzliY2NhNGUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiZW1wbGVhZG9AZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0NDQ5OTQ1fQ.UwGMFkzphUXVKnjaHvIWHPRZgXYQRMeBTmpdoVCiJ4I
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiIzYWIzNTYwOC01MDkyLTRmMDEtOTY1MS1jYWMzNGQzOTIwOGIiLCJub21icmVzIjoiQ2FybG9zIERhdmlkIiwiYXBlbGxpZG9zIjoiUm9tZXJvIHJlc3RyZXBvIiwiZW1haWwiOiJlbXBsZWFkb0BnbWFpbC5lZHUuY29tIiwibm9tYnJlVXN1YXJpbyI6ImVtcGxlYWRvIiwiaWF0IjoxNzE0ODAwNzcyfQ.oQjd-lpF4Hwas2GyyQx8y-FXHoqjhKB4FkgwETMTJ70
 #cliente
 # authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiI5YzJkMWUyYy04NzVmLTRmZGUtYjE2NS1kMzc3OGQ1OWI5ZWUiLCJub21icmVzIjoiQ2FybG9zIiwiYXBlbGxpZG9zIjoiMiIsImVtYWlsIjoiYWJAZ21haWwuZWR1LmNvIiwiaWF0IjoxNzE0MzQ4MjkwfQ.SWQr_3tz_HwFyfbkHfkmqPtVUdlLvhwRjWSDBdRxmDM
 Content-Type: application/json
@@ -60,7 +60,7 @@ Content-Type: application/json
 
 
 ###
-POST http://localhost:5000/tickets/
+POST http://localhost:5000/tickets/email
 Content-Type: application/json
 
 {

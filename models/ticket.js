@@ -22,7 +22,7 @@ export const ticketModel = {
       text:
       `SELECT u.* 
       FROM usuario u 
-      JOIN ticket t ON t.email=u.email  
+      JOIN ticket t ON t.email=u.email OR t.idusuario=u.idusuario  
       WHERE idticket=$1`,
 
       values: [idticket]
@@ -111,7 +111,7 @@ export const ticketModel = {
   assignEmployee: async (idempleado, idticket) => {
     const query = {
       name: "gestionar-ticket",
-      text: "UPDATE ticket SET empleado_asignado=$1 WHERE idticket=$2 RETURNING *",
+      text: "UPDATE ticket SET empleado_asignado=$1, estado='aceptado' WHERE idticket=$2 RETURNING *",
       values: [
         idempleado,
         idticket
