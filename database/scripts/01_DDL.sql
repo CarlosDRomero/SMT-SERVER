@@ -222,7 +222,8 @@ CREATE TABLE vistas_notificacion(
 CREATE TABLE tipo_servicio(
 	idtipo_servicio serial PRIMARY KEY,
 	tipo_servicio varchar(50) NOT NULL UNIQUE,
-	descripcion varchar(2000) NOT NULL
+	descripcion varchar(2000) NOT NULL,
+	url_imagen varchar(500)
 );
 
 CREATE TABLE ticket(

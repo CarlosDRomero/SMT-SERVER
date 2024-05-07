@@ -33,6 +33,11 @@ FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(evento_notificacion).csv'
 DELIMITER ','
 CSV HEADER;
 
+COPY tipo_servicio(idtipo_servicio,tipo_servicio,descripcion,url_imagen)
+FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(servicios).csv'
+DELIMITER ';'
+CSV HEADER;
+
 INSERT INTO tipo_receptor (idtipo, tipo) VALUES
 (1,'directo'),
 (2,'rol')
