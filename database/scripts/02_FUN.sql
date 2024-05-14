@@ -83,3 +83,21 @@ BEGIN
 	RETURN NEXT fila_notif;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION reabrir_ticket(id UUID)
+RETURNS SETOF ticket AS
+$$
+DECLARE
+ 	fila ticket%ROWTYPE;
+	estadoAnterior estadosTicket;
+	estadoActual estadosTicket;
+BEGIN
+	SELECT estado INTO estadoActual FROM ticket t WHERE t.idticket=id;
+	IF estadoActual='cerrado' THEN
+		SELECT estado INTO estadoAnterior FROM ultimo_estado_ticket u WHERE u.idticket=id;
+		UPDATE ticket t SET estado=estadoAnterior WHERE t.idticket=id;
+		RETURN QUERY SELECT * FROM ticket WHERE idticket=id;
+	END IF;
+	 
+END;
+$$ LANGUAGE plpgsql;

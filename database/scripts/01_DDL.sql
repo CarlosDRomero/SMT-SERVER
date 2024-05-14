@@ -2,7 +2,7 @@
 
 CREATE TYPE rolesUsuario AS ENUM ('admin', 'empleado', 'cliente');
 CREATE TYPE estadoOrden AS ENUM ('pedido', 'enviado', 'recibido');
-CREATE TYPE estadosTicket AS ENUM ('nuevo', 'aceptado', 'listo', 'en-proceso', 'resuelto', 'cerrado');
+CREATE TYPE estadosTicket AS ENUM ('nuevo', 'aceptado', 'listo', 'en proceso', 'resuelto', 'cerrado');
 CREATE TYPE prioridadTicket AS ENUM ('baja', 'media', 'alta');
 CREATE TYPE estadoMensaje AS ENUM ('enviado', 'recibido', 'leido');
 
@@ -237,11 +237,20 @@ CREATE TABLE ticket(
 	contenido varchar(2000) NOT NULL,
 	estado estadosTicket DEFAULT 'nuevo'::estadosTicket,
 	prioridad prioridadTicket,
+	reabierto integer DEFAULT 0,
 	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	fecha_actualizacion timestamp WITH TIME ZONE,
 	
 	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
 	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
 	CONSTRAINT ticket_tipo_servicio FOREIGN KEY (idtipo_servicio) REFERENCES tipo_servicio(idtipo_servicio)
+);
+
+CREATE TABLE ultimo_estado_ticket(
+	idticket uuid PRIMARY KEY,
+	estado estadosTicket,
+	
+	CONSTRAINT estado_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket)
 );
 
 CREATE TABLE conversacion(
@@ -272,7 +281,7 @@ CREATE TABLE mensaje(
 CREATE VIEW vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
 CREATE VIEW vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';
 CREATE VIEW vista_admins AS SELECT * FROM usuario WHERE rol='admin';
-
-
+CREATE VIEW vista_estados_ticket AS SELECT ROW_NUMBER() OVER()  AS num,estado  FROM (select unnest(enum_range(NULL::estadosticket)) as estado );
+CREATE VIEW vista_prioridad_ticket AS SELECT ROW_NUMBER() OVER()  AS num,prioridad  FROM (select unnest(enum_range(NULL::prioridadticket)) as prioridad)
 
 

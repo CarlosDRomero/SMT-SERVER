@@ -117,6 +117,7 @@ describe("Componentes para los admins/empleados",() => {
         { idcat_espec: 16,valor: "4GB" }
       ]
     }
+
     let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
 
     await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
@@ -126,10 +127,11 @@ describe("Componentes para los admins/empleados",() => {
     
     let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
 
-    const res = await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
-
+    await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    
     let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
     expect(componentesb2).toHaveLength(componentesa2.length - 1);
+
 
     
 

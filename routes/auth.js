@@ -56,7 +56,7 @@ authRouter.post("/verification/:id",
   usuarioController.confirmar,
   firmarToken
 )
-authRouter.post("/resendcode/:id",
+authRouter.get("/resendcode/:id",
   UUIDParamValidator(),
   checkValidator,
   usuarioController.encontrarUsuarioCodigo,

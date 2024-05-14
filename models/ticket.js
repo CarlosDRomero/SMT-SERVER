@@ -5,11 +5,7 @@ export const ticketModel = {
     const query = {
       name: "obtener-ticket",
       text:
-      `SELECT t.*, u.idusuario, u.nombres, u.apellidos 
-      FROM ticket t 
-      LEFT JOIN usuario u ON t.email=u.email  
-      WHERE idticket=$1`,
-
+      "SELECT * FROM ticket WHERE idticket=$1",
       values: [idticket]
     }
 
@@ -20,11 +16,58 @@ export const ticketModel = {
     const query = {
       name: "obtener-usuario-ticket",
       text:
-      `SELECT u.* 
+      `SELECT u.idusuario, u.email, u.nombres, u.apellidos 
       FROM usuario u 
-      JOIN ticket t ON t.email=u.email OR t.idusuario=u.idusuario  
-      WHERE idticket=$1`,
+      JOIN ticket t ON t.idusuario=u.idusuario
+      WHERE t.idticket=$1`,
+      values: [idticket]
+    }
 
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  discardTicketUser: async (idusuario, idticket) => {
+    const query = {
+      name: "descartar-ticket-usuario",
+      text:
+      `UPDATE ticket SET estado='cerrado'
+      WHERE idusuario=$1 AND idticket=$2 RETURNING *`,
+      values: [idusuario,idticket]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  discardTicket: async (idticket) => {
+    const query = {
+      name: "descartar-ticket",
+      text:
+      `UPDATE ticket SET estado='cerrado'
+      WHERE idticket=$1 RETURNING *`,
+      values: [idticket]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  reopenTicket: async (idticket) => {
+    const query = {
+      name: "reabrir-ticket",
+      text: "SELECT * FROM reabrir_ticket($1)",
+      values: [idticket]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  findEmpleadoTicket: async (idticket) => {
+    const query = {
+      name: "obtener-empleado-ticket",
+      text:
+      `SELECT u.idusuario, u.email, u.nombres, u.apellidos 
+      FROM usuario u 
+      JOIN ticket t ON t.empleado_asignado=u.idusuario
+      WHERE t.idticket=$1`,
       values: [idticket]
     }
 
@@ -41,6 +84,16 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows;
   },
+  findOneByUsuario: async (idusuario,idticket) => {
+    const query = {
+      name: "obtener-ticket-usuario",
+      text: "SELECT * FROM ticket WHERE idusuario=$1 AND idticket=$2",
+      values: [idusuario, idticket]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   findByEmail: async (email) => {
     const query = {
       name: "obtener-tickets-email",
@@ -51,19 +104,9 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows;
   },
-  findOneByUsuario: async (idusuario, idticket) => {
-    const query = {
-      name: "obtener-tickets-usuario",
-      text: "SELECT * FROM ticket WHERE idusuario=$1 AND idticket=$2",
-      values: [idusuario, idticket]
-    }
-
-    const result = await poolClient.query(query);
-    return result.rows[0];
-  },
   findOneByEmail: async (email, idticket) => {
     const query = {
-      name: "obtener-tickets-usuario",
+      name: "obtener-tickets-email",
       text: "SELECT * FROM ticket WHERE email=$1 AND idticket=$2",
       values: [email, idticket]
     }
@@ -72,11 +115,27 @@ export const ticketModel = {
     return result.rows[0];
   },
   findAll: async () => {
+    console.log("buscando tickets")
     const query = {
-      name: "obtener-tickets",
-      text: "SELECT * FROM ticket"
+      name:"obtener-tickets",
+      text: "SELECT * FROM ticket",
+
     }
 
+    const result = await poolClient.query(query);
+    return result.rows;
+  },
+  filterTickets: async (parametros) => {
+    console.log("filtrando tickets")
+    const query = {
+      name:"filtrar-tickets",
+      text: "SELECT * FROM ticket WHERE idusuario=$1 OR email=$2",
+      values: [
+        parametros?.idusuario,
+        parametros?.email,
+      ]
+    }
+    console.log(query.values)
     const result = await poolClient.query(query);
     return result.rows;
   },
@@ -110,7 +169,7 @@ export const ticketModel = {
   },
   assignEmployee: async (idempleado, idticket) => {
     const query = {
-      name: "gestionar-ticket",
+      name: "asignar-ticket",
       text: "UPDATE ticket SET empleado_asignado=$1, estado='aceptado' WHERE idticket=$2 RETURNING *",
       values: [
         idempleado,
@@ -127,7 +186,7 @@ export const ticketModel = {
       text: "UPDATE ticket SET idtipo_servicio=$1, prioridad=$2 WHERE idticket=$3 RETURNING *",
       values: [
         ticketInfo.idtipo_servicio,
-        ticketInfo.prioridad,
+        ticketInfo.prioridad.toLowerCase(),
         idticket
       ]
     }
@@ -153,5 +212,22 @@ export const ticketModel = {
 
     const res = await poolClient.query(query);
     return res.rows
+  },
+  getEstadosTickets: async () => {
+    const query = {
+      name:"estados-tickets",
+      text: "SELECT * FROM vista_estados_ticket"
+    }
+    const res = await poolClient.query(query);
+    return res.rows
+  },
+  getPrioridadTickets: async () => {
+    const query = {
+      name:"prioridad-tickets",
+      text: "SELECT * FROM vista_priorida_ticket"
+    }
+    const res = await poolClient.query(query);
+    return res.rows
   }
+
 }

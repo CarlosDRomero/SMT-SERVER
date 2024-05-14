@@ -212,3 +212,60 @@ FOR EACH ROW
 WHEN (NEW.idcategoria <> OLD.idcategoria)
 EXECUTE FUNCTION trasladar_especificaciones();
 
+/*
+ * 
+ * esta funcion junto con el trigger "ticket_listo" se ejecutara para
+ * buscar las especificaciones de la nueva categoria que aun se pueden mantener
+ * 
+ * */
+
+
+
+CREATE OR REPLACE FUNCTION actualizar_estado_ticket()
+RETURNS TRIGGER AS $$
+BEGIN
+	IF (OLD.idtipo_servicio IS NULL AND NEW.idtipo_servicio IS NOT NULL) AND (OLD.prioridad IS NULL AND NEW.prioridad IS NOT NULL) THEN
+		IF (NEW.empleado_asignado IS NOT NULL) THEN
+			NEW.estado := 'en proceso';
+		END IF;
+		IF (NEW.empleado_asignado IS NULL) THEN
+			NEW.estado := 'listo';
+		END IF;
+	END IF;
+	IF (OLD.idtipo_servicio IS NOT NULL AND NEW.idtipo_servicio IS NULL) OR (OLD.prioridad IS NOT NULL AND NEW.prioridad IS NULL) THEN 
+		NEW.estado := 'aceptado';
+	END IF;
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER ticket_listo
+BEFORE UPDATE OF idtipo_servicio, prioridad, empleado_asignado ON ticket
+FOR EACH ROW
+EXECUTE FUNCTION actualizar_estado_ticket();
+
+/*
+ * 
+ * esta funcion junto con el trigger "cambio_categoria" se ejecutara para
+ * buscar las especificaciones de la nueva categoria que aun se pueden mantener
+ * 
+ * */
+
+
+
+CREATE OR REPLACE FUNCTION respaldo_estado()
+RETURNS TRIGGER AS $$
+BEGIN
+	INSERT INTO ultimo_estado_ticket(idticket, estado) VALUES (OLD.idticket, OLD.estado);
+	RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER ticket_cerrado
+BEFORE UPDATE OF estado ON ticket
+FOR EACH ROW
+WHEN (NEW.estado='cerrado' AND OLD.estado<>'cerrado')
+EXECUTE FUNCTION respaldo_estado();
+
+
+

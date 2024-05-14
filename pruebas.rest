@@ -41,8 +41,8 @@ content-type: application/json
 POST http://localhost:5000/auth/resendcode/21c705b6-a8fc-4a1d-884f-bcbd5f68a138
 
 ###
-get http://localhost:5000/tickets/gestionar
-Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiIzYWIzNTYwOC01MDkyLTRmMDEtOTY1MS1jYWMzNGQzOTIwOGIiLCJub21icmVzIjoiQ2FybG9zIERhdmlkIiwiYXBlbGxpZG9zIjoiUm9tZXJvIHJlc3RyZXBvIiwiZW1haWwiOiJlbXBsZWFkb0BnbWFpbC5lZHUuY29tIiwibm9tYnJlVXN1YXJpbyI6ImVtcGxlYWRvIiwiaWF0IjoxNzE0ODAwNzcyfQ.oQjd-lpF4Hwas2GyyQx8y-FXHoqjhKB4FkgwETMTJ70
+get http://localhost:5000/tickets/estados-tickets
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHVzdWFyaW8iOiJjZmFjZjUwMC1jMmM2LTRiNzQtYmYzMS1mZjQ3ZTdjY2YyMDEiLCJub21icmVzIjoiZW1wbGVhZG8iLCJhcGVsbGlkb3MiOiJlbCBlbXBsZWFkbyIsImVtYWlsIjoiZW1wbGVhZG9Ac3VwcG9ydC5tYXgudGkiLCJub21icmVVc3VhcmlvIjoiZW1wbGVhZG8iLCJpYXQiOjE3MTUyOTA4MjB9.lIzqVXXARoH9MLyMauCRAHEStqwcOkHpQ49u4-iSyDo
 
 ###
 PUT http://localhost:5000/tickets/aceptar/56eec0e9-54f7-450a-ae75-622659436d55
@@ -70,7 +70,7 @@ Content-Type: application/json
 }
 
 ###
-get http://localhost:5000/componentes/especificaciones-categoria/3
+get http://localhost:5000/componentes/especificaciones-categoria/6
 
 
 

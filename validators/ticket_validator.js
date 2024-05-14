@@ -10,6 +10,6 @@ export const ticketEmailValidator = [
 ]
 
 export const ticketProcessValidator = [
-  body("idclasificacion", "La clasificacion no es valida").isInt(),
+  body("idtipo_servicio", "El servicio no es valida").isInt(),
   body("prioridad", "La prioridad del ticket").notEmpty()
 ]

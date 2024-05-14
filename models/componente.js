@@ -54,7 +54,6 @@ export const componenteModel = {
   },
   createSpecs: async (idcomponente, listaEspecificaciones) => {
     const query = {
-      name: "crear-especificaciones-componente",
       text: "INSERT INTO componente_espec (idcat_espec, idcomponente, valor) VALUES",
       values: []
     }
