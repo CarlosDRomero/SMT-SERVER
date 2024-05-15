@@ -14,6 +14,15 @@ export const inventarioController = {
     if (!producto) return next({ name: "RecursoNoEncontrado", message: "No se encontro este producto" })
     res.json(producto);
   },
+  validarCantidadProducto: async (req,res,next) => {
+    const { idproducto } = req.params
+    const producto = await inventarioModel.findById(idproducto);
+
+    if (!producto) return next({ name: "RecursoNoEncontrado", message: "No se encontro este producto" })
+    if (req.body.cantidad > producto.disponibilidad) return res.status(400).json({ error: "La cantidad no es valida" })
+    req.payload = { ...req.paylaod, max: producto.disponibilidad }
+    next()
+  },
   crearProducto: async (req, res) => {
     const { idcomponente } = req.params
     const productoNuevo = await inventarioModel.crear({ idcomponente,...req.body });

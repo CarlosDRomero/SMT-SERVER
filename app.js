@@ -13,6 +13,7 @@ import { errorHandler } from "./middlewares.js";
 
 
 import "./devdefault.js"
+import tiendaRouter from "./routes/tienda.js";
 
 
 //MIDLEWARES INICIALES
@@ -25,6 +26,7 @@ app.use("/auth", authRouter)
 app.use("/domicilio", domicilioRouter)
 app.use("/componentes", componentesRouter)
 app.use("/tickets", ticketRouter)
+app.use("/tienda", tiendaRouter)
 app.use("/notificaciones", notificacionesRouter)
 
 //MIDDLEWARES FINALES

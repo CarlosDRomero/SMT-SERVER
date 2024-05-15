@@ -88,17 +88,74 @@ CREATE OR REPLACE FUNCTION reabrir_ticket(id UUID)
 RETURNS SETOF ticket AS
 $$
 DECLARE
- 	fila ticket%ROWTYPE;
 	estadoAnterior estadosTicket;
 	estadoActual estadosTicket;
 BEGIN
 	SELECT estado INTO estadoActual FROM ticket t WHERE t.idticket=id;
 	IF estadoActual='cerrado' THEN
 		SELECT estado INTO estadoAnterior FROM ultimo_estado_ticket u WHERE u.idticket=id;
-		UPDATE ticket t SET estado=estadoAnterior WHERE t.idticket=id;
         DELETE FROM ultimo_estado_ticket WHERE idticket=id;
-		RETURN QUERY SELECT * FROM ticket WHERE idticket=id;
+		RETURN QUERY UPDATE ticket t SET estado=estadoAnterior WHERE t.idticket=id RETURNING *;
 	END IF;
 
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION obtener_carrito(id_usuario UUID)
+RETURNS UUID AS 
+$$
+DECLARE
+	id_carrito UUID;
+BEGIN 
+	SELECT idcarrito INTO id_carrito FROM carrito_compras WHERE idusuario=id_usuario;
+	IF (id_carrito IS NULL) THEN
+		INSERT INTO carrito_compras(idusuario) VALUES (id_usuario) RETURNING idcarrito INTO id_carrito;
+		
+	END IF;
+	RETURN id_carrito;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION agregar_a_carrito(id_usuario UUID, id_producto UUID, cantidad_agregada integer)
+RETURNS SETOF producto_carrito AS
+$$
+DECLARE
+	id_carrito UUID;
+	cantidad_actual integer;
+BEGIN
+	id_carrito :=	obtener_carrito(id_usuario);
+	SELECT cantidad INTO cantidad_actual FROM producto_carrito WHERE idcarrito=id_carrito AND idproducto=id_producto;
+IF (cantidad_actual IS NULL) THEN
+	INSERT INTO producto_carrito(idcarrito, idproducto, cantidad) VALUES (id_carrito, id_producto, cantidad_agregada);
+ELSE
+	UPDATE producto_carrito SET cantidad=cantidad_actual+cantidad_agregada WHERE idcarrito=id_carrito AND idproducto=id_producto;
+END IF;
+	RETURN QUERY  SELECT * FROM producto_carrito WHERE idcarrito=id_carrito AND idproducto=id_producto;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION obtener_producto_carrito_usuario(id_usuario UUID)
+RETURNS SETOF productos_carrito AS
+$$
+DECLARE
+	id_carrito UUID;
+BEGIN
+	id_carrito :=	obtener_carrito(id_usuario);
+	RETURN QUERY  SELECT * FROM producto_carrito WHERE idcarrito=id_carrito;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION obtener_productos_info(id_usuario UUID)
+RETURNS SETOF inventario AS
+$$
+DECLARE
+	id_carrito UUID;
+BEGIN
+	id_carrito :=	obtener_carrito(id_usuario);
+	RETURN QUERY  SELECT i.* FROM producto_carrito pc 
+	JOIN inventario i ON i.idproducto=pc.idproducto
+	
+	WHERE pc.idcarrito=id_carrito;
 END;
 $$ LANGUAGE plpgsql;

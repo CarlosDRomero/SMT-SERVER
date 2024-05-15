@@ -136,7 +136,7 @@ CREATE TABLE promocion_categoria(
 
 CREATE TABLE carrito_compras(
 	idcarrito uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	idusuario uuid NOT NULL,
+	idusuario uuid NOT NULL UNIQUE,
 	
 	CONSTRAINT carrito_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
 );
@@ -147,8 +147,8 @@ CREATE TABLE producto_carrito(
 	cantidad integer NOT NULL,
 	
 	PRIMARY KEY (idcarrito, idproducto),
-	CONSTRAINT carrito_producto FOREIGN KEY (idcarrito) REFERENCES carrito_compras(idcarrito),
-	CONSTRAINT producto_carrito FOREIGN KEY (idproducto) REFERENCES inventario(idproducto)
+	CONSTRAINT carrito_producto FOREIGN KEY (idcarrito) REFERENCES carrito_compras(idcarrito) ON DELETE CASCADE,
+	CONSTRAINT producto_carrito FOREIGN KEY (idproducto) REFERENCES inventario(idproducto) ON DELETE CASCADE
 );
 
 CREATE TABLE orden_compra(
