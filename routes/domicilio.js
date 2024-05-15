@@ -20,6 +20,7 @@ domicilioRouter.get("/listaMunicipios/:c_departamento",
 domicilioRouter
   .post("/direcciones",
     extraerUsuario,
+    verificarRol([rolesUsuario.CLIENTE]),
     direccionValidator,
     checkValidator,
     domicilioController.crearDireccion

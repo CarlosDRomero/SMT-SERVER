@@ -25,7 +25,6 @@ componentesRouter.post("/inventario/:idcomponente",
   UUIDParamValidator("idcomponente"),
   ProductoValidator,
   checkValidator,
-  checkNoExtraFields,
   inventarioController.crearProducto
 )
 componentesRouter.put("/inventario/:idproducto",

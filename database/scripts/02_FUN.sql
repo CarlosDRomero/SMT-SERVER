@@ -96,8 +96,9 @@ BEGIN
 	IF estadoActual='cerrado' THEN
 		SELECT estado INTO estadoAnterior FROM ultimo_estado_ticket u WHERE u.idticket=id;
 		UPDATE ticket t SET estado=estadoAnterior WHERE t.idticket=id;
+        DELETE FROM ultimo_estado_ticket WHERE idticket=id;
 		RETURN QUERY SELECT * FROM ticket WHERE idticket=id;
 	END IF;
-	 
+
 END;
 $$ LANGUAGE plpgsql;
