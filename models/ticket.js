@@ -70,7 +70,7 @@ export const ticketModel = {
       WHERE t.idticket=$1`,
       values: [idticket]
     }
-
+    console.log("query",query.text)
     const result = await poolClient.query(query);
     return result.rows[0];
   },

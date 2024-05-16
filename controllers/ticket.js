@@ -1,5 +1,6 @@
 import { ticketModel } from "../models/ticket.js"
 import { notificacionPayloadFactory } from "../services/notificaciones.js"
+import { reqOnline } from "../socket/utilidades.js"
 import { rolesUsuario } from "./usuario.js"
 
 const crearNotificacionNuevo = (cliente, idticket, mensaje) => {
@@ -83,11 +84,17 @@ export const ticketController = {
       tickets = tickets.filter(ticket => !ticket.empleado_asignado || ticket.empleado_asignado === idusuario)
     } else if (rol === rolesUsuario.ADMIN){
       await Promise.all(tickets.map(async t => {
-        if (t.empleado_asignado) t.empleado = await ticketModel.findEmpleadoTicket(t.idticket)
+        if (t.empleado_asignado) {
+          t.empleado = await ticketModel.findEmpleadoTicket(t.idticket)
+          reqOnline(t.empleado)
+        }
       }))
     }
     await Promise.all(tickets.map(async t => {
-      if (t.idusuario) t.usuario = await ticketModel.findUsuarioTicket(t.idticket)
+      if (t.idusuario) {
+        t.usuario = await ticketModel.findUsuarioTicket(t.idticket)
+        reqOnline(t.usuario)
+      }
     }))
     
     res.json(tickets)
@@ -96,7 +103,11 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.findById(idticket)
     if (!ticket) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
-    if (ticket.idusuario) ticket.usuario = await ticketModel.findUsuarioTicket(ticket.idticket)
+    if (ticket.idusuario) {
+
+      ticket.usuario = await ticketModel.findUsuarioTicket(ticket.idticket)
+      reqOnline(ticket.usuario)
+    }
     res.json(ticket)
   },
   obtenerTicketUsuario: async (req, res) => {
@@ -104,7 +115,7 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.findOneByUsuario(idusuario, idticket)
     if (!ticket) return res.status(403).json({ error: "No tiene permisos para esta accion" })
-    if (t.empleado_asignado) t.empleado = await ticketModel.findEmpleadoTicket(t.idticket)
+    if (ticket.empleado_asignado) ticket.empleado = await ticketModel.findEmpleadoTicket(idticket)
     res.json(ticket)
   },
   gestionarTicket: async (req, res, next) => {

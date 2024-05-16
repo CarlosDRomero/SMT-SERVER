@@ -68,18 +68,20 @@ export const usuarioController = {
   },
   obtenerOnline: async (req, res) => {
     const socketOnline = verOnlineIds()
-    const usuariosOnline = await Promise.all(socketOnline.map(
-      async id => {
-        const { idusuario, nombres, apellidos, email, nombre_usuario } = await usuarioModel.findById(id)
-        return { idusuario, nombres, apellidos, email, nombre_usuario }
-      }
-    ));
-    console.log("USUARIOS ONLINE: ", usuariosOnline)
-    res.json(usuariosOnline)
+    // const usuariosOnline = await Promise.all(socketOnline.map(
+    //   async id => {
+    //     const { idusuario, nombres, apellidos, email, nombre_usuario } = await usuarioModel.findById(id)
+    //     return { idusuario, nombres, apellidos, email, nombre_usuario }
+    //   }
+    // ));
+    // console.log("USUARIOS ONLINE: ", usuariosOnline)
+    res.json(socketOnline)
   },
   validarEmailCliente: async (req, res, next) => {
     const { email } = req.body
-    const usuario = await usuarioModel.findByEmailOrUserName(email)
+    if (!email) return res.redirect(307,"/tickets/")
+    const usuario = await usuarioModel.findByEmailOrUserName({ email })
+    console.log("usuario encontrado: ",usuario)
     if (!usuario)return next()
     next({ name: "RolNoDebido", message: "Inicia sesion para crear un ticket" })
 

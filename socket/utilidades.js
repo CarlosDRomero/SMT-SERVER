@@ -41,7 +41,10 @@ export const unirSalaRol = (socket, rol) => {
 
 export const unirAOnline = (socket, idusuario) => {
   socket.join(idusuario)
-  if (!onlineUsers.includes(idusuario)) onlineUsers.push(idusuario);
+  if (!onlineUsers.includes(idusuario)) {
+    socket.broadcast.emit("cambio-en-online")
+    onlineUsers.push(idusuario);
+  }
 }
 
 export const seDesconecta = async (socket, idusuario) => {
@@ -49,6 +52,7 @@ export const seDesconecta = async (socket, idusuario) => {
   const indexSala = onlineUsers.indexOf(idusuario)
   if (sockets.length === 0 && indexSala > -1) {
     console.log("Se deconecto")
+    socket.broadcast.emit("cambio-en-online")
     onlineUsers.splice(indexSala,1);
   }
 }
@@ -62,4 +66,13 @@ export const seDesconecta = async (socket, idusuario) => {
 
 export const verOnlineIds = () => {
   return onlineUsers;
+}
+
+export const reqOnline = (usuario) => {
+  usuario.online = isOnline(usuario.idusuario)
+}
+
+export const isOnline = (idusuario) => {
+  console.log("usuario", idusuario, onlineUsers)
+  return onlineUsers.includes(idusuario)
 }

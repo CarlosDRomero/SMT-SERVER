@@ -159,3 +159,4 @@ BEGIN
 	WHERE pc.idcarrito=id_carrito;
 END;
 $$ LANGUAGE plpgsql;
+

@@ -22,9 +22,9 @@ io.use(expressMiddlewareAdapter(extraerUsuario))
 io.on("connection", socket => {
   const usuario = socket.handshake.usuario;
   console.log(`${usuario.nombre_usuario} se ha conectado`)
+  socket.emit("cambio-en-online")
   unirAOnline(socket, usuario.idusuario)
   unirSalaRol(socket, usuario.rol)
-
   useEvents(socket, "chat", chatEvents)
   
   socket.on("disconnect", (r) => {

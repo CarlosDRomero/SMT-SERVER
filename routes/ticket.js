@@ -107,6 +107,15 @@ ticketRouter.put("/gestionar/:idticket",
   ticketController.gestionarTicket,
   notificacionController.notificar
 );
+ticketRouter.put("/gestionar/resuelto/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
+  UUIDParamValidator("idticket"),
+  checkValidator,
+  ticketController.gestionarTicket,
+  notificacionController.notificar
+);
+
 ticketRouter.put("/gestionar/reabrir/:idticket",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),

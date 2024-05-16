@@ -6,7 +6,7 @@ export const ticketNuevoValidator = [
 ]
 
 export const ticketEmailValidator = [
-  body("email", "Email no valido").isEmail()
+  body("email", "Email no valido").isEmail().optional()
 ]
 
 export const ticketProcessValidator = [

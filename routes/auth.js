@@ -67,9 +67,7 @@ authRouter.get("/resendcode/:id",
 authRouter.get("/rol", extraerUsuario, usuarioController.obtenerRol)
 authRouter.get("/validar-sesion", extraerUsuario, (_,res) => res.send())
 
-authRouter.get("/onlineTest", extraerUsuario, usuarioController.obtenerOnline)
-
-authRouter.get("/onlineTest", usuarioController.obtenerOnline)
+authRouter.get("/online", extraerUsuario, usuarioController.obtenerOnline)
 
 //TODO:IMPORTANTE > RUTA PARA RECUPERACION DE CONTRASEÑA
 
