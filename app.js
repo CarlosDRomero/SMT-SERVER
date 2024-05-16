@@ -14,6 +14,7 @@ import { errorHandler } from "./middlewares.js";
 
 import "./devdefault.js"
 import tiendaRouter from "./routes/tienda.js";
+import chatRouter from "./routes/chat.js";
 
 
 //MIDLEWARES INICIALES
@@ -28,6 +29,7 @@ app.use("/componentes", componentesRouter)
 app.use("/tickets", ticketRouter)
 app.use("/tienda", tiendaRouter)
 app.use("/notificaciones", notificacionesRouter)
+app.use("/chat", chatRouter)
 
 //MIDDLEWARES FINALES
 

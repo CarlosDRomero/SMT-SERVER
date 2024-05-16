@@ -254,16 +254,14 @@ CREATE TABLE ultimo_estado_ticket(
 );
 
 CREATE TABLE conversacion(
-	idticket uuid PRIMARY KEY,
-	idusuario_1 uuid NOT NULL,
-	idusuario_2 uuid NOT NULL,
-	
-	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket),
-	CONSTRAINT usuario_conversacion_1 FOREIGN KEY (idusuario_1) REFERENCES usuario(idusuario),
-	CONSTRAINT usuario_conversacion_2 FOREIGN KEY (idusuario_2) REFERENCES usuario(idusuario)
+	idconversacion uuid PRIMARY KEY DEFAULT gen_random_uuid(), 
+	idticket uuid NOT NULL UNIQUE,
+	iddependiente uuid NOT NULL,
+	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket)
 );
 
 CREATE TABLE mensaje(
+	idconversacion uuid NOT NULL,
 	idmensaje uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idemisor uuid,
 	idreceptor uuid NOT NULL,
@@ -272,6 +270,7 @@ CREATE TABLE mensaje(
 	estado estadoMensaje NOT NULL,
 	fecha_envio timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	
+	CONSTRAINT conversacion FOREIGN KEY (idconversacion) REFERENCES conversacion(idconversacion),
 	CONSTRAINT emisor_mensaje FOREIGN KEY (idemisor) REFERENCES usuario(idusuario),
 	CONSTRAINT receptor_mensaje FOREIGN KEY (idreceptor) REFERENCES usuario(idusuario)
 	

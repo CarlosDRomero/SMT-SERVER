@@ -160,3 +160,28 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION obtener_conversacion_ticket(id_ticket UUID)
+RETURNS UUID AS
+$$
+DECLARE 
+	id_conversacion UUID;
+BEGIN 
+	SELECT idconversacion INTO id_conversacion FROM conversacion WHERE idticket=id_ticket;
+	IF (id_conversacion IS NULL) THEN
+		INSERT INTO conversacion(idticket) VALUES (id_ticket) RETURNING idconversacion INTO id_conversacion ;
+	END IF;
+	RETURN id_conversacion;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION enviar_mensaje(id_ticket UUID, id_emisor UUID, id_receptor UUID, cuerpo varchar(1000), fecha timestamp WITH time zone)
+RETURNS SETOF mensaje AS
+$$
+DECLARE
+	id_conversacion UUID;
+BEGIN
+	SELECT obtener_conversacion_ticket(id_ticket) INTO id_conversacion;
+	RETURN QUERY	INSERT INTO mensaje(idconversacion, idemisor, idreceptor, contenido, estado, fecha_envio) VALUES (id_conversacion,id_emisor, id_receptor, cuerpo, 'enviado', fecha) RETURNING *;
+END;
+$$ LANGUAGE plpgsql;
+
