@@ -160,6 +160,19 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION obtener_conversaciones_usuario(id_usuario UUID)
+RETURNS SETOF conversacion AS
+$$
+BEGIN 
+	RETURN QUERY SELECT idconversacion INTO id_conversacion 
+	FROM conversacion c
+	JOIN ticket t ON t.idticket=c.idticket
+	JOIN usuario u ON t.idusuario=u.idusuario OR t.empleado_asignado=u.idusuario
+  WHERE t.idusuario=id_usuario OR t.empleado_asignado=id_usuario;
+	
+END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION obtener_conversacion_ticket(id_ticket UUID)
 RETURNS UUID AS
 $$
