@@ -136,7 +136,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION obtener_producto_carrito_usuario(id_usuario UUID)
-RETURNS SETOF productos_carrito AS
+RETURNS SETOF producto_carrito AS
 $$
 DECLARE
 	id_carrito UUID;
