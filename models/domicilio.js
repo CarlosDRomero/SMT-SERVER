@@ -45,6 +45,16 @@ export const domicilioModel = {
     return result.rows[0]
   },
 
+  updatePredeterminadaUser: async (iddireccion, idusuario) => {
+    const query = {
+      name: "actualizar-predeterminada",
+      text: "UPDATE direccion SET predeterminada = TRUE WHERE iddireccion = $1 AND idusuario=$2 RETURNING *",
+      values: [iddireccion,idusuario]
+    }
+    const result = await poolClient.query(query);
+    return result.rows[0]
+  },
+
   deleteAddressUser: async (iddireccion, idusuario) => {
     const query = {
       name: "eliminar-direccion",

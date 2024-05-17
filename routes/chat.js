@@ -12,12 +12,12 @@ chatRouter.get("/mensajes/:idticket",
   conversacionController.obtenerMensajesChat
 )
 
-chatRouter.get("/conversacion",
+chatRouter.get("/conversaciones",
   extraerUsuario,
   checkValidator,
   conversacionController.obtenerConversaciones
 )
-chatRouter.get("/conversacion/:idticket",
+chatRouter.get("/conversaciones/:idticket",
   extraerUsuario,
   UUIDParamValidator("idticket"),
   checkValidator,

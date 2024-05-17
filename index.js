@@ -4,6 +4,7 @@ import "./app.js";
 
 httpServer.listen(env.PORT, () => {
   console.log("Server escuchando en puerto " + env.PORT)
+  console.log("MODO:",env.NODE_ENV)
 });
 
 

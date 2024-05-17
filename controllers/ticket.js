@@ -35,7 +35,7 @@ const crearNotificacionDescartado = (tecnico, cliente, ticket) => {
     fuente: ticket.idticket,
     iniciador: tecnico.idusuario,
     objetivo: cliente?.idusuario,
-    mensaje: "Su ticket ha sido descartado"
+    mensaje: "Pronto te atenderemos"
   })
 }
 
