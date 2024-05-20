@@ -37,6 +37,8 @@ CREATE TYPE data_notificacion AS (
   fecha_creacion TIMESTAMP WITH TIME ZONE,
   visto BOOLEAN   
  );
+
+
 CREATE OR REPLACE FUNCTION obtener_notificaciones_usuario(idusuario_peticion UUID)
 RETURNS SETOF data_notificacion
 AS $$
@@ -136,7 +138,7 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION obtener_producto_carrito_usuario(id_usuario UUID)
-RETURNS SETOF productos_carrito AS
+RETURNS SETOF producto_carrito AS
 $$
 DECLARE
 	id_carrito UUID;
@@ -160,11 +162,13 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+
+
 CREATE OR REPLACE FUNCTION obtener_conversaciones_usuario(id_usuario UUID)
-RETURNS SETOF conversacion AS
+RETURNS SETOF conversacion  AS
 $$
 BEGIN 
-	RETURN QUERY SELECT idconversacion
+	RETURN QUERY SELECT c.*
 	FROM conversacion c
 	JOIN ticket t ON t.idticket=c.idticket
 	JOIN usuario u ON t.idusuario=u.idusuario OR t.empleado_asignado=u.idusuario

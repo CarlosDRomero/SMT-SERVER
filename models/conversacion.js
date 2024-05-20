@@ -36,6 +36,54 @@ export const conversacionModel = {
     const res = await poolClient.query(query);
 
     return res.rows;
+  },
+  findChat: async (idusuario, idticket) => {
+    const query = {
+      name: "obtener-conversacion",
+      text: `
+      SELECT * FROM obtener_conversaciones_usuario($1) WHERE idticket=$2 
+      `,
+      values:[idusuario, idticket]
+    }
+    const res = await poolClient.query(query);
+
+    return res.rows[0];
+  },
+  findTicketChat: async (idticket) => {
+    const query = {
+      name: "obtener-ticket-chat",
+      text: `
+      SELECT * FROM ticket WHERE idticket=$1 
+      `,
+      values:[idticket]
+    }
+    const res = await poolClient.query(query);
+
+    return res.rows[0];
+  },
+  findChats: async (idusuario) => {
+    const query = {
+      name: "obtenerid-conversaciones",
+      text: `
+      SELECT * FROM obtener_conversaciones_usuario($1) group by idconversacion, idticket, iddependiente
+      `,
+      values:[idusuario]
+    }
+    const res = await poolClient.query(query);
+
+    return res.rows;
+  },
+  findChatExists: async (idticket) => {
+    const query = {
+      name: "obtener-conversacion-existente",
+      text: `
+      SELECT * FROM conversacion WHERE idticket=$1
+      `,
+      values:[idticket]
+    }
+    const res = await poolClient.query(query);
+
+    return res.rows[0];
   }
 
 }

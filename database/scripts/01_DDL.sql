@@ -256,7 +256,7 @@ CREATE TABLE ultimo_estado_ticket(
 CREATE TABLE conversacion(
 	idconversacion uuid PRIMARY KEY DEFAULT gen_random_uuid(), 
 	idticket uuid NOT NULL UNIQUE,
-	iddependiente uuid NOT NULL,
+	iddependiente uuid,
 	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket)
 );
 

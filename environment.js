@@ -6,6 +6,7 @@ export const env = {
   NODE_ENV: process.env.NODE_ENV,
   IS_TEST,
   PORT:    process.env.PORT,
+  FRONTEND_ORIGIN:    process.env.FRONTEND_ORIGIN,
   JWT_SECRET: process.env.JWT_SECRET,
   MAIL_HOST: process.env.MAIL_HOST,
   MAIL_PORT: process.env.MAIL_PORT,

@@ -15,11 +15,16 @@ import { errorHandler } from "./middlewares.js";
 import "./devdefault.js"
 import tiendaRouter from "./routes/tienda.js";
 import chatRouter from "./routes/chat.js";
+import { env } from "./environment.js";
 
+const corsOptions = {
+  origin: env.FRONTEND_ORIGIN, // Replace with your allowed origin
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 
 //MIDLEWARES INICIALES
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
 //RUTAS
 

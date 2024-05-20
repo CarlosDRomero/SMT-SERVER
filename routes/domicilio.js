@@ -82,6 +82,13 @@ domicilioRouter
     gestionarUsuario,
     domicilioController.eliminarDireccion
   )
+  .get("/direcciones/hacer-predeterminada/:iddireccion",
+    extraerUsuario,
+    verificarRol([rolesUsuario.CLIENTE]),
+    UUIDParamValidator("iddireccion"),
+    checkValidator,
+    domicilioController.actualizarPredeterminada
+  )
 
   
 

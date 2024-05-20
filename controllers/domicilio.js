@@ -24,7 +24,17 @@ export const domicilioController = {
     const iddireccion = req.params.iddireccion
     const resultado = await domicilioModel.deleteAddressUser(iddireccion, idusuario);
     if(!resultado) return res.status(403).json({ error: "No tiene permisos para esta accion" });
-    return res.status(204).json();
+    return res.status(201).json(resultado);
+  },
+
+  actualizarPredeterminada: async(req, res) => {
+    const { idusuario } = req.usuario
+    const { iddireccion } = req.params
+    const resultado = await domicilioModel.updatePredeterminadaUser(iddireccion,idusuario);
+    console.log("DIRECCION PREDETERMINADA", resultado)
+    if(!resultado) return res.status(403).json({ error: "No tiene permisos para esta accion" });
+    return res.status(201).json(resultado);
+
   }
     
 }
