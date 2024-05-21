@@ -64,6 +64,13 @@ authRouter.get("/resendcode/:id",
   mailerController.mailVerificacion,
   codigoController.crearCodigo
 )
+
+authRouter.get("/users/:rol",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN]),
+  usuarioController.obtenerPorRol
+)
+
 authRouter.get("/rol", extraerUsuario, usuarioController.obtenerRol)
 authRouter.get("/validar-sesion", extraerUsuario, (_,res) => res.send())
 

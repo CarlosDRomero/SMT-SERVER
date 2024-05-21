@@ -86,11 +86,10 @@ export const verificarRol = (rolesAdmitidos) => {
     next()
   }
 }
-export const redireccionPorRol = (rolesAdmitidos, ruta) => {
+export const redireccionPorRol = (rolesAdmitidos, ruta, ignorar = []) => {
   return async (req, res, next) => {
-    console.log(req.params,ruta + Object.values(req.params).join("/"))
-    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.redirect(ruta + Object.values(req.params).join("/"))
-    
+    const parametros = Object.entries(req.params).filter(([p]) => !ignorar.includes(p)).map(p => p[1])
+    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.redirect(307,ruta + parametros.join("/"))
     next()
   }
 }
@@ -108,7 +107,6 @@ export const gestionarUsuario = (rolObjetivo) => async (req, res, next) => {
   const userData = await usuarioModel.findById(req.params.idusuario)
   if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
   if (userData.rol !== rolObjetivo) return next({ name: "RolNoDebido", message: "Este usuario no aplica para esta caracteristica" })
-
   req.usuarioGestor = req.usuario;
   req.usuario = userData;
   next()
