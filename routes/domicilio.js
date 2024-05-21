@@ -1,7 +1,7 @@
 import { Router } from "express"
 import { colombiaAPIController } from "../controllers/colombia_api.js";
 import { municipioParamValidator } from "../validators/munipicio_validator.js";
-import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol } from "../middlewares.js";
+import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol, redireccionPorRol } from "../middlewares.js";
 import { direccionValidator } from "../validators/direccion_validator.js";
 import { domicilioController } from "../controllers/domicilio.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
@@ -47,10 +47,10 @@ domicilioRouter
 
   .get("/direcciones/administrar/:idusuario",
     extraerUsuario,
-    verificarRol([rolesUsuario.ADMIN]),
+    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
     UUIDParamValidator("idusuario"),
     checkValidator,
-    gestionarUsuario,
+    gestionarUsuario("cliente"),
     domicilioController.obtenerDireccion
   ) //obtener direcciones por id solo siendo admin
 

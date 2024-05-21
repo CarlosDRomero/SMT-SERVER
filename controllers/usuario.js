@@ -85,6 +85,11 @@ export const usuarioController = {
     if (!usuario)return next()
     next({ name: "RolNoDebido", message: "Inicia sesion para crear un ticket" })
 
+  },
+  obtenerPorRol: async (req,res) => {
+    const { rol } = req.params
+    const usuarios = await usuarioModel.getUsersByRole(rolesUsuario[rol.toUpperCase()])
+    res.json(usuarios)
   }
 }
 

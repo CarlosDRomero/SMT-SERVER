@@ -94,5 +94,15 @@ export const usuarioModel = {
   
     const result = await poolClient.query(query);
     return result.rows[0]
+  },
+  getUsersByRole: async (rol) => {
+    const query = {
+      name: "obtener-usuarios-rol",
+      text: "SELECT email,nombre_usuario,nombres,apellidos, idusuario FROM usuario WHERE rol=$1",
+      values: [rol]
+    }
+  
+    const result = await poolClient.query(query);
+    return result.rows
   }
 }
