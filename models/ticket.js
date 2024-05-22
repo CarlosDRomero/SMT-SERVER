@@ -50,6 +50,18 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows[0];
   },
+  solveTicket: async (idticket,{ idusuario, rol }) => {
+    const query = {
+      name: "resolver-ticket",
+      text:
+      `UPDATE ticket SET estado='resuelto'
+      WHERE idticket=$1 AND (empleado_asignado=$2 OR $3='admin') RETURNING *`,
+      values: [idticket,idusuario, rol]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   reopenTicket: async (idticket) => {
     const query = {
       name: "reabrir-ticket",
@@ -139,6 +151,33 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows;
   },
+  getTicketGrade: async ({ idticket, usuario }) => {
+    const query = {
+      name:"obtener-calificacion-ticket",
+      text: `
+      SELECT valor, comentario FROM calificacion_ticket c 
+      JOIN ticket t ON c.idticket=t.idticket
+      WHERE t.idticket=$1 AND (t.idusuario=$2 OR t.empleado_asignado=$2 OR $3='admin')
+      `,
+      values: [
+        idticket, usuario.idusuario, usuario.rol
+      ]
+    }
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  calificarTicket: async (idticket,{ valor, comentario }) => {
+    const query = {
+      name:"calificar-ticket",
+      text: "INSERT INTO calificacion_ticket(idticket, valor, comentario) VALUES ($1,$2,$3) RETURNING valor, comentario",
+      values: [
+        idticket, valor, comentario
+      ]
+    }
+    console.log(query.values)
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   createTicketEmail: async (ticketInfo) => {
     const query = {
       name: "crear-ticket-email",
@@ -194,11 +233,31 @@ export const ticketModel = {
     const res = await poolClient.query(query);
     return res.rows[0];
   },
-  addTicketTag: async (tag, descripcion) => {
+  addTicketTag: async ({ tipo_servicio, descripcion,url_imagen }) => {
     const query = {
       name: "crear-clasificacion-ticket",
-      text: "INSERT INTO tipo_servicio (tipo_servicio, descripcion) VALUES ($1, $2) RETURNING *",
-      values: [tag, descripcion]
+      text: "INSERT INTO tipo_servicio (tipo_servicio, descripcion, url_imagen) VALUES ($1, $2,$3) RETURNING *",
+      values: [tipo_servicio, descripcion, url_imagen]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  updateTicketTag: async (idtipo_servicio,{ tipo_servicio, descripcion,url_imagen }) => {
+    const query = {
+      name: "actualizar-clasificacion-ticket",
+      text: "UPDATE tipo_servicio SET tipo_servicio=$1, descripcion=$2, url_imagen=$3 WHERE idtipo_servicio=$4 RETURNING *",
+      values: [tipo_servicio, descripcion, url_imagen, idtipo_servicio]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  deleteTicketTag: async (idtipo_servicio) => {
+    const query = {
+      name: "borrar-clasificacion-ticket",
+      text: "DELETE FROM tipo_servicio WHERE idtipo_servicio=$1 RETURNING *",
+      values: [idtipo_servicio]
     }
 
     const res = await poolClient.query(query);
@@ -207,7 +266,7 @@ export const ticketModel = {
   getTicketTags: async () => {
     const query = {
       name: "obtener-clasificacion-ticket",
-      text: "SELECT * FROM tipo_servicio"
+      text: "SELECT * FROM tipo_servicio ORDER BY idtipo_servicio"
     }
 
     const res = await poolClient.query(query);

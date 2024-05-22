@@ -243,7 +243,15 @@ CREATE TABLE ticket(
 	
 	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
 	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
-	CONSTRAINT ticket_tipo_servicio FOREIGN KEY (idtipo_servicio) REFERENCES tipo_servicio(idtipo_servicio)
+	CONSTRAINT ticket_tipo_servicio FOREIGN KEY (idtipo_servicio) REFERENCES tipo_servicio(idtipo_servicio) ON DELETE SET NULL
+);
+
+CREATE TABLE calificacion_ticket(
+	idticket UUID PRIMARY KEY,
+	valor integer NOT NULL,
+	comentario varchar(500),
+
+	CONSTRAINT calificacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket) ON DELETE CASCADE
 );
 
 CREATE TABLE ultimo_estado_ticket(

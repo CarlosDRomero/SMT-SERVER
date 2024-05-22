@@ -2,8 +2,8 @@ import { Router } from "express"
 import { ticketController } from "../controllers/ticket.js";
 import { checkValidator, extraerUsuario, gestionarUsuario, redireccionPorRol, verificarRol } from "../middlewares.js";
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
-import { UUIDParamValidator } from "../validators/general_validators.js";
-import { ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
+import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
+import { calificacionTicketValidator, servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
 
 const ticketRouter = Router();
@@ -48,7 +48,25 @@ ticketRouter.get("/servicios",
 ticketRouter.post("/servicios",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),
+  servicioValidator,
+  checkValidator,
   ticketController.agregarTipoServicio
+);
+
+ticketRouter.put("/servicios/:idtipo_servicio",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN]),
+  servicioValidator,
+  NumberParamValidator("idtipo_servicio"),
+  checkValidator,
+  ticketController.actualizarTipoServicio
+);
+ticketRouter.delete("/servicios/:idtipo_servicio",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN]),
+  NumberParamValidator("idtipo_servicio"),
+  checkValidator,
+  ticketController.eliminarTipoServicio
 );
 
 ticketRouter.get("/gestionar",
@@ -72,6 +90,15 @@ ticketRouter.get("/:idticket",
   ticketController.obtenerTicketUsuario
 );
 
+ticketRouter.put("/calificar/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.CLIENTE]),
+  UUIDParamValidator("idticket"),
+  calificacionTicketValidator,
+  checkValidator,
+  ticketController.calificarTicket,
+  notificacionController.notificar
+);
 
 ticketRouter.put("/aceptar/:idticket",
   extraerUsuario,
@@ -120,9 +147,20 @@ ticketRouter.put("/gestionar/reabrir/:idticket",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),
   UUIDParamValidator("idticket"),
+  checkValidator,
   ticketController.reabrirTicket,
   notificacionController.notificar
 );
+
+ticketRouter.put("/gestionar/resolver/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.EMPLEADO,rolesUsuario.ADMIN]),
+  UUIDParamValidator("idticket"),
+  checkValidator,
+  ticketController.resolverTicket,
+  notificacionController.notificar
+);
+
 
 
 
