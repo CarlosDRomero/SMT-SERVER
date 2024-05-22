@@ -181,9 +181,21 @@ export const ticketController = {
     next()
   },
   agregarTipoServicio: async (req,res) => {
-    const tag = await ticketModel.addTicketTag(req.body.tipo_servicio, req.body.descripcion)
+    const tag = await ticketModel.addTicketTag(req.body)
     console.log(tag)
     res.json(tag)
+  },
+  actualizarTipoServicio: async (req,res) => {
+    const { idtipo_servicio } = req.params
+    const tag = await ticketModel.updateTicketTag(idtipo_servicio,req.body)
+    if (!tag) return res.status(403).status("Parace que este servicio ya no existe o no tienes los permisos para actualizarlo")
+    res.status(201).json(tag)
+  },
+  eliminarTipoServicio: async (req,res) => {
+    const { idtipo_servicio } = req.params
+    const tag = await ticketModel.deleteTicketTag(idtipo_servicio)
+    if (!tag) return res.status(403).status("Parace que este servicio ya no existe o no tienes los permisos para eliminarlo")
+    res.status(201).json(tag)
   },
   obtenerTiposServicio: async (req,res) => {
     const tags = await ticketModel.getTicketTags()

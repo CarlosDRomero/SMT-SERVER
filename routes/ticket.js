@@ -2,8 +2,8 @@ import { Router } from "express"
 import { ticketController } from "../controllers/ticket.js";
 import { checkValidator, extraerUsuario, gestionarUsuario, redireccionPorRol, verificarRol } from "../middlewares.js";
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
-import { UUIDParamValidator } from "../validators/general_validators.js";
-import { ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
+import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
+import { servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
 
 const ticketRouter = Router();
@@ -48,7 +48,25 @@ ticketRouter.get("/servicios",
 ticketRouter.post("/servicios",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),
+  servicioValidator,
+  checkValidator,
   ticketController.agregarTipoServicio
+);
+
+ticketRouter.put("/servicios/:idtipo_servicio",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN]),
+  servicioValidator,
+  NumberParamValidator("idtipo_servicio"),
+  checkValidator,
+  ticketController.actualizarTipoServicio
+);
+ticketRouter.delete("/servicios/:idtipo_servicio",
+  extraerUsuario,
+  verificarRol([rolesUsuario.ADMIN]),
+  NumberParamValidator("idtipo_servicio"),
+  checkValidator,
+  ticketController.eliminarTipoServicio
 );
 
 ticketRouter.get("/gestionar",

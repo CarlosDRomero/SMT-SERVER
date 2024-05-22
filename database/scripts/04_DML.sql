@@ -1,14 +1,14 @@
-COPY atributo_espec(idespec, atributo)
+COPY atributo_espec(atributo)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(especificacion).csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY categoria_componente(idcategoria, denominacion)
+COPY categoria_componente(denominacion)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(categoria).csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY categoria_espec(idcat_espec, idcategoria, idespec)
+COPY categoria_espec(idcategoria, idespec)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(categoria_especificacion).csv'
 DELIMITER ','
 CSV HEADER;
@@ -33,7 +33,7 @@ FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(evento_notificacion).csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY tipo_servicio(idtipo_servicio,tipo_servicio,descripcion,url_imagen)
+COPY tipo_servicio(tipo_servicio,descripcion,url_imagen)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(servicios).csv'
 DELIMITER ';'
 CSV HEADER;

@@ -3,9 +3,9 @@ import { poolClient } from "./database/conexion.js"
 import { Encrypt } from "./services/encryption.js"
 export default setTimeout(async () => {
   console.log("EJECUTANDO DEFAULTS")
-  if (env.NODE_ENV.trim() === "development"){
+  if (env.NODE_ENV.trim() === "development" ){
 
-    if ((await poolClient.query("select * from usuario")).rows.length === 0){
+    if (poolClient && (await poolClient.query("select * from usuario")).rows.length === 0){
 
       const query = `
       insert into usuario 
