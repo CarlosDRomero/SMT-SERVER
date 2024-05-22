@@ -56,30 +56,30 @@ domicilioRouter
 
   .post("/direcciones/administrar/:idusuario",
     extraerUsuario,
-    verificarRol([rolesUsuario.ADMIN]),
+    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
     direccionValidator,
     UUIDParamValidator("idusuario"),
     checkValidator,
-    gestionarUsuario,
+    gestionarUsuario("cliente"),
     domicilioController.crearDireccion
   )
 
   .put("/direcciones/administrar/:idusuario/:iddireccion",
     extraerUsuario,
-    verificarRol([rolesUsuario.ADMIN]),
+    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
     UUIDParamValidator("idusuario", "iddireccion"),
     direccionValidator,
     checkValidator,
-    gestionarUsuario,
+    gestionarUsuario("cliente"),
     domicilioController.actualizarDireccion
   )
 
   .delete("/direcciones/administrar/:idusuario/:iddireccion",
     extraerUsuario,
-    verificarRol([rolesUsuario.ADMIN]),
+    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
     UUIDParamValidator("idusuario", "iddireccion"),
     checkValidator,
-    gestionarUsuario,
+    gestionarUsuario("cliente"),
     domicilioController.eliminarDireccion
   )
   .get("/direcciones/hacer-predeterminada/:iddireccion",
