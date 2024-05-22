@@ -12,6 +12,7 @@ export const notificacionPayloadFactory = async ({ tipo, emailPayload, idevento,
     idevento,
     idusuario_iniciador: iniciador,
     idfuente: fuente,
+    anexos: emailPayload?.anexos,
     mensaje
   }
   if (emailPayload) payload.email = { email: emailPayload.email, asunto: emailPayload.asunto }
@@ -47,11 +48,13 @@ export const notificacionService = {
     io.in( target ).emit("notificacion", notificacion)
   },
 
-  notificarACorreo: async (payload, notificacion) => {
+  notificarACorreo: async (payload, notificacion,anexos) => {
     const html = `
     <h1>${payload.asunto}</h1>
     <p>${notificacion.mensaje}</p>
     `
+
+    if (anexos) html += anexos
     const emails = [].concat(payload.email)
     for (const email of emails)
       mailerService.enviarCorreo({

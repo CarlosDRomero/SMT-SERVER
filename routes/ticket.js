@@ -3,7 +3,7 @@ import { ticketController } from "../controllers/ticket.js";
 import { checkValidator, extraerUsuario, gestionarUsuario, redireccionPorRol, verificarRol } from "../middlewares.js";
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
 import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
-import { servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
+import { calificacionTicketValidator, servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
 
 const ticketRouter = Router();
@@ -90,6 +90,15 @@ ticketRouter.get("/:idticket",
   ticketController.obtenerTicketUsuario
 );
 
+ticketRouter.put("/calificar/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.CLIENTE]),
+  UUIDParamValidator("idticket"),
+  calificacionTicketValidator,
+  checkValidator,
+  ticketController.calificarTicket,
+  notificacionController.notificar
+);
 
 ticketRouter.put("/aceptar/:idticket",
   extraerUsuario,
@@ -138,9 +147,20 @@ ticketRouter.put("/gestionar/reabrir/:idticket",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN]),
   UUIDParamValidator("idticket"),
+  checkValidator,
   ticketController.reabrirTicket,
   notificacionController.notificar
 );
+
+ticketRouter.put("/gestionar/resolver/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.EMPLEADO,rolesUsuario.ADMIN]),
+  UUIDParamValidator("idticket"),
+  checkValidator,
+  ticketController.resolverTicket,
+  notificacionController.notificar
+);
+
 
 
 

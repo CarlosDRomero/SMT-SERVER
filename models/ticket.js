@@ -50,6 +50,18 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows[0];
   },
+  solveTicket: async (idticket,{ idusuario, rol }) => {
+    const query = {
+      name: "resolver-ticket",
+      text:
+      `UPDATE ticket SET estado='resuelto'
+      WHERE idticket=$1 AND (empleado_asignado=$2 OR $3='admin') RETURNING *`,
+      values: [idticket,idusuario, rol]
+    }
+
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   reopenTicket: async (idticket) => {
     const query = {
       name: "reabrir-ticket",
@@ -138,6 +150,33 @@ export const ticketModel = {
     console.log(query.values)
     const result = await poolClient.query(query);
     return result.rows;
+  },
+  getTicketGrade: async ({ idticket, usuario }) => {
+    const query = {
+      name:"obtener-calificacion-ticket",
+      text: `
+      SELECT valor, comentario FROM calificacion_ticket c 
+      JOIN ticket t ON c.idticket=t.idticket
+      WHERE t.idticket=$1 AND (t.idusuario=$2 OR t.empleado_asignado=$2 OR $3='admin')
+      `,
+      values: [
+        idticket, usuario.idusuario, usuario.rol
+      ]
+    }
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  calificarTicket: async (idticket,{ valor, comentario }) => {
+    const query = {
+      name:"calificar-ticket",
+      text: "INSERT INTO calificacion_ticket(idticket, valor, comentario) VALUES ($1,$2,$3) RETURNING valor, comentario",
+      values: [
+        idticket, valor, comentario
+      ]
+    }
+    console.log(query.values)
+    const result = await poolClient.query(query);
+    return result.rows[0];
   },
   createTicketEmail: async (ticketInfo) => {
     const query = {

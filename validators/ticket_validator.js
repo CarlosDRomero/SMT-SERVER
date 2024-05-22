@@ -19,3 +19,8 @@ export const servicioValidator = [
   body("url_imagen", "No es una url valida").isURL(),
   body("descripcion", "No es una descripcion valida").isLength({ min:10 })
 ]
+
+export const calificacionTicketValidator = [
+  body("valor","El valor debe ir de 0 a 5").isInt({ min:1, max:5 }),
+  body("comentario","El comentario no debe superar los 500 caracteres").isLength({ max:500 }).optional()
+]

@@ -1,3 +1,4 @@
+import { env } from "../environment.js"
 import { ticketModel } from "../models/ticket.js"
 import { notificacionPayloadFactory } from "../services/notificaciones.js"
 import { reqOnline } from "../socket/utilidades.js"
@@ -36,6 +37,32 @@ const crearNotificacionDescartado = (tecnico, cliente, ticket) => {
     iniciador: tecnico.idusuario,
     objetivo: cliente?.idusuario,
     mensaje: "Pronto te atenderemos"
+  })
+}
+const crearNotificacionCalificacion = (cliente, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "directa",
+    idevento: 4,
+    fuente: ticket.idticket,
+    iniciador: cliente.idusuario,
+    objetivo: ticket.empleado_asignado,
+    mensaje: `Su servicio ha sido calificado por: ${cliente.nombres} ${cliente.apellidos}`
+  })
+}
+
+const crearNotificacionResuelto = (tecnico, cliente, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "directa",
+    idevento: 4,
+    emailPayload:{
+      email: cliente?.email || ticket.email,
+      asunto: "Su ticket ha sido resuelto",
+      anexos: `<a href="${env.FRONTEND_ORIGIN}/tickets/${ticket.idticket}">entra aquí para ver</a>`
+    },
+    fuente: ticket.idticket,
+    iniciador: tecnico.idusuario,
+    objetivo: cliente?.idusuario,
+    mensaje: `El ${tecnico.rol} ${tecnico.nombres} ha resuelto tu ticket ¿Estas satisfecho con tu cuidado?`
   })
 }
 
@@ -106,7 +133,7 @@ export const ticketController = {
     if (ticket.idusuario) {
 
       ticket.usuario = await ticketModel.findUsuarioTicket(ticket.idticket)
-      reqOnline(ticket.usuario)
+      ticket.calificacion = await ticketModel.getTicketGrade({ idticket, usuario:req.usuario })
     }
     res.json(ticket)
   },
@@ -165,10 +192,18 @@ export const ticketController = {
   reabrirTicket: async (req, res) => {
     const { idticket } = req.params
     const ticket = await ticketModel.reopenTicket(idticket)
-    // const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    // req.payload = await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket);
-    // next()
+    const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
+    req.payload = await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket);
     res.status(201).json(ticket)
+    next()
+  },
+  resolverTicket: async (req, res, next) => {
+    const { idticket } = req.params
+    const ticket = await ticketModel.solveTicket(idticket, req.usuario)
+    const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
+    req.payload = await crearNotificacionResuelto(req.usuario, usuario_notificar, ticket);
+    res.status(201).json(ticket)
+    next()
   },
   descartarTicket: async (req, res,next) => {
     const { idticket } = req.params
@@ -178,6 +213,19 @@ export const ticketController = {
     res.status(201).json(ticket)
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
     req.payload = await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket);
+    next()
+  },
+  calificarTicket: async (req, res,next) => {
+    const { idticket } = req.params
+    const { idusuario } = req.usuario
+    const pertenece = await ticketModel.findOneByUsuario(idusuario, idticket);
+    if (!pertenece || !pertenece.empleado_asignado || pertenece.estado !== "resuelto") return res.status(403).json({ error: "No puedes calificar este ticket" })
+    console.log(req.body)
+    const calificacion_ticket = await ticketModel.calificarTicket(idticket, req.body)
+    pertenece.calificacion = calificacion_ticket;
+    res.status(201).json(pertenece)
+    req.payload = await crearNotificacionCalificacion(req.usuario, pertenece);
+    console.log(pertenece,req.payload)
     next()
   },
   agregarTipoServicio: async (req,res) => {
