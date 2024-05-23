@@ -49,11 +49,11 @@ export const notificacionService = {
   },
 
   notificarACorreo: async (payload, notificacion,anexos) => {
-    const html = `
+    let html = `
     <h1>${payload.asunto}</h1>
     <p>${notificacion.mensaje}</p>
     `
-
+    console.log("ANEXOS", anexos)
     if (anexos) html += anexos
     const emails = [].concat(payload.email)
     for (const email of emails)

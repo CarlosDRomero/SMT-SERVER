@@ -4,7 +4,7 @@ import { municipioParamValidator } from "../validators/munipicio_validator.js";
 import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol, redireccionPorRol } from "../middlewares.js";
 import { direccionValidator } from "../validators/direccion_validator.js";
 import { domicilioController } from "../controllers/domicilio.js";
-import { UUIDParamValidator } from "../validators/general_validators.js";
+import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { rolesUsuario } from "../controllers/usuario.js";
 
 const domicilioRouter = Router()
@@ -15,6 +15,12 @@ domicilioRouter.get("/listaMunicipios/:c_departamento",
   municipioParamValidator,
   checkValidator,
   colombiaAPIController.obtenerMunicipiosPorDep
+);
+
+domicilioRouter.get("/departamento-municipio/:c_municipio",
+  NumberParamValidator("c_municipio"),
+  checkValidator,
+  colombiaAPIController.obtenerDepartamentoMunicipio
 );
 
 domicilioRouter
