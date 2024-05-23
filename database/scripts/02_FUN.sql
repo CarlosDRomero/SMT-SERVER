@@ -97,6 +97,7 @@ BEGIN
 	IF estadoActual='cerrado' THEN
 		SELECT estado INTO estadoAnterior FROM ultimo_estado_ticket u WHERE u.idticket=id;
         DELETE FROM ultimo_estado_ticket WHERE idticket=id;
+				DELETE FROM calificacion_ticket WHERE idticket=id;
 		RETURN QUERY UPDATE ticket t SET estado=estadoAnterior WHERE t.idticket=id RETURNING *;
 	END IF;
 

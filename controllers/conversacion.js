@@ -1,4 +1,6 @@
 import { conversacionModel } from "../models/conversacion.js"
+import { popularTicket } from "./ticket.js";
+import { rolesUsuario } from "./usuario.js";
 
 export const conversacionController = {
   obtenerMensajesChat: async (req,res,next) => {
@@ -12,13 +14,24 @@ export const conversacionController = {
     const { idticket } = req.params
     const conversacion = await conversacionModel.findChat(idusuario, idticket);
     if (!conversacion) return res.status(403).json({ mensaje:"Acceso no permitido" })
-    return res.json({ ...conversacion, ...(await conversacionModel.findTicketChat(conversacion.idticket)) })
+    const ticket = await conversacionModel.findTicketChat(conversacion.idticket)
+    await popularTicket(ticket, req.usuario,["empleado","usuario"])
+    return res.json({ ...conversacion, ticket })
   },
   obtenerConversaciones: async (req,res,next) => {
-    const { idusuario } = req.usuario
+    const { rol,idusuario } = req.usuario
     let conversaciones = await conversacionModel.findChats(idusuario);
     if (!conversaciones) return res.status(403).json({ mensaje:"Acceso no permitido" })
-    conversaciones = await Promise.all(conversaciones.map(async c => ({ ...c, ...(await conversacionModel.findTicketChat(c.idticket)) })))
+      
+    conversaciones = await Promise.all(conversaciones.map(async c => {
+      const ticket = await conversacionModel.findTicketChat(c.idticket)
+      if (rol === rolesUsuario.CLIENTE)
+        await popularTicket(ticket, req.usuario,["empleado"])
+      if (rol === rolesUsuario.EMPLEADO)
+        await popularTicket(ticket, req.usuario,["usuario"])
+
+      return { ...c, ticket }
+    }))
     return res.json(conversaciones)
   }
 }

@@ -1,7 +1,6 @@
 import { env } from "../environment.js"
 import { ticketModel } from "../models/ticket.js"
 import { notificacionPayloadFactory } from "../services/notificaciones.js"
-import { reqOnline } from "../socket/utilidades.js"
 import { rolesUsuario } from "./usuario.js"
 
 const crearNotificacionNuevo = (cliente, idticket, mensaje) => {
@@ -49,7 +48,27 @@ const crearNotificacionDescartado = (tecnico, cliente, ticket) => {
     mensaje: "Pronto te atenderemos"
   })
 }
+const crearNotificacionReabiertoCliente = (admin, cliente, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "directa",
+    idevento: 4,
+    fuente: ticket.idticket,
+    iniciador: admin.idusuario,
+    objetivo: cliente?.idusuario,
+    mensaje: `El admin ${admin.nombres} ha reabierto su ticket: ${ticket.asunto}`
+  })
+}
 
+const crearNotificacionReabiertoEmpleados = (admin, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "rol",
+    idevento: 4,
+    fuente: ticket.idticket,
+    iniciador: admin.idusuario,
+    objetivo: ["empleado"],
+    mensaje: `Un ticket ha sido reabierto por ${admin.nombres}`
+  })
+}
 
 
 
@@ -65,7 +84,18 @@ const crearNotificacionResuelto = (tecnico, cliente, ticket) => {
     fuente: ticket.idticket,
     iniciador: tecnico.idusuario,
     objetivo: cliente?.idusuario,
-    mensaje: `El ${tecnico.rol} ${tecnico.nombres} ha resuelto tu ticket ¿Estas satisfecho con tu cuidado?`
+    mensaje: `El ${tecnico.rol} ${tecnico.nombres} ha resuelto tu ticket ¿Estas satisfecho con el servicio?`
+  })
+}
+
+const crearNotificacionCalificacion = (cliente, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "directa",
+    idevento: 4,
+    fuente: ticket.idticket,
+    iniciador: cliente.idusuario,
+    objetivo: ticket.empleado_asignado,
+    mensaje: `Su servicio ha sido calificado por: ${cliente.nombres} ${cliente.apellidos}`
   })
 }
 
@@ -89,54 +119,57 @@ const generarNotificacionNuevo = async (ticketNuevo) => {
 }
 
 
+export const popularTicket = async (ticket, usuario,campos) => {
+  for (let campo of campos){
+    if (campo === "usuario") ticket.usuario = await ticketModel.findUsuarioTicket(ticket.idticket)
+    if (campo === "empleado") ticket.empleado = await ticketModel.findEmpleadoTicket(ticket.idticket)
+    if (campo === "calificacion") ticket.calificacion = await ticketModel.getTicketGrade({ idticket: ticket.idticket,usuario })
+      
+    ticket.tipo_servicio = (await ticketModel.getTicketTag(ticket.idticket))?.tipo_servicio
+  }
+
+}
+
+export const popularTickets = (tickets, usuario, campos) => {
+  return Promise.all(tickets.map(async t => await popularTicket(t, usuario, campos)))
+}
+
 export const ticketController = {
   crearTicketUsuario: async (req, res, next) => {
     const { idusuario } = req.usuario;
     const ticketNuevo = await ticketModel.createTicketUser(idusuario,req.body)
     res.status(201).json(ticketNuevo)
-    console.log("CREANDO TICKET A USUARIO")
-    req.payload = await generarNotificacionNuevo(ticketNuevo)
+    req.payload = [await generarNotificacionNuevo(ticketNuevo)]
     next()
   },
   crearTicketEmail: async (req, res, next) => {
     const ticketNuevo = await ticketModel.createTicketEmail(req.body)
 
     res.status(201).json(ticketNuevo)
-    req.payload = await generarNotificacionNuevo(ticketNuevo)
+    req.payload = [await generarNotificacionNuevo(ticketNuevo)]
     next()
   },
   obtenerTickets: async (req, res) => {
     let tickets;
-    const { rol,idusuario } = req.usuario
+    const { rol, idusuario } = req.usuario;
     if (Object.keys(req.query).length > 0) tickets = await ticketModel.filterTickets(req.query)
     else tickets = await ticketModel.findAll()
     if (rol === rolesUsuario.EMPLEADO){
-      tickets = tickets.filter(ticket => !ticket.empleado_asignado || ticket.empleado_asignado === idusuario)
-    } else if (rol === rolesUsuario.ADMIN){
-      await Promise.all(tickets.map(async t => {
-        if (t.empleado_asignado) {
-          t.empleado = await ticketModel.findEmpleadoTicket(t.idticket)
-          reqOnline(t.empleado)
-        }
-      }))
+      tickets = tickets.filter(t => t.estado !== "cerrado" && (!t.empleado_asignado || t.empleado_asignado === idusuario))
+      await popularTickets(tickets, req.usuario, ["usuario","calificacion"])
+    }else if (rol === rolesUsuario.ADMIN){
+      await popularTickets(tickets, req.usuario, ["empleado","usuario","calificacion"])
     }
-    await Promise.all(tickets.map(async t => {
-      if (t.idusuario) {
-        t.usuario = await ticketModel.findUsuarioTicket(t.idticket)
-        reqOnline(t.usuario)
-      }
-    }))
-    
     res.json(tickets)
   },
   obtenerTicket: async (req, res, next) => {
+    const { idusuario, rol } = req.usuario
     const { idticket } = req.params
     const ticket = await ticketModel.findById(idticket)
-    if (!ticket) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
+    console.log("OBENIEDO", ticket.estado !== "cerrado")
+    if (!ticket || ((ticket.empleado_asignado && ticket.empleado_asignado !== idusuario) && rol !== rolesUsuario.ADMIN || (rol !== rolesUsuario.ADMIN && ticket.estado === "cerrado"))) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
     if (ticket.idusuario) {
-
-      ticket.usuario = await ticketModel.findUsuarioTicket(ticket.idticket)
-      ticket.calificacion = await ticketModel.getTicketGrade({ idticket, usuario:req.usuario })
+      await popularTicket(ticket, req.usuario, ["usuario","calificacion"])
     }
     res.json(ticket)
   },
@@ -145,25 +178,23 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.findOneByUsuario(idusuario, idticket)
     if (!ticket) return res.status(403).json({ error: "No tiene permisos para esta accion" })
-    if (ticket.empleado_asignado) ticket.empleado = await ticketModel.findEmpleadoTicket(idticket)
+    await popularTicket(ticket, req.usuario, ["empleado","calificacion"])
     res.json(ticket)
   },
   gestionarTicket: async (req, res, next) => {
     const { idticket } = req.params
     const ticket = await ticketModel.manageTicket(req.body,idticket)
     if (!ticket) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
+    await popularTicket(ticket, req.usuario, ["usuario","empleado","calificacion"])
     res.json(ticket)
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    console.log(usuario_notificar)
-    req.payload = await crearNotificacionActualizacion(req.usuario, usuario_notificar, ticket);
+    req.payload = [await crearNotificacionActualizacion(req.usuario, usuario_notificar, ticket)]
     next();
   },
   obtenerTicketsUsuario: async (req, res) => {
     const { idusuario } = req.usuario
     let tickets = await ticketModel.findByUsuario(idusuario)
-    await Promise.all(tickets.map(async t => {
-      if (t.empleado_asignado) t.empleado = await ticketModel.findEmpleadoTicket(t.idticket)
-    }))
+    await popularTickets(tickets, req.usuario, ["empleado","calificacion"])
     res.json(tickets)
   },
   validarNoAceptado: async (req, res, next) => {
@@ -178,11 +209,11 @@ export const ticketController = {
     const ticket = await ticketModel.assignEmployee(idusuario, idticket)
 
     if (!ticket) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
+    await popularTicket(ticket, req.usuario, ["usuario"])
     res.status(201).json(ticket)
 
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    console.log(usuario_notificar)
-    req.payload = await crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket);
+    req.payload = [await crearNotificacionAsignacion(req.usuario, usuario_notificar, ticket)]
     next();
   },
   descartarTicketUsuario: async (req, res) => {
@@ -190,6 +221,7 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.discardTicketUser(idusuario, idticket)
     if (!ticket) res.status(403).json({ error: "No tienes permisos de modificar los tickets de alguien más" })
+    await popularTicket(ticket, req.usuario, ["empleado","calificacion"])
     res.status(201).json(ticket)
   
   },
@@ -198,15 +230,20 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.requestReopen(idticket, idusuario)
     if (!ticket) res.status(403).json({ error: "No tienes permisos de modificar los tickets de alguien más" })
+    await popularTicket(ticket, req.usuario, ["empleado","calificacion"])
     res.status(201).json(ticket)
-    req.payload = await crearNotificacionSolicitud(req.usuario, ticket);
+    req.payload = [await crearNotificacionSolicitud(req.usuario, ticket)]
     next()
   },
-  reabrirTicket: async (req, res) => {
+  reabrirTicket: async (req, res, next) => {
     const { idticket } = req.params
     const ticket = await ticketModel.reopenTicket(idticket)
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    req.payload = await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket);
+    req.payload = [
+      await crearNotificacionReabiertoCliente(req.usuario, usuario_notificar, ticket),
+      await crearNotificacionReabiertoEmpleados(req.usuario, ticket)
+    ]
+    await popularTicket(ticket, req.usuario, ["empleado","usuario","calificacion"])
     res.status(201).json(ticket)
     next()
   },
@@ -214,7 +251,8 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.solveTicket(idticket, req.usuario)
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    req.payload = await crearNotificacionResuelto(req.usuario, usuario_notificar, ticket);
+    req.payload = [await crearNotificacionResuelto(req.usuario, usuario_notificar, ticket)];
+    await popularTicket(ticket, req.usuario, ["usuario","calificacion"])
     res.status(201).json(ticket)
     next()
   },
@@ -222,10 +260,10 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.discardTicket(idticket)
     if (!ticket) res.status(404).json({ error: "Ticket no encontrado" })
-    console.log(ticket)
+    await popularTicket(ticket, req.usuario, ["empleado","usuario","calificacion"])
     res.status(201).json(ticket)
     const usuario_notificar = await ticketModel.findUsuarioTicket(ticket.idticket);
-    req.payload = await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket);
+    req.payload = [await crearNotificacionDescartado(req.usuario, usuario_notificar, ticket)];
     next()
   },
   calificarTicket: async (req, res,next) => {
@@ -233,12 +271,12 @@ export const ticketController = {
     const { idusuario } = req.usuario
     const pertenece = await ticketModel.findOneByUsuario(idusuario, idticket);
     if (!pertenece || !pertenece.empleado_asignado || pertenece.estado !== "resuelto") return res.status(403).json({ error: "No puedes calificar este ticket" })
-    console.log(req.body)
     const calificacion_ticket = await ticketModel.calificarTicket(idticket, req.body)
     const actualizar_estado = await ticketModel.setTicketState("cerrado", idticket)
     actualizar_estado.calificacion = calificacion_ticket;
+    await popularTicket(actualizar_estado, req.usuario, ["empleado"])
     res.status(201).json(actualizar_estado)
-    req.payload = await crearNotificacionCalificacion(req.usuario, actualizar_estado);
+    req.payload = [await crearNotificacionCalificacion(req.usuario, actualizar_estado)];
     next()
   },
   agregarTipoServicio: async (req,res) => {

@@ -15,6 +15,14 @@ ticketRouter.post("/",
   ticketController.crearTicketUsuario,
   notificacionController.notificar
 );
+ticketRouter.post("/email",
+  ticketEmailValidator,
+  ticketNuevoValidator,
+  checkValidator,
+  usuarioController.validarEmailCliente,
+  ticketController.crearTicketEmail,
+  notificacionController.notificar
+);
 
 ticketRouter.get("/",
   extraerUsuario,
@@ -31,14 +39,6 @@ ticketRouter.get("/prioridades-tickets",
   ticketController.obtenerPrioridadTickets,
 );
 
-ticketRouter.post("/email",
-  ticketEmailValidator,
-  ticketNuevoValidator,
-  checkValidator,
-  usuarioController.validarEmailCliente,
-  ticketController.crearTicketEmail,
-  notificacionController.notificar
-);
 
 
 ticketRouter.get("/servicios",
@@ -145,7 +145,7 @@ ticketRouter.put("/gestionar/:idticket",
 );
 ticketRouter.put("/gestionar/resuelto/:idticket",
   extraerUsuario,
-  verificarRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
+  verificarRol([rolesUsuario.EMPLEADO]),
   UUIDParamValidator("idticket"),
   checkValidator,
   ticketController.gestionarTicket,
