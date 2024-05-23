@@ -100,6 +100,15 @@ ticketRouter.put("/calificar/:idticket",
   notificacionController.notificar
 );
 
+ticketRouter.put("/solicitar-reapertura/:idticket",
+  extraerUsuario,
+  verificarRol([rolesUsuario.CLIENTE]),
+  UUIDParamValidator("idticket"),
+  checkValidator,
+  ticketController.solicitarReapertura,
+  notificacionController.notificar
+);
+
 ticketRouter.put("/aceptar/:idticket",
   extraerUsuario,
   verificarRol([rolesUsuario.EMPLEADO]),

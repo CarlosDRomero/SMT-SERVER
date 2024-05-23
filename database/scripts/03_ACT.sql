@@ -257,6 +257,7 @@ CREATE OR REPLACE FUNCTION respaldo_estado()
 RETURNS TRIGGER AS $$
 BEGIN
 	INSERT INTO ultimo_estado_ticket(idticket, estado) VALUES (OLD.idticket, OLD.estado);
+	NEW.empleado_asignado := NULL;
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

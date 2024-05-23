@@ -138,7 +138,7 @@ CREATE TABLE carrito_compras(
 	idcarrito uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idusuario uuid NOT NULL UNIQUE,
 	
-	CONSTRAINT carrito_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+	CONSTRAINT carrito_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario) ON DELETE CASCADE
 );
 
 CREATE TABLE producto_carrito(
@@ -199,8 +199,8 @@ CREATE TABLE notificacion(
 	
 	CONSTRAINT notificacion_evento FOREIGN KEY (idevento) REFERENCES evento_notificacion(idevento),
 	CONSTRAINT notificacion_tipo FOREIGN KEY (idtipo) REFERENCES tipo_receptor(idtipo),
-	CONSTRAINT usuario_notificante FOREIGN KEY (idusuario_iniciador) REFERENCES usuario(idusuario),
-	CONSTRAINT usuario_notificado FOREIGN KEY (idusuario_notificado) REFERENCES usuario(idusuario)
+	CONSTRAINT usuario_notificante FOREIGN KEY (idusuario_iniciador) REFERENCES usuario(idusuario) ON DELETE CASCADE,
+	CONSTRAINT usuario_notificado FOREIGN KEY (idusuario_notificado) REFERENCES usuario(idusuario) ON DELETE CASCADE
 );
 
 CREATE TABLE vistas_notificacion(
@@ -208,8 +208,8 @@ CREATE TABLE vistas_notificacion(
 	idusuario uuid NOT NULL,
 	
 	PRIMARY KEY (idnotificacion, idusuario),
-	CONSTRAINT notificacion_vista FOREIGN KEY (idnotificacion) REFERENCES notificacion(idnotificacion),
-	CONSTRAINT visto_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+	CONSTRAINT notificacion_vista FOREIGN KEY (idnotificacion) REFERENCES notificacion(idnotificacion) ON DELETE CASCADE,
+	CONSTRAINT visto_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario) ON DELETE CASCADE
 );
 
 
@@ -241,8 +241,8 @@ CREATE TABLE ticket(
 	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	fecha_actualizacion timestamp WITH TIME ZONE,
 	
-	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario),
-	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
+	CONSTRAINT empleado_ticket FOREIGN KEY (empleado_asignado) REFERENCES usuario(idusuario) ON DELETE SET NULL,
+	CONSTRAINT usuario_ticket FOREIGN KEY (idusuario) REFERENCES usuario(idusuario) ON DELETE CASCADE,
 	CONSTRAINT ticket_tipo_servicio FOREIGN KEY (idtipo_servicio) REFERENCES tipo_servicio(idtipo_servicio) ON DELETE SET NULL
 );
 
@@ -265,8 +265,9 @@ CREATE TABLE conversacion(
 	idconversacion uuid PRIMARY KEY DEFAULT gen_random_uuid(), 
 	idticket uuid NOT NULL UNIQUE,
 	iddependiente uuid,
-	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket)
+	CONSTRAINT conversacion_ticket FOREIGN KEY (idticket) REFERENCES ticket(idticket) ON DELETE CASCADE
 );
+
 
 CREATE TABLE mensaje(
 	idconversacion uuid NOT NULL,
@@ -278,9 +279,9 @@ CREATE TABLE mensaje(
 	estado estadoMensaje NOT NULL,
 	fecha_envio timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	
-	CONSTRAINT conversacion FOREIGN KEY (idconversacion) REFERENCES conversacion(idconversacion),
-	CONSTRAINT emisor_mensaje FOREIGN KEY (idemisor) REFERENCES usuario(idusuario),
-	CONSTRAINT receptor_mensaje FOREIGN KEY (idreceptor) REFERENCES usuario(idusuario)
+	CONSTRAINT conversacion FOREIGN KEY (idconversacion) REFERENCES conversacion(idconversacion) ON DELETE CASCADE,
+	CONSTRAINT emisor_mensaje FOREIGN KEY (idemisor) REFERENCES usuario(idusuario) ON DELETE CASCADE,
+	CONSTRAINT receptor_mensaje FOREIGN KEY (idreceptor) REFERENCES usuario(idusuario) ON DELETE CASCADE
 	
 );
 

@@ -27,7 +27,7 @@ export const inventarioModel = {
   crear: async (productoInfo) => {
     const query = {
       name: "crear-componentes-inventario",
-      text: "INSERT INTO inventario (idcomponente, sku, disponibilidad, precio) VALUES ($1,$2,$3,$4)",
+      text: "INSERT INTO inventario (idcomponente, sku, disponibilidad, precio) VALUES ($1,$2,$3,$4) RETURNING *",
       values: [
         productoInfo.idcomponente,
         productoInfo.sku,

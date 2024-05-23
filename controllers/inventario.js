@@ -26,14 +26,16 @@ export const inventarioController = {
   crearProducto: async (req, res) => {
     const { idcomponente } = req.params
     const productoNuevo = await inventarioModel.crear({ idcomponente,...req.body });
-
-    res.status(201).json(productoNuevo)
+    if (!productoNuevo) return res.status(400).json({ error: "Parece que no se pudo crear el producto, puede que el SKU este repetido" })
+    const producto = await inventarioModel.findById(productoNuevo.idproducto);
+    res.status(201).json(producto)
   },
   actualizarProducto: async (req, res) => {
     const { idproducto } = req.params
     const productoActualizado = await inventarioModel.actualizar(idproducto,req.body);
-
-    res.status(201).json(productoActualizado)
+    if (!productoActualizado) return next({ name: "RecursoNoEncontrado", message: "No se encontro este producto" })
+    const producto = await inventarioModel.findById(idproducto);
+    res.status(201).json(producto)
   },
   eliminarProducto: async (req, res) => {
     const { idproducto } = req.params

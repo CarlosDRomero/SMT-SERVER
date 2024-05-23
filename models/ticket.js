@@ -178,6 +178,30 @@ export const ticketModel = {
     const result = await poolClient.query(query);
     return result.rows[0];
   },
+  setTicketState: async (estado, idticket) => {
+    const query = {
+      name:"actualizar-estado-ticket",
+      text: "UPDATE ticket SET estado=$1 WHERE idticket=$2 RETURNING *",
+      values: [
+        estado,idticket
+      ]
+    }
+    console.log(query.values)
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
+  requestReopen: async (idticket, idusuario) => {
+    const query = {
+      name:"solicitar-reapertura-ticket",
+      text: "UPDATE ticket SET estado='en proceso' WHERE idticket=$1 AND idusuario=$2 RETURNING *",
+      values: [
+        idticket, idusuario
+      ]
+    }
+    console.log(query.values)
+    const result = await poolClient.query(query);
+    return result.rows[0];
+  },
   createTicketEmail: async (ticketInfo) => {
     const query = {
       name: "crear-ticket-email",

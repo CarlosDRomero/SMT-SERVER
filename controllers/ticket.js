@@ -14,6 +14,16 @@ const crearNotificacionNuevo = (cliente, idticket, mensaje) => {
     mensaje
   })
 }
+const crearNotificacionSolicitud = (cliente, ticket) => {
+  return notificacionPayloadFactory({
+    tipo: "rol",
+    idevento: 4,
+    fuente: ticket.idticket,
+    iniciador: cliente.idusuario,
+    objetivo: ["admin", "empleado"],
+    mensaje: `${cliente.nombres} ${cliente.apellidos} ha solicitado la reapertura del ticket: ${ticket.asunto}`
+  })
+}
 
 const crearNotificacionAsignacion = (tecnico, cliente, ticket) => {
   return notificacionPayloadFactory({
@@ -39,16 +49,9 @@ const crearNotificacionDescartado = (tecnico, cliente, ticket) => {
     mensaje: "Pronto te atenderemos"
   })
 }
-const crearNotificacionCalificacion = (cliente, ticket) => {
-  return notificacionPayloadFactory({
-    tipo: "directa",
-    idevento: 4,
-    fuente: ticket.idticket,
-    iniciador: cliente.idusuario,
-    objetivo: ticket.empleado_asignado,
-    mensaje: `Su servicio ha sido calificado por: ${cliente.nombres} ${cliente.apellidos}`
-  })
-}
+
+
+
 
 const crearNotificacionResuelto = (tecnico, cliente, ticket) => {
   return notificacionPayloadFactory({
@@ -188,6 +191,16 @@ export const ticketController = {
     const ticket = await ticketModel.discardTicketUser(idusuario, idticket)
     if (!ticket) res.status(403).json({ error: "No tienes permisos de modificar los tickets de alguien más" })
     res.status(201).json(ticket)
+  
+  },
+  solicitarReapertura: async (req, res, next) => {
+    const { idusuario } = req.usuario
+    const { idticket } = req.params
+    const ticket = await ticketModel.requestReopen(idticket, idusuario)
+    if (!ticket) res.status(403).json({ error: "No tienes permisos de modificar los tickets de alguien más" })
+    res.status(201).json(ticket)
+    req.payload = await crearNotificacionSolicitud(req.usuario, ticket);
+    next()
   },
   reabrirTicket: async (req, res) => {
     const { idticket } = req.params
@@ -222,10 +235,10 @@ export const ticketController = {
     if (!pertenece || !pertenece.empleado_asignado || pertenece.estado !== "resuelto") return res.status(403).json({ error: "No puedes calificar este ticket" })
     console.log(req.body)
     const calificacion_ticket = await ticketModel.calificarTicket(idticket, req.body)
-    pertenece.calificacion = calificacion_ticket;
-    res.status(201).json(pertenece)
-    req.payload = await crearNotificacionCalificacion(req.usuario, pertenece);
-    console.log(pertenece,req.payload)
+    const actualizar_estado = await ticketModel.setTicketState("cerrado", idticket)
+    actualizar_estado.calificacion = calificacion_ticket;
+    res.status(201).json(actualizar_estado)
+    req.payload = await crearNotificacionCalificacion(req.usuario, actualizar_estado);
     next()
   },
   agregarTipoServicio: async (req,res) => {

@@ -95,6 +95,15 @@ domicilioRouter
     checkValidator,
     domicilioController.actualizarPredeterminada
   )
+  .get("/direcciones/administrar/hacer-predeterminada/:idusuario/:iddireccion",
+    extraerUsuario,
+    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/hacer-predeterminada/", ["idusuario"]),
+    UUIDParamValidator("iddireccion", "idusuario"),
+    checkValidator,
+    gestionarUsuario("cliente"),
+    domicilioController.actualizarPredeterminada
+  )
+
 
   
 
