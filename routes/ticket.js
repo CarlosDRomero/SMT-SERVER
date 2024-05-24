@@ -5,6 +5,7 @@ import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
 import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { calificacionTicketValidator, servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
+import { conversacionController } from "../controllers/conversacion.js";
 
 const ticketRouter = Router();
 ticketRouter.post("/",
@@ -38,7 +39,12 @@ ticketRouter.get("/prioridades-tickets",
   extraerUsuario,
   ticketController.obtenerPrioridadTickets,
 );
-
+ticketRouter.get("/ticket-conversacion/:idticket",
+  extraerUsuario,
+  UUIDParamValidator("idticket"),
+  checkValidator,
+  conversacionController.obtenerTicketConversacion
+);
 
 
 ticketRouter.get("/servicios",

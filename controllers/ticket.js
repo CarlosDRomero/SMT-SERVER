@@ -166,7 +166,6 @@ export const ticketController = {
     const { idusuario, rol } = req.usuario
     const { idticket } = req.params
     const ticket = await ticketModel.findById(idticket)
-    console.log("OBENIEDO", ticket.estado !== "cerrado")
     if (!ticket || ((ticket.empleado_asignado && ticket.empleado_asignado !== idusuario) && rol !== rolesUsuario.ADMIN || (rol !== rolesUsuario.ADMIN && ticket.estado === "cerrado"))) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
     if (ticket.idusuario) {
       await popularTicket(ticket, req.usuario, ["usuario","calificacion"])

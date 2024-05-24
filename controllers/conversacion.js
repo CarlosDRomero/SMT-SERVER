@@ -33,5 +33,12 @@ export const conversacionController = {
       return { ...c, ticket }
     }))
     return res.json(conversaciones)
-  }
+  },
+  obtenerTicketConversacion: async (req, res) => {
+    const { usuario } = req
+    const { idticket } = req.params
+    let tickets = await conversacionModel.findTicketConversacion(idticket, usuario)
+    if (!tickets) return res.status(404).json({ error: "Esta conversación no existe" })
+    res.json(tickets)
+  },
 }

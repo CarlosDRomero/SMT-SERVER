@@ -84,6 +84,21 @@ export const conversacionModel = {
     const res = await poolClient.query(query);
 
     return res.rows[0];
+  },
+  findTicketConversacion: async (idticket, usuario) => {
+    const query = {
+      name: "obtener-ticket-conversacion",
+      text: `
+      SELECT t.* FROM ticket t
+      JOIN usuario u ON u.idusuario=t.idusuario OR u.idusuario=t.empleado_asignado
+      LEFT JOIN conversacion c ON t.idticket=c.idticket
+      WHERE t.idticket=$1 AND (c.idconversacion IS NOT NULL OR $2='empleado')
+      `,
+      values: [idticket,usuario.rol]
+    }
+    const res = await poolClient.query(query);
+
+    return res.rows[0];
   }
 
 }
