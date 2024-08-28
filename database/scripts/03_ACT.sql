@@ -224,6 +224,15 @@ EXECUTE FUNCTION trasladar_especificaciones();
 CREATE OR REPLACE FUNCTION actualizar_estado_ticket()
 RETURNS TRIGGER AS $$
 BEGIN
+		IF (NEW.empleado_asignado IS NOT NULL AND OLD.empleado_asignado IS NULL) THEN
+			IF (NEW.idtipo_servicio IS NULL) OR (NEW.prioridad IS NULL) THEN
+				NEW.estado := 'aceptado';
+			END IF;
+			IF (NEW.idtipo_servicio IS NOT NULL AND NEW.prioridad IS NOT NULL) THEN
+				NEW.estado='en proceso';
+			END IF;
+			RETURN NEW;
+		END IF;
 	IF (OLD.idtipo_servicio IS NULL AND NEW.idtipo_servicio IS NOT NULL) AND (OLD.prioridad IS NULL AND NEW.prioridad IS NOT NULL) THEN
 		IF (NEW.empleado_asignado IS NOT NULL) THEN
 			NEW.estado := 'en proceso';
@@ -246,7 +255,7 @@ EXECUTE FUNCTION actualizar_estado_ticket();
 
 /*
  * 
- * esta funcion junto con el trigger "cambio_categoria" se ejecutara para
+ * esta funcion junto con el trigger "ticket_cerrado" se ejecutara para
  * buscar las especificaciones de la nueva categoria que aun se pueden mantener
  * 
  * */
@@ -256,7 +265,11 @@ EXECUTE FUNCTION actualizar_estado_ticket();
 CREATE OR REPLACE FUNCTION respaldo_estado()
 RETURNS TRIGGER AS $$
 BEGIN
-	INSERT INTO ultimo_estado_ticket(idticket, estado) VALUES (OLD.idticket, OLD.estado);
+	IF (OLD.estado='resuelto') THEN
+		INSERT INTO ultimo_estado_ticket(idticket, estado) VALUES (OLD.idticket, 'listo');
+	ELSE 
+		INSERT INTO ultimo_estado_ticket(idticket, estado) VALUES (OLD.idticket, OLD.estado);
+	END IF;
 	NEW.empleado_asignado := NULL;
 	RETURN NEW;
 END;

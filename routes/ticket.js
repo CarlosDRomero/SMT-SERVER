@@ -5,6 +5,7 @@ import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
 import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { calificacionTicketValidator, servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
+import { conversacionController } from "../controllers/conversacion.js";
 
 const ticketRouter = Router();
 ticketRouter.post("/",
@@ -13,6 +14,14 @@ ticketRouter.post("/",
   ticketNuevoValidator,
   checkValidator,
   ticketController.crearTicketUsuario,
+  notificacionController.notificar
+);
+ticketRouter.post("/email",
+  ticketEmailValidator,
+  ticketNuevoValidator,
+  checkValidator,
+  usuarioController.validarEmailCliente,
+  ticketController.crearTicketEmail,
   notificacionController.notificar
 );
 
@@ -30,14 +39,11 @@ ticketRouter.get("/prioridades-tickets",
   extraerUsuario,
   ticketController.obtenerPrioridadTickets,
 );
-
-ticketRouter.post("/email",
-  ticketEmailValidator,
-  ticketNuevoValidator,
+ticketRouter.get("/ticket-conversacion/:idticket",
+  extraerUsuario,
+  UUIDParamValidator("idticket"),
   checkValidator,
-  usuarioController.validarEmailCliente,
-  ticketController.crearTicketEmail,
-  notificacionController.notificar
+  conversacionController.obtenerTicketConversacion
 );
 
 
@@ -145,7 +151,7 @@ ticketRouter.put("/gestionar/:idticket",
 );
 ticketRouter.put("/gestionar/resuelto/:idticket",
   extraerUsuario,
-  verificarRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
+  verificarRol([rolesUsuario.EMPLEADO]),
   UUIDParamValidator("idticket"),
   checkValidator,
   ticketController.gestionarTicket,
