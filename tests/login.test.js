@@ -6,6 +6,8 @@ import moment from "moment"
 import { tokens } from "../services/tokens.js"
 
 
+// TODO > Revisar funcionalidad de este test
+
 app.removeAllListeners()
 const api = supertest(app)
 

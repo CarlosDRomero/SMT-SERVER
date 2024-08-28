@@ -4,6 +4,9 @@ import { notificacionPayloadFactory } from "../services/notificaciones.js"
 import { reqOnline } from "../socket/utilidades.js"
 import { rolesUsuario } from "./usuario.js"
 
+
+// TODO:IMPORTANTE > Refactorizar este codigo y ver en que sitio se coloca mejor
+
 const crearNotificacionNuevo = (cliente, idticket, mensaje) => {
   return notificacionPayloadFactory({
     tipo: "rol",

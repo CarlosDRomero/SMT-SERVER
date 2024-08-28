@@ -4,6 +4,9 @@ import { limpiarTablas } from "./test_helper"
 import { poolClient } from "../database/conexion"
 import { tokens } from "../services/tokens"
 
+
+// TODO > Revisar funcionalidad de los test
+
 app.removeAllListeners()
 const api = supertest(app)
 

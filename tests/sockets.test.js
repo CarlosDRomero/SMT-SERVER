@@ -6,6 +6,8 @@ import { limpiarTablas } from "./test_helper.js"
 import { io as ioc } from "socket.io-client";
 import { httpServer } from "../socket/socket.js";
 
+// TODO > Revisar funcionalidad del test
+
 app.removeAllListeners()
 let api;
 let io, url, jwts, clientSockets;
