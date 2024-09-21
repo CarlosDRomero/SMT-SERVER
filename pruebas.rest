@@ -70,7 +70,7 @@ Content-Type: application/json
 }
 
 ###
-get http://localhost:5000/componentes/especificaciones-categoria/6
+get http://localhost:5000/productos/especificaciones-categoria/6
 
 
 

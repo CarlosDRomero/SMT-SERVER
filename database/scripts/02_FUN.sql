@@ -150,14 +150,14 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION obtener_productos_info(id_usuario UUID)
-RETURNS SETOF inventario AS
+RETURNS SETOF producto AS
 $$
 DECLARE
 	id_carrito UUID;
 BEGIN
 	id_carrito :=	obtener_carrito(id_usuario);
 	RETURN QUERY  SELECT i.* FROM producto_carrito pc 
-	JOIN inventario i ON i.idproducto=pc.idproducto
+	JOIN producto i ON i.idproducto=pc.idproducto
 	
 	WHERE pc.idcarrito=id_carrito;
 END;

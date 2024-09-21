@@ -1,17 +1,380 @@
-atributo
-cantidad de nucleos
-frecuencia promedio
-potencia base
-cache
-tipo de conexion
-radio de accion inalambrico
-altura
-ancho
-profundidad
-peso
-chipset
-socket
-velocidad
-capacidad
-vram
-largo
+id,espeficifacion
+1,LAN Chipset
+2,Chipset de video integrado
+3,Puertos frontales
+4,Detalle del conector
+5,DisplayPort (Puerto de visualización)
+6,Tubo dim.
+7,Especificaciones del cable
+8,Tipo de memoria flash NAND
+9,Fuego cruzado
+10,Corriente máx. de +5 V
+11,Fabricante de teléfono compatible
+12,Ventiladores de 80 mm
+13,Controlador
+14,INCURSIÓN
+15,+12V1 Corriente máx.
+16,Capacidad de disco duro incluida
+17,MTTF
+18,USB trasero
+19,"Bahías de unidad internas de 2,5"""
+20,+12V4 Máx. Corriente
+21,Otros conectores
+22,Material del marco
+23,Puerto RJ-45
+24,Memoria máxima admitida
+25,Protocolo
+26,Procesadores de flujo
+27,Nivel sonoro
+28,Ranuras PCI
+29,Conector de alimentación SATA
+30,Resolución máxima
+31,Procesador
+32,Altura
+33,4 KB de lectura aleatoria
+34,Audio Chipset
+35,Conector de alimentación
+36,Tiempo de acceso al CD-ROM
+38,Fabricante de chipsets
+39,-12 V máx. de corriente
+40,Humedad de funcionamiento
+41,Listo para la realidad virtual
+42,PCI Express x1
+43,Color de la montura
+44,Tecnologías Avanzadas
+45,Potencia recomendada de la fuente de alimentación
+46,Reloj de sombreado
+47,Capacidad máxima de memoria
+48,Pcie
+49,Adaptador de CA
+50,Corriente de entrada
+51,Ventiladores de 120 mm
+52,"Bahías de unidades externas de 3,5"""
+53,Kit multicanal
+54,Conectores USB
+55,SATA RAID
+56,OpenGL
+57,Consumo de energía (activo)
+58,Compatibilidad de bloques - Intel
+59,"Bahías de unidad internas de 3.5"""
+60,Con fuente de alimentación
+61,Uso
+62,Escritura aleatoria de 4 KB
+63,Windows Vista
+64,Tipo de CPU
+65,Número de conector
+66,Compatible con ECC
+67,Caché L3
+68,Poder
+69,Frecuencia turbo máxima
+70,Material del disipador de calor
+71,Compatibilidad de bloques
+72,# de núcleos
+73,Estilo
+74,VGA
+75,Filtros de polvo
+76,Canales de audio
+77,Tiempo de acceso al DVD-ROM
+78,Enfriador
+79,Encriptación
+80,Terabytes escritos (TBW)
+81,SLI
+82,Ancho
+83,Conéctate a
+84,Lectura secuencial máxima
+85,Conector de alimentación de 12 V
+86,"Bahías de unidades externas de 5,25"""
+87,Especificaciones de puertos
+88,Se utiliza para
+89,Cantidad total de ventiladores
+90,Serie de GPU
+91,Difusor de calor
+92,Velocidad de escritura
+93,Gráficos integrados
+94,Potencia de diseño térmico
+95,Renuncia
+96,Fuente de alimentación montada
+97,LAN inalámbrica
+98,Serie
+99,Material de la caja
+100,Dimensiones del disipador de calor
+101,Clasificación Joule de supresión de CA
+102,Potencia nominal
+103,DVD-R
+104,Conducto de aire lateral
+105,PCI Express 3.0 x16
+106,Altura máxima del refrigerador de CPU
+107,Amplificador de salida
+108,Tasa de transferencia
+109,Material del tubo
+110,Número máximo de carriles PCI Express
+111,CD-R
+112,Protección
+113,Bomba dim.
+114,Construcción
+115,Tecnología de grabación
+116,CD-ROM
+117,Compatibilidad de unidades
+118,Compatibilidad de bloques - AMD
+119,Género terminal
+120,Peso
+121,Conductividad térmica
+122,Caché L2
+123,Dimensiones (alto x ancho x profundidad)
+124,Potencia máxima de salida
+125,Compatibilidad con SLI
+126,Nombre
+127,Velocidad máxima de LAN
+128,Reloj de juego
+129,Puerto eSATA
+130,USB 3.0
+131,Temperatura de funcionamiento
+132,Gráficos Frecuencia dinámica máxima
+133,Zócalo de CPU
+134,Memoria ECC
+135,Director
+136,Anchura (máxima)
+137,Conectores internos
+138,Factor de forma
+139,Escalabilidad
+140,PCI Express 4.0 x16
+141,Puertos de audio frontales
+142,Carga Protocal
+143,Normas
+144,Revisión de PCI Express
+145,Preparado para Intel Optane
+146,Compatibilidad con varios monitores
+147,Otros puertos traseros
+148,Protección contra sobretemperatura
+149,Dimensiones del ventilador
+150,Tiempo medio de búsqueda
+151,PCI Express 2.0 x16
+152,Temperatura de funcionamiento a largo plazo
+153,Reloj de impulso
+154,Tipo de memoria
+155,Requisitos del sistema
+156,Eficacia
+157,DVI
+158,Bloque Dim.
+159,Temperatura de almacenamiento
+160,PCI Express x4
+161,Uso recomendado
+162,Interfaz de disco duro
+163,Estándar de memoria
+164,Aficionados
+165,Compatibilidad de la placa base
+166,Frecuencia base de gráficos
+167,Seguridad y confiabilidad
+168,Interfaz
+169,Disco duro instalado
+170,Interfaz externa
+171,Ventilador Dim.
+172,+12V3 Corriente máx.
+173,Adaptador
+174,HDMI
+175,Dimensiones
+176,Compatibilidad con Hyper-Threading
+177,"Corriente máx. de +3,3 V"
+178,Humedad
+179,Tipo de memoria admitido
+180,Altura (máxima)
+181,Longitud (máxima)
+182,Latencia CAS
+183,Tamaño de los ventiladores traseros
+184,Consumo de energía (inactivo)
+185,Funciones
+186,Soporte de perfil bajo incluido
+187,Profundidad
+188,Abanicar
+189,Función de memoria
+190,Capacidad
+191,Ruido del ventilador
+192,Velocidad de lectura
+193,Nivel de ruido de la fuente de alimentación
+194,Conector de ventilador
+195,Puerto USB
+196,Iluminación LED
+197,Búfer soportado
+198,Recuento de discos duros compatible
+199,Tipo de tarjeta
+200,Resistencia máxima a los golpes
+201,Tipo de carga
+202,ECC
+203,Opciones de radiador
+204,PCI Express 5.0 x16
+205,Protección contra sobrecorriente
+206,Ventana del panel lateral
+207,Interfaz interna
+208,DVD+R DL
+209,Ranuras de expansión
+210,Conector A
+211,Blindaje
+212,Tamaño máximo de memoria
+213,Controlador RAID adicional
+214,Dimensiones de la tarjeta (largo x alto)
+215,DVD+RW
+216,Modular
+217,Soporte de tecnología de virtualización
+218,Interfaz de memoria
+219,Velocidad de la bomba
+220,TDP (en inglés)
+221,Color
+222,Memoria instalada
+223,Sistema operativo compatible
+224,Audio a bordo
+225,+12V2 Máx. Corriente
+226,Frecuencia de funcionamiento
+227,Controlador de ventilador
+228,Canal admitido
+229,SATA 6Gb/s
+230,Tamaño del ventilador
+231,Tipo de procesador
+232,Tecnologías de CPU compatibles
+233,Potencia turbo máxima
+234,Consumo de energía
+235,Reloj de memoria efectivo
+236,Ancho de la ranura
+237,Número de ranuras de memoria
+238,Material
+239,Espesor del ventilador
+240,Chipsets de escritorio compatibles
+241,RPM
+242,Canal de memoria
+243,Núcleos CUDA
+244,Rieles de +12V
+245,Número de bahías
+246,Ventiladores de 200 mm
+247,Compatibilidad
+248,Protección contra sobretensión
+249,ATA serie
+250,Capacidad máxima (por bahía)
+251,USB integrado
+252,Protección contra sobrecarga
+253,Longitud máxima de la fuente de alimentación
+254,RJ45
+255,M.2
+256,Resistencia máxima a las vibraciones
+257,Fuente de alimentación
+258,Tiempo de espera
+259,Protocolos admitidos
+260,Escritura secuencial máxima
+261,Tipo de zócalo de CPU
+262,Tamaño
+263,Recuentos de fans
+264,Potencia máxima
+265,Segundo chipset LAN
+266,Pin de alimentación
+267,Bluetooth
+268,Windows 11
+269,Puertos
+270,Modelo
+271,Ventiladores de 140 mm
+272,Ruido de la bomba
+273,Volumen / Peso Neto
+274,CD-RW
+276,Características de la IA
+277,Bahías de unidades intercambiables en caliente
+278,Número de pieza
+279,Arquitectura
+280,Conector periférico
+281,Contenido del paquete
+282,Tamaño superior de los ventiladores
+283,Ranura de memoria
+284,Conjunto de chips
+285,Protección contra bajo voltaje
+286,Afinador
+287,Características técnicas
+288,Temperatura
+289,Ancho de banda de memoria máximo
+290,Soporte de Haswell
+291,Fecha disponible por primera vez
+292,Tipo
+293,PCI Express x16
+294,Puente Sur
+295,Opciones de ventilador
+296,Dispositivo de enfriamiento
+297,Configuraciones de PCI Express
+298,+5VSB Máx. Corriente
+299,Tamaño del radiador
+300,# de hilos
+301,Conector PCI-Express
+302,Tipos de memoria
+303,Tipo de rodamiento de los ventiladores superiores
+304,Longitud del cable
+305,Preparado para HDCP
+306,Dimensiones de la unidad
+307,Aprobaciones
+308,Conectores
+309,Número máximo de dispositivos compatibles
+310,Panel Color
+311,Rango de frecuencia de entrada
+312,BIOS/Perfil de rendimiento
+313,PFC
+314,Tarjeta gráfica discreta
+315,DVD-RAM
+316,USB frontal
+317,Puertos de E/S posteriores
+318,Caché
+319,Conector B
+320,Conéctate desde
+321,Disipador de calor
+322,Caché L1
+323,Soporte de 64 bits
+324,Leds
+325,DVD-R DL
+326,Latencia media
+327,MTBF
+328,DVD-ROM
+330,Conector principal de la fuente de alimentación
+331,Puente Norte
+332,Rango de frecuencia
+333,Peso unitario
+334,DVD-RW
+335,Potencia Buena Señal
+336,Flujo de aire del ventilador
+337,Material del bloque
+338,DVD+R
+339,Opción
+340,Largura
+341,Reloj central
+342,Presión
+343,Protección contra cortocircuitos
+345,Embalaje
+346,Conector de disquete
+347,Longitud máxima de la GPU
+348,Tecnología de fabricación
+349,Almacenado en búfer/registrado
+350,DirectX
+351,Material del radiador
+352,Monitor
+353,Tipo de rodamiento
+355,Tamaño de la memoria
+356,Tipo de dispositivo
+357,Registrado
+358,LED Color
+359,Compatibilidad con zócalos de CPU
+360,Capacidad máxima
+361,LAN
+362,Eficiencia energética
+363,Nombre principal
+364,RPM del ventilador
+365,Salida
+366,Velocidad
+367,Protección contra sobrealimentación
+368,Dimensiones (ancho x largo)
+369,Tipos de montaje del ventilador en el disipador de calor
+370,Sistemas operativos compatibles
+371,Perfil de rendimiento de memoria
+372,Voltaje
+373,Clasificación de clase de velocidad
+374,Otras tragamonedas
+375,Voltaje de entrada
+376,Presión atmosférica
+377,Puerto USB estándar
+378,LED
+379,Conector principal
+380,Cronometraje
+382,GPU
+383,Flujo de aire
+384,Componentes de la memoria
+385,Especificación USB

@@ -41,14 +41,14 @@ beforeAll((done) => {
   },3000)
 },10000)
 
-describe("Componentes para los clientes", () => {
+describe("Productos para los clientes", () => {
   let token;
   beforeAll(async () => {
     const res = await api.post("/auth/login").send({ clave: "test",email: "testing@tests.test.t.com" })
     token = res.body.token;
   })
-  test("Un GET a la ruta /componentes/inventario obtiene los componentes existentes en el inventario", async () => {
-    const res = await api.get("/componentes/inventario").expect(200)
+  test("Un GET a la ruta /productos/inventario obtiene los productos existentes en el inventario", async () => {
+    const res = await api.get("/productos/inventario").expect(200)
     
     expect(res.body).toHaveLength(7)
     expect(res.body[0].marca).toBeDefined();
@@ -56,8 +56,8 @@ describe("Componentes para los clientes", () => {
     expect(res.body[0].sku).toBeDefined();
     expect(res.body[0].precio).toBeDefined();
   })
-  test("Un GET a la ruta /componentes/catalogo obtiene los componentes existentes en general", async () => {
-    const res = await api.get("/componentes/catalogo").expect(200)
+  test("Un GET a la ruta /productos/catalogo obtiene los productos existentes en general", async () => {
+    const res = await api.get("/productos/catalogo").expect(200)
     
     expect(res.body).toHaveLength(7)
     expect(res.body[0].marca).toBeDefined();
@@ -65,37 +65,37 @@ describe("Componentes para los clientes", () => {
     expect(res.body[0].sku).not.toBeDefined();
     expect(res.body[0].precio).not.toBeDefined();
   })
-  test("Un GET a la ruta /componentes/especificaciones-categoria/:idcategoria obtiene una lista de las categorias posibles", async () => {
-    const res = await api.get("/componentes/especificaciones-categoria/4").expect(200)
+  test("Un GET a la ruta /productos/especificaciones-categoria/:idcategoria obtiene una lista de las categorias posibles", async () => {
+    const res = await api.get("/productos/especificaciones-categoria/4").expect(200)
     
     expect(res.body).toHaveLength(4)
     expect(res.body.map(a => a.atributo)).toContain("vram");
     
   })
-  test("Un GET a la ruta /componentes/catalogo/:idcomponente obtiene el componente general con su id de componente", async () => {
-    const res = await api.get("/componentes/catalogo").expect(200)
-  
-    const idcomponente = res.body[0].idcomponente;
-    expect(idcomponente).toBeDefined();
-
-    const res2 = await api.get(`/componentes/catalogo/${idcomponente}`).expect(200)
-    delete res2.body.especificaciones
-    expect(res2.body).toEqual(res.body[0])
-    
-  })
-  test("Un GET a la ruta /componentes/inventario/:idproducto obtiene el componente el inventario identificado con su id de producto", async () => {
-    const res = await api.get("/componentes/inventario").expect(200)
+  test("Un GET a la ruta /productos/catalogo/:idproducto obtiene el producto general con su id de producto", async () => {
+    const res = await api.get("/productos/catalogo").expect(200)
   
     const idproducto = res.body[0].idproducto;
     expect(idproducto).toBeDefined();
 
-    const res2 = await api.get(`/componentes/inventario/${idproducto}`).expect(200)
+    const res2 = await api.get(`/productos/catalogo/${idproducto}`).expect(200)
+    delete res2.body.especificaciones
+    expect(res2.body).toEqual(res.body[0])
+    
+  })
+  test("Un GET a la ruta /productos/inventario/:idproducto obtiene el producto el inventario identificado con su id de producto", async () => {
+    const res = await api.get("/productos/inventario").expect(200)
+  
+    const idproducto = res.body[0].idproducto;
+    expect(idproducto).toBeDefined();
+
+    const res2 = await api.get(`/productos/inventario/${idproducto}`).expect(200)
     
     expect(res2.body).toEqual(res.body[0])
     
   })
 })
-describe("Componentes para los admins/empleados",() => {
+describe("Productos para los admins/empleados",() => {
   let token;
   beforeAll(async () => {
     let res = await api.post("/auth/login").send({ clave: "admin",email: "admin@tests.test.t.com" })
@@ -103,7 +103,7 @@ describe("Componentes para los admins/empleados",() => {
     res = await api.post("/auth/login").send({ clave: "test",email: "testing@tests.test.t.com" })
     token = { ...token, cliente:res.body.token }
   })
-  test("Solo un admin al hacer un POST a la ruta /componentes/catalogo podra crear un nuevo componente", async () => {
+  test("Solo un admin al hacer un POST a la ruta /productos/catalogo podra crear un nuevo producto", async () => {
     const nuevaInfo = {
       idcategoria: 4,
       marca: "MARCA X",
@@ -111,152 +111,152 @@ describe("Componentes para los admins/empleados",() => {
       descripcion: "Una gpu mas en el mercado",
       url_imagen: "https://imagen.com",
       especificaciones: [
-        { idcat_espec: 13,valor: 4000 },
-        { idcat_espec: 14,valor: "230MHz" },
-        { idcat_espec: 15,valor: "300W" },
-        { idcat_espec: 16,valor: "4GB" }
+        { idespec: 13,valor: 4000 },
+        { idespec: 14,valor: "230MHz" },
+        { idespec: 15,valor: "300W" },
+        { idespec: 16,valor: "4GB" }
       ]
     }
 
-    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
+    let { body:productosb1 } = await api.get("/productos/catalogo").expect(200)
 
-    await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.post("/productos/catalogo").send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
-    expect(componentesb1).toHaveLength(componentesa1.length);
+    let { body:productosa1 } = await api.get("/productos/catalogo").expect(200)
+    expect(productosb1).toHaveLength(productosa1.length);
     
-    let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
+    let { body: productosb2 } = await api.get("/productos/catalogo").expect(200)
 
-    await api.post("/componentes/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.post("/productos/catalogo").send(nuevaInfo).set({ authorization: token.admin }).expect(201)
     
-    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
-    expect(componentesb2).toHaveLength(componentesa2.length - 1);
+    let { body: productosa2 } = await api.get("/productos/catalogo").expect(200)
+    expect(productosb2).toHaveLength(productosa2.length - 1);
 
 
     
 
   })
 
-  test("Solo un admin al hacer un PUT a la ruta /componentes/catalogo/:idcomponente podra crear un nuevo componente", async () => {
-    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
-    const componenteb1 = componentesb1[3]
+  test("Solo un admin al hacer un PUT a la ruta /productos/catalogo/:idproducto podra crear un nuevo producto", async () => {
+    let { body:productosb1 } = await api.get("/productos/catalogo").expect(200)
+    const productob1 = productosb1[3]
     const nuevaInfo = {
       idcategoria: 3,
       marca: "MSI",
       nombre: "MSIS",
-      descripcion: componenteb1.descripcion,
-      url_imagen: componenteb1.url_imagen,
+      descripcion: productob1.descripcion,
+      url_imagen: productob1.url_imagen,
       especificaciones: [
-        { idcat_espec: 9,valor: "23MHz" },
-        { idcat_espec: 10,valor: "8GB" }
+        { idespec: 9,valor: "23MHz" },
+        { idespec: 10,valor: "8GB" }
       ]
     }
     
-    expect(componenteb1.idcomponente).toBeDefined();
+    expect(productob1.idproducto).toBeDefined();
     
 
-    await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.put(`/productos/catalogo/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    const componentea1 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
+    const productoa1 = (await poolClient.query(`SELECT * FROM producto WHERE idproducto='${productob1.idproducto}'`)).rows[0]
 
-    expect(componentea1).toEqual(componenteb1);
+    expect(productoa1).toEqual(productob1);
     
 
-    const res = await api.put(`/componentes/catalogo/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
-    const componentea2 = (await poolClient.query(`SELECT * FROM componente WHERE idcomponente='${componenteb1.idcomponente}'`)).rows[0]
+    const res = await api.put(`/productos/catalogo/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    const productoa2 = (await poolClient.query(`SELECT * FROM producto WHERE idproducto='${productob1.idproducto}'`)).rows[0]
 
-    expect(componentea2.marca).toBe("MSI");
-    expect(componentea2.nombre).toBe("MSIS");
+    expect(productoa2.marca).toBe("MSI");
+    expect(productoa2.nombre).toBe("MSIS");
 
-    expect(componentea2.url_imagen).toEqual(componenteb1.url_imagen);
+    expect(productoa2.url_imagen).toEqual(productob1.url_imagen);
 
   })
 
-  test("Solo un admin al hacer un DELETE a la ruta /componentes/catalogo/:idcomponente podra eliminar un componente", async () => {
-    let { body:componentesb1 } = await api.get("/componentes/catalogo").expect(200)
+  test("Solo un admin al hacer un DELETE a la ruta /productos/catalogo/:idproducto podra eliminar un producto", async () => {
+    let { body:productosb1 } = await api.get("/productos/catalogo").expect(200)
 
-    await api.delete("/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.cliente }).expect(403)
+    await api.delete("/productos/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes/catalogo").expect(200)
-    expect(componentesb1).toHaveLength(componentesa1.length);
+    let { body:productosa1 } = await api.get("/productos/catalogo").expect(200)
+    expect(productosb1).toHaveLength(productosa1.length);
     
-    let { body: componentesb2 } = await api.get("/componentes/catalogo").expect(200)
+    let { body: productosb2 } = await api.get("/productos/catalogo").expect(200)
 
-    await api.delete("/componentes/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.admin }).expect(204)
+    await api.delete("/productos/catalogo/c283e7b6-e291-412d-a25e-ab0b5c40229a").set({ authorization: token.admin }).expect(204)
 
-    let { body: componentesa2 } = await api.get("/componentes/catalogo").expect(200)
+    let { body: productosa2 } = await api.get("/productos/catalogo").expect(200)
     
-    expect(componentesa2).toHaveLength(componentesb2.length - 1);
+    expect(productosa2).toHaveLength(productosb2.length - 1);
 
   })
 
-  test("Solo un admin al hacer un POST a la ruta /componentes/inventario podra crear un nuevo componente", async () => {
-    let { body:catalogo } = await api.get("/componentes/catalogo").expect(200)
-    const componenteb1 = catalogo[3]
+  test("Solo un admin al hacer un POST a la ruta /productos/inventario podra crear un nuevo producto", async () => {
+    let { body:catalogo } = await api.get("/productos/catalogo").expect(200)
+    const productob1 = catalogo[3]
     const nuevaInfo = {
       sku: "XD-1123-SDF",
       disponibilidad: "40", // puede estar mal que sea string?
       precio: "1500000"
     }
 
-    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
+    let { body:productosb1 } = await api.get("/productos/inventario").expect(200)
 
-    await api.post(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    await api.post(`/productos/inventario/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes/inventario").expect(200)
-    expect(componentesb1).toHaveLength(componentesa1.length);
+    let { body:productosa1 } = await api.get("/productos/inventario").expect(200)
+    expect(productosb1).toHaveLength(productosa1.length);
 
-    await api.post(`/componentes/inventario/${componenteb1.idcomponente}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.post(`/productos/inventario/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body: componentesa2 } = await api.get("/componentes/inventario").expect(200)
-    expect(componentesa1).toHaveLength(componentesa2.length - 1);
+    let { body: productosa2 } = await api.get("/productos/inventario").expect(200)
+    expect(productosa1).toHaveLength(productosa2.length - 1);
 
   })
 
-  test("Solo un admin al hacer un PUT a la ruta /componentes/inventario/:idproducto podra crear un nuevo componente", async () => {
-    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
-    const componenteb1 = componentesb1[3]
+  test("Solo un admin al hacer un PUT a la ruta /productos/inventario/:idproducto podra crear un nuevo producto", async () => {
+    let { body:productosb1 } = await api.get("/productos/inventario").expect(200)
+    const productob1 = productosb1[3]
     const nuevaInfo = {
       sku: "NOXD-1123-SDF",
       disponibilidad: "21", // puede estar mal que sea string?
-      precio: componenteb1.precio
+      precio: productob1.precio
     }
     
-    expect(componenteb1.idcomponente).toBeDefined();
+    expect(productob1.idproducto).toBeDefined();
     
-    const res = await api.put(`/componentes/inventario/${componenteb1.idproducto}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
-    let { body:componentea1 } = await api.get(`/componentes/inventario/${componenteb1.idproducto}`).expect(200)
+    const res = await api.put(`/productos/inventario/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.cliente }).expect(403)
+    let { body:productoa1 } = await api.get(`/productos/inventario/${productob1.idproducto}`).expect(200)
 
-    expect(componentea1).toEqual(componenteb1);
+    expect(productoa1).toEqual(productob1);
     
 
-    await api.put(`/componentes/inventario/${componenteb1.idproducto}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
+    await api.put(`/productos/inventario/${productob1.idproducto}`).send(nuevaInfo).set({ authorization: token.admin }).expect(201)
 
-    let { body:componentea2 } = await api.get(`/componentes/inventario/${componenteb1.idproducto}`).expect(200)
+    let { body:productoa2 } = await api.get(`/productos/inventario/${productob1.idproducto}`).expect(200)
 
-    expect(componentea2.sku).toBe(nuevaInfo.sku);
-    expect(componentea2.disponibilidad).toBe(Number(nuevaInfo.disponibilidad));
+    expect(productoa2.sku).toBe(nuevaInfo.sku);
+    expect(productoa2.disponibilidad).toBe(Number(nuevaInfo.disponibilidad));
 
-    expect(componentea2.precio).toEqual(componenteb1.precio);
+    expect(productoa2.precio).toEqual(productob1.precio);
 
   })
 
-  test("Solo un admin al hacer un DELETE a la ruta /componentes/inventario/:idproducto podra eliminar un componente", async () => {
-    let { body:componentesb1 } = await api.get("/componentes/inventario").expect(200)
-    const componenteb1 = componentesb1[3]
+  test("Solo un admin al hacer un DELETE a la ruta /productos/inventario/:idproducto podra eliminar un producto", async () => {
+    let { body:productosb1 } = await api.get("/productos/inventario").expect(200)
+    const productob1 = productosb1[3]
 
-    await api.delete(`/componentes/inventario/${componenteb1.idproducto}`).set({ authorization: token.cliente }).expect(403)
+    await api.delete(`/productos/inventario/${productob1.idproducto}`).set({ authorization: token.cliente }).expect(403)
 
-    let { body:componentesa1 } = await api.get("/componentes/inventario").expect(200)
-    expect(componentesb1).toHaveLength(componentesa1.length);
+    let { body:productosa1 } = await api.get("/productos/inventario").expect(200)
+    expect(productosb1).toHaveLength(productosa1.length);
     
-    let { body: componentesb2 } = await api.get("/componentes/inventario").expect(200)
+    let { body: productosb2 } = await api.get("/productos/inventario").expect(200)
 
-    await api.delete(`/componentes/inventario/${componenteb1.idproducto}`).set({ authorization: token.admin }).expect(204)
+    await api.delete(`/productos/inventario/${productob1.idproducto}`).set({ authorization: token.admin }).expect(204)
 
-    let { body: componentesa2 } = await api.get("/componentes/inventario").expect(200)
+    let { body: productosa2 } = await api.get("/productos/inventario").expect(200)
     
-    expect(componentesa2).toHaveLength(componentesb2.length - 1);
+    expect(productosa2).toHaveLength(productosb2.length - 1);
 
   })
 })

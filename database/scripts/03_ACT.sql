@@ -154,39 +154,13 @@ EXECUTE FUNCTION limpiar_predeterminadas();
 
 /*
  * 
- * esta funcion junto con el trigger "especificacion_componente" se ejecutara para
- * evitar que se inserte una especificacion de un componente cuya categoria no la incluye
+ * esta funcion junto con el trigger "especificacion_producto" se ejecutara para
+ * evitar que se inserte una especificacion de un producto cuya categoria no la incluye
  * 
  * */
 
 
 
-CREATE OR REPLACE FUNCTION verificar_especificacion()
-RETURNS TRIGGER AS $$
-DECLARE categoria_componente integer;
-BEGIN
-	SELECT idcategoria INTO categoria_componente
-	FROM componente
-	WHERE idcomponente=NEW.idcomponente;
-
-	IF EXISTS(
-		SELECT 1
-		FROM categoria_espec
-		WHERE idcat_espec=NEW.idcat_espec
-		  AND idcategoria = categoria_componente
-	) THEN
-			RETURN NEW;
-	ELSE
-		RAISE EXCEPTION 'Una especificacion no coincide con la categoria del producto';
-	END IF;
-	
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE TRIGGER especificacion_componente
-BEFORE INSERT ON componente_espec
-FOR EACH ROW
-EXECUTE FUNCTION verificar_especificacion();
 
 /*TODO:IMPORTANTE > MANEJAR EL CASO EN QUE SE CAMBIE LA CATEGORIA DE UN PRODUCTO*/
 
@@ -199,18 +173,6 @@ EXECUTE FUNCTION verificar_especificacion();
 
 
 
-CREATE OR REPLACE FUNCTION trasladar_especificaciones()
-RETURNS TRIGGER AS $$
-BEGIN
-	
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE TRIGGER cambio_categoria
-AFTER UPDATE OF idcategoria ON componente
-FOR EACH ROW
-WHEN (NEW.idcategoria <> OLD.idcategoria)
-EXECUTE FUNCTION trasladar_especificaciones();
 
 /*
  * 

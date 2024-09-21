@@ -1,4 +1,4 @@
-import { categoriaModel } from "../models/categoria_componente.js";
+import { categoriaModel } from "../models/categoria_producto.js";
 
 export const categoriaController = {
   obtenerCategorias: async (req, res) => {
@@ -17,7 +17,7 @@ export const categoriaController = {
     const especificaciones = await categoriaModel.findSpecsById(idcategoria);
 
     const matches = especificaciones?.reduce(
-      (value,espec) => value ? !!req.body.especificaciones?.find(e => e.idcat_espec === espec.idcat_espec) : value, true
+      (value,espec) => value ? !!req.body.especificaciones?.find(e => e.idespec === espec.idespec) : value, true
     )
     if (!matches) return res.status(400).json({ error: "Hacen falta especificaciones para esta categoría" })
 
@@ -28,7 +28,7 @@ export const categoriaController = {
     const especificaciones = await categoriaModel.findSpecsById(idcategoria);
 
     const matches = req.body.especificaciones?.reduce(
-      (value,espec) => value ? !!especificaciones?.find(e => e.idcat_espec === espec.idcat_espec) : value, true
+      (value,espec) => value ? !!especificaciones?.find(e => e.idespec === espec.idespec) : value, true
     )
     if (!matches) return res.status(400).json({ error: "Alguna espeficicacion no es valida" })
     next();

@@ -5,7 +5,7 @@ export const categoriaModel = {
   findAll: async () => {
     const query = {
       name: "obtener-categorias",
-      text: "SELECT * FROM categoria_componente"
+      text: "SELECT * FROM categoria_producto"
     }
 
     const res = await poolClient.query(query);
@@ -14,7 +14,11 @@ export const categoriaModel = {
   findSpecsById: async (idcategoria) => {
     const query = {
       name: "obtener-especificaciones-categoria",
-      text: "SELECT idcat_espec, atributo FROM categoria_espec ce JOIN atributo_espec ae ON ae.idespec=ce.idespec WHERE ce.idcategoria=$1",
+      text: `SELECT pe.idespec, ae.atributo FROM producto_espec pe 
+      JOIN atributo_espec ae ON ae.idespec=pe.idespec
+      JOIN producto p ON p.idproducto=pe.idproducto
+      JOIN categoria ce on ce.idcategoria=p.idcategoria
+      WHERE ce.idcategoria=$1`,
       values: [idcategoria]
     }
 

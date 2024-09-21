@@ -1,8 +1,20 @@
-denominacion
-perifericos
-motherboards
-CPU
-GPU
-RAM
-Cables
-Unidades de almacenamiento
+id,categoria
+1,Adaptadores y cambiadores de género
+2,Ordenadores Barebone / Mini
+3,Grabadoras de CD / DVD / Blu-Ray y medios
+4,CPUs / Procesadores
+5,Cables
+6,Accesorios para computadoras
+7,Chasis de computadora
+8,Ventiladores y enfriamiento de PC
+9,GPUs y dispositivos gráficos de vídeo
+10,Discos duros
+11,Dispositivo de entrada
+12,Accesorios para portátiles
+13,Memoria
+14,Placas base
+15,Almacenamiento conectado a la red (NAS)
+16,Protección de energía
+17,Fuentes de alimentación
+18,SSD
+19,Unidades flash USB y tarjetas de memoria

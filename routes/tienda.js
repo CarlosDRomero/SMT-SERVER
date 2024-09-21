@@ -4,7 +4,7 @@ import { rolesUsuario } from "../controllers/usuario.js";
 import { carritoComprasController } from "../controllers/carrito_compras.js";
 import { productoCarritoValidator } from "../validators/tienda_validator.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
-import { inventarioController } from "../controllers/inventario.js";
+import { productoController } from "../controllers/producto.js";
 
 const tiendaRouter = Router()
 
@@ -12,7 +12,7 @@ tiendaRouter.get("/validar-cantidad/:idproducto",
   productoCarritoValidator,
   UUIDParamValidator("idproducto"),
   checkValidator,
-  inventarioController.validarCantidadProducto,
+  productoController.validarCantidadProducto,
   (req,res) => {
     res.status(204).send();
   }
@@ -42,7 +42,7 @@ tiendaRouter.post("/carrito/:idproducto",
   productoCarritoValidator,
   UUIDParamValidator("idproducto"),
   checkValidator,
-  inventarioController.validarCantidadProducto,
+  productoController.validarCantidadProducto,
   carritoComprasController.agregarACarrito
 )
 

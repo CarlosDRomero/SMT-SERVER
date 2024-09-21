@@ -50,7 +50,7 @@ CREATE TABLE codigo_verificacion(
 /* 
  * 
  * 
- * INICIAL DEL SISTEMA DE COMPONENTES COMO PRODUCTO 
+ * INICIAL DEL SISTEMA DE productoS COMO PRODUCTO 
  * 
  * 
  * */
@@ -60,52 +60,34 @@ CREATE TABLE atributo_espec(
 	atributo varchar(150) UNIQUE
 );
 
-CREATE TABLE categoria_componente(
+CREATE TABLE categoria_producto(
 	idcategoria serial PRIMARY KEY,
-	denominacion varchar(30) NOT NULL UNIQUE
+	denominacion varchar(75) NOT NULL UNIQUE
 );
 
-CREATE TABLE categoria_espec(
-	idcat_espec serial PRIMARY KEY,
-	idespec integer NOT NULL,
-	idcategoria integer NOT NULL,
-	
-	CONSTRAINT espec_categoria FOREIGN KEY (idespec) REFERENCES atributo_espec(idespec)  ON DELETE CASCADE,
-	CONSTRAINT categoria_espec FOREIGN KEY (idcategoria) REFERENCES categoria_componente(idcategoria)
-);
-
-CREATE TABLE componente(
-	idcomponente uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+CREATE TABLE producto(
+	idproducto uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idcategoria integer NOT NULL,
 	marca varchar(20) NOT NULL,
-	nombre varchar(50) NOT NULL,
-	descripcion varchar(1000) NOT NULL,
-	url_imagen varchar(500) NOT NULL,
-	
-	CONSTRAINT categoria_componente FOREIGN KEY(idcategoria) REFERENCES categoria_componente(idcategoria)
-	
-);
-
-CREATE TABLE componente_espec(
-	idcat_espec integer NOT NULL,
-	idcomponente uuid NOT NULL,
-	valor varchar(100),
-	
-	PRIMARY KEY (idcat_espec, idcomponente),
-	CONSTRAINT cat_espec_componente FOREIGN KEY (idcat_espec) REFERENCES categoria_espec(idcat_espec)  ON DELETE CASCADE,
-	CONSTRAINT componente_cat_espec FOREIGN KEY (idcomponente) REFERENCES componente(idcomponente) ON DELETE CASCADE
-);
-
-CREATE TABLE inventario(
-	idproducto uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	idcomponente uuid NOT NULL,
-	SKU varchar(22) UNIQUE,
+	nombre varchar(500) NOT NULL,
 	disponibilidad integer,
 	precio float,
+	descripcion text NOT NULL,
+	url_imagen varchar(500) NOT NULL,
+	CONSTRAINT categoria_producto FOREIGN KEY(idcategoria) REFERENCES categoria_producto(idcategoria)
 	
-	CONSTRAINT unique_sku_componente UNIQUE(idcomponente, SKU),
-	CONSTRAINT inventario_componente FOREIGN KEY (idcomponente) REFERENCES componente(idcomponente) ON DELETE CASCADE
 );
+
+CREATE TABLE producto_espec(
+	idespec integer NOT NULL,
+	idproducto uuid NOT NULL,
+	valor TEXT,
+	
+	PRIMARY KEY (idespec, idproducto),
+	CONSTRAINT espec_producto FOREIGN KEY (idespec) REFERENCES atributo_espec(idespec)  ON DELETE CASCADE,
+	CONSTRAINT producto_espec FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE
+);
+
 CREATE TABLE promocion(
 	idpromocion serial PRIMARY KEY,
 	idusuario uuid,
@@ -125,7 +107,7 @@ CREATE TABLE promocion_categoria(
 	
 	PRIMARY KEY (idpromocion, idcategoria),
 	CONSTRAINT promocion_categoria FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
-	CONSTRAINT categoria_promocion FOREIGN KEY (idcategoria) REFERENCES categoria_componente(idcategoria)
+	CONSTRAINT categoria_promocion FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria)
 );
 
 /*
@@ -148,7 +130,7 @@ CREATE TABLE producto_carrito(
 	
 	PRIMARY KEY (idcarrito, idproducto),
 	CONSTRAINT carrito_producto FOREIGN KEY (idcarrito) REFERENCES carrito_compras(idcarrito) ON DELETE CASCADE,
-	CONSTRAINT producto_carrito FOREIGN KEY (idproducto) REFERENCES inventario(idproducto) ON DELETE CASCADE
+	CONSTRAINT producto_carrito FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE
 );
 
 CREATE TABLE orden_compra(
@@ -172,7 +154,7 @@ CREATE TABLE producto_orden(
 	costo integer DEFAULT 0,
 	
 	CONSTRAINT orden_producto FOREIGN KEY (idorden) REFERENCES orden_compra(idorden),
-	CONSTRAINT producto_orden FOREIGN KEY (idproducto) REFERENCES inventario(idproducto)
+	CONSTRAINT producto_orden FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
 );
 
 CREATE TABLE evento_notificacion(

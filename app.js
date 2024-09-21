@@ -5,7 +5,7 @@ import cors from "cors"
 
 import authRouter from "./routes/auth.js";
 import domicilioRouter from "./routes/domicilio.js";
-import componentesRouter from "./routes/componentes.js";
+import productosRouter from "./routes/productos.js";
 import ticketRouter from "./routes/ticket.js";
 import notificacionesRouter from "./routes/notificaciones.js";
 
@@ -30,7 +30,7 @@ app.use(cors(corsOptions));
 
 app.use("/auth", authRouter)
 app.use("/domicilio", domicilioRouter)
-app.use("/componentes", componentesRouter)
+app.use("/productos", productosRouter)
 app.use("/tickets", ticketRouter)
 app.use("/tienda", tiendaRouter)
 app.use("/notificaciones", notificacionesRouter)
