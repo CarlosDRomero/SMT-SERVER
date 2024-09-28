@@ -35,6 +35,7 @@ export const generarCodigo = (req, _, next) => {
 //TODO:OPCIONAL > return map de la propiedad del mensaje del error
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
+  console.log(req.body)
   if (!errors.isEmpty()){
     console.log("ERRORES: ", errors.array())
     return res.status(400).json({ errors: errors.array() })
@@ -86,12 +87,9 @@ export const verificarRol = (rolesAdmitidos) => {
     next()
   }
 }
-export const redireccionPorRol = (rolesAdmitidos, ruta, ignorar = []) => {
-  return async (req, res, next) => {
-    const parametros = Object.entries(req.params).filter(([p]) => !ignorar.includes(p)).map(p => p[1])
-    if (!rolesAdmitidos.includes(req.usuario.rol)) return res.redirect(307,ruta + parametros.join("/"))
-    next()
-  }
+export const middlewarePorRol = (rolesGestionadores, vista1, vista2) => (req, res,next) => {
+  if (rolesGestionadores.includes(req.usuario.rol)) return vista1(req, res,next)
+  return vista2(req, res,next)
 }
 
 /**
@@ -103,12 +101,14 @@ export const redireccionPorRol = (rolesAdmitidos, ruta, ignorar = []) => {
 *
 **/
 
-export const gestionarUsuario = (rolObjetivo) => async (req, res, next) => {
-  const userData = await usuarioModel.findById(req.params.idusuario)
-  if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
-  if (userData.rol !== rolObjetivo) return next({ name: "RolNoDebido", message: "Este usuario no aplica para esta caracteristica" })
-  req.usuarioGestor = req.usuario;
-  req.usuario = userData;
+export const gestionarUsuario = (rolObjetivo, rolesGestionantes) => async (req, res, next) => {
+  if (req.usuario && req.params.idusuario !== req.usuario.idusuario && rolesGestionantes.includes(req.usuario.rol)){
+    const userData = await usuarioModel.findById(req.headers.idusuario_gestionado)
+    if (!userData) return res.status(404).json({ error: "Debes gestionar a un usuario que exista." })
+    if (userData.rol !== rolObjetivo) return next({ name: "RolNoDebido", message: "Este usuario no aplica para esta caracteristica" })
+    req.usuarioGestor = req.usuario;
+    req.usuario = userData;
+  }
   next()
 }
 

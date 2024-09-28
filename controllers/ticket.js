@@ -149,6 +149,7 @@ export const ticketController = {
     const ticketNuevo = await ticketModel.createTicketEmail(req.body)
 
     res.status(201).json(ticketNuevo)
+
     req.payload = [await generarNotificacionNuevo(ticketNuevo)]
     next()
   },

@@ -1,10 +1,10 @@
 import { Router } from "express"
 import { colombiaAPIController } from "../controllers/colombia_api.js";
 import { municipioParamValidator } from "../validators/munipicio_validator.js";
-import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol, redireccionPorRol } from "../middlewares.js";
+import { checkValidator, extraerUsuario, gestionarUsuario, verificarRol } from "../middlewares.js";
 import { direccionValidator } from "../validators/direccion_validator.js";
 import { domicilioController } from "../controllers/domicilio.js";
-import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
+import { IdUsuarioBodyOptional, NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { rolesUsuario } from "../controllers/usuario.js";
 
 const domicilioRouter = Router()
@@ -51,41 +51,45 @@ domicilioRouter
     domicilioController.eliminarDireccion
   ) //eliminar direcciones del usuario
 
-  .get("/direcciones/administrar/:idusuario",
+  .get("/direcciones/administrar",
     extraerUsuario,
-    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
-    UUIDParamValidator("idusuario"),
+    verificarRol([rolesUsuario.CLIENTE,rolesUsuario.ADMIN]),
+    // redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
+    IdUsuarioBodyOptional,
     checkValidator,
-    gestionarUsuario("cliente"),
+    gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN]),
     domicilioController.obtenerDireccion
   ) //obtener direcciones por id solo siendo admin
 
-  .post("/direcciones/administrar/:idusuario",
+  .post("/direcciones/administrar",
     extraerUsuario,
-    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
+    verificarRol([rolesUsuario.CLIENTE,rolesUsuario.ADMIN]),
+    // redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
     direccionValidator,
-    UUIDParamValidator("idusuario"),
+    IdUsuarioBodyOptional,
     checkValidator,
-    gestionarUsuario("cliente"),
+    gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN]),
     domicilioController.crearDireccion
   )
 
-  .put("/direcciones/administrar/:idusuario/:iddireccion",
+  .put("/direcciones/administrar/:iddireccion",
     extraerUsuario,
-    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
-    UUIDParamValidator("idusuario", "iddireccion"),
+    verificarRol([rolesUsuario.CLIENTE,rolesUsuario.ADMIN]),
+    IdUsuarioBodyOptional,
+    UUIDParamValidator("iddireccion"),
     direccionValidator,
     checkValidator,
-    gestionarUsuario("cliente"),
+    gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN]),
     domicilioController.actualizarDireccion
   )
 
-  .delete("/direcciones/administrar/:idusuario/:iddireccion",
+  .delete("/direcciones/administrar/:iddireccion",
     extraerUsuario,
-    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/", ["idusuario"]),
-    UUIDParamValidator("idusuario", "iddireccion"),
+    verificarRol([rolesUsuario.CLIENTE,rolesUsuario.ADMIN]),
+    IdUsuarioBodyOptional,
+    UUIDParamValidator("iddireccion"),
     checkValidator,
-    gestionarUsuario("cliente"),
+    gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN]),
     domicilioController.eliminarDireccion
   )
   .get("/direcciones/hacer-predeterminada/:iddireccion",
@@ -95,12 +99,13 @@ domicilioRouter
     checkValidator,
     domicilioController.actualizarPredeterminada
   )
-  .get("/direcciones/administrar/hacer-predeterminada/:idusuario/:iddireccion",
+  .get("/direcciones/administrar/hacer-predeterminada/:iddireccion",
     extraerUsuario,
-    redireccionPorRol([rolesUsuario.ADMIN], "/domicilio/direcciones/hacer-predeterminada/", ["idusuario"]),
-    UUIDParamValidator("iddireccion", "idusuario"),
+    verificarRol([rolesUsuario.CLIENTE,rolesUsuario.ADMIN]),
+    IdUsuarioBodyOptional,
+    UUIDParamValidator("iddireccion"),
     checkValidator,
-    gestionarUsuario("cliente"),
+    gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN]),
     domicilioController.actualizarPredeterminada
   )
 

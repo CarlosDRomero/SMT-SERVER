@@ -79,7 +79,6 @@ export const usuarioController = {
   },
   validarEmailCliente: async (req, res, next) => {
     const { email } = req.body
-    if (!email) return res.redirect(307,"/tickets/")
     const usuario = await usuarioModel.findByEmailOrUserName({ email })
     console.log("usuario encontrado: ",usuario)
     if (!usuario)return next()

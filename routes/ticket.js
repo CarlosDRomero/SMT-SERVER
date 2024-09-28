@@ -1,8 +1,8 @@
 import { Router } from "express"
 import { ticketController } from "../controllers/ticket.js";
-import { checkValidator, extraerUsuario, gestionarUsuario, redireccionPorRol, verificarRol } from "../middlewares.js";
+import { checkValidator, extraerUsuario, gestionarUsuario, middlewarePorRol, verificarRol } from "../middlewares.js";
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js";
-import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
+import { IdUsuarioBodyOptional, NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { calificacionTicketValidator, servicioValidator, ticketEmailValidator, ticketNuevoValidator, ticketProcessValidator } from "../validators/ticket_validator.js";
 import { notificacionController } from "../controllers/notificacion.js";
 import { conversacionController } from "../controllers/conversacion.js";
@@ -77,16 +77,17 @@ ticketRouter.delete("/servicios/:idtipo_servicio",
 
 ticketRouter.get("/gestionar",
   extraerUsuario,
-  redireccionPorRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO], "/tickets/"),
-  ticketController.obtenerTickets
+  //VERIFICAR ROL?
+  middlewarePorRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO],ticketController.obtenerTickets, ticketController.obtenerTicketsUsuario)
 );
 
 ticketRouter.get("/gestionar/:idticket",
   extraerUsuario,
-  redireccionPorRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO], "/tickets/"),
   UUIDParamValidator("idticket"),
   checkValidator,
-  ticketController.obtenerTicket
+  middlewarePorRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO], ticketController.obtenerTicket, ticketController.obtenerTicketUsuario),
+  
+
 );
 ticketRouter.get("/:idticket",
   extraerUsuario,
@@ -126,17 +127,16 @@ ticketRouter.put("/aceptar/:idticket",
 );
 ticketRouter.put("/descartar/:idticket",
   extraerUsuario,
-  redireccionPorRol([rolesUsuario.CLIENTE]),
+  verificarRol([rolesUsuario.CLIENTE]),
   UUIDParamValidator("idticket"),
   checkValidator,
-  ticketController.descartarTicketUsuario
+  
 );
 ticketRouter.put("/gestionar/descartar/:idticket",
   extraerUsuario,
-  redireccionPorRol([rolesUsuario.EMPLEADO, rolesUsuario.ADMIN], "/tickets/descartar/"),
   UUIDParamValidator("idticket"),
   checkValidator,
-  ticketController.descartarTicket,
+  middlewarePorRol([rolesUsuario.EMPLEADO, rolesUsuario.ADMIN],ticketController.descartarTicket,ticketController.descartarTicketUsuario),
   notificacionController.notificar
 );
 
@@ -179,12 +179,12 @@ ticketRouter.put("/gestionar/resolver/:idticket",
 
 
 
-ticketRouter.get("/gestionar/:idusuario",
+ticketRouter.get("/gestionar",
   extraerUsuario,
   verificarRol([rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
-  UUIDParamValidator("idusuario"),
+  IdUsuarioBodyOptional,
   checkValidator,
-  gestionarUsuario(rolesUsuario.CLIENTE),
+  gestionarUsuario(rolesUsuario.CLIENTE, [rolesUsuario.ADMIN, rolesUsuario.EMPLEADO]),
   ticketController.obtenerTicketsUsuario
 );
 
