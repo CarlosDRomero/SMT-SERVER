@@ -20,6 +20,17 @@ export const fecha_validator = (dateString) => {
   return day > 0 && day <= monthLength[month - 1];
 };
 
+export const is_base64 = (str) => {
+  const base64Regex = /^[A-Za-z0-9+/=]+$/;
+
+  // Verificar longitud divisible por 4 y caracteres válidos de Base64
+  if (!base64Regex.test(str) || str.length % 4 !== 0) {
+    throw new Error("Invalid cursor. Must be a valid encoded string.");
+  }
+
+  return true;
+}
+
 export const RolValidator = (rol) => {
   // console.log("VALIDANDO ROL: ", rol,!!usuarioController.roles[rol.toUpperCase()])
   return !!rolesUsuario[rol.toUpperCase()]

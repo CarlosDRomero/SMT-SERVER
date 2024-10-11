@@ -3,6 +3,7 @@ import { Encrypt } from "./services/encryption.js"
 import { genCode } from "./services/random.js";
 import { tokens } from "./services/tokens.js";
 import { usuarioModel } from "./models/usuario.js";
+import { parseCursorOrderingFieldsDirections } from "./utils.js";
 
 
 export const claveEncrypt = async (req, _, next) => {
@@ -35,7 +36,6 @@ export const generarCodigo = (req, _, next) => {
 //TODO:OPCIONAL > return map de la propiedad del mensaje del error
 export const checkValidator = (req, res, next) => {
   const errors = validationResult(req);
-  console.log(req.body)
   if (!errors.isEmpty()){
     console.log("ERRORES: ", errors.array())
     return res.status(400).json({ errors: errors.array() })
@@ -112,6 +112,30 @@ export const gestionarUsuario = (rolObjetivo, rolesGestionantes) => async (req, 
   next()
 }
 
+export const parsePagingHeader = (req, _, next) => {
+  req.headers.paging = JSON.parse(req.headers.paging)
+  next()
+}
+export const parsePaging = (validOrderingFields) => (req, res, next) => {
+  if (req.headers.paging){
+    const { cursor, cursorsetup } = req.headers.paging
+    if (cursorsetup){
+      req.pageCursor = {
+        fields: parseCursorOrderingFieldsDirections(cursorsetup.orderby, validOrderingFields),
+        pageSize: cursorsetup.pagesize
+      }
+      console.log(`Setup: ${JSON.stringify(cursorsetup)}`)
+      return next()
+    }
+    else if (cursor){
+      const decoded_cursor = JSON.parse(atob(cursor))
+      req.pageCursor = decoded_cursor
+      return next()
+    }
+  }
+  req.pageCursor = {}
+  next()
+}
 
 
 
