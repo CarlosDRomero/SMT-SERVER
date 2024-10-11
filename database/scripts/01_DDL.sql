@@ -74,8 +74,8 @@ CREATE TABLE producto(
 	precio float,
 	descripcion text NOT NULL,
 	url_imagen varchar(500) NOT NULL,
+	fecha_salida date NOT NULL,
 	CONSTRAINT categoria_producto FOREIGN KEY(idcategoria) REFERENCES categoria_producto(idcategoria)
-	
 );
 
 CREATE TABLE producto_espec(

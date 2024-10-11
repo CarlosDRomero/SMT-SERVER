@@ -8,7 +8,7 @@ FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(categoria).csv'
 DELIMITER ','
 CSV HEADER;
 
-COPY producto(idproducto, idcategoria, marca,	nombre, disponibilidad, precio,	descripcion, url_imagen)
+COPY producto(idproducto, idcategoria, marca,	nombre, disponibilidad, precio,	descripcion, url_imagen, fecha_salida)
 FROM '/docker-entrypoint-initdb.d/initial_data/DBCC(producto).csv'
 DELIMITER ','
 CSV HEADER;
