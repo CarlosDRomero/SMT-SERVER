@@ -112,13 +112,14 @@ export const gestionarUsuario = (rolObjetivo, rolesGestionantes) => async (req, 
   next()
 }
 
-export const parsePagingHeader = (req, _, next) => {
-  req.headers.paging = JSON.parse(req.headers.paging)
+export const parsePaginationHeader = (req, _, next) => {
+  if (req.headers.pagination)
+    req.headers.pagination = JSON.parse(req.headers.pagination)
   next()
 }
-export const parsePaging = (validOrderingFields) => (req, res, next) => {
-  if (req.headers.paging){
-    const { cursor, cursorsetup } = req.headers.paging
+export const parsePagination = (validOrderingFields) => (req, res, next) => {
+  if (req.headers.pagination){
+    const { cursor, cursorsetup } = req.headers.pagination
     if (cursorsetup){
       req.pageCursor = {
         fields: parseCursorOrderingFieldsDirections(cursorsetup.orderby, validOrderingFields),

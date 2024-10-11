@@ -16,9 +16,9 @@ export const productoModel = {
       name: "obtener-productos",
       text: "SELECT * FROM producto"
     }
-    const pagingQuery = applyCursorPagination(query, cursor, cursorSchema)
-    // console.log(pagingQuery)
-    const res = await poolClient.query(pagingQuery);
+    const paginationQuery = applyCursorPagination(query, cursor, cursorSchema)
+    // console.log(paginationQuery)
+    const res = await poolClient.query(paginationQuery);
     return res.rows;
   },
   findById: async (idproducto) => {

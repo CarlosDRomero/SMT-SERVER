@@ -32,14 +32,14 @@ describe("Pagination tests",() => {
     let newBatch ;
     do{
       let res;
-      if (!cursor) res = await api.get("/productos/inventario").set("paging",JSON.stringify({
+      if (!cursor) res = await api.get("/productos/inventario").set("pagination",JSON.stringify({
         cursorsetup
       }))
-      else res = await api.get("/productos/inventario").set("paging",JSON.stringify({
+      else res = await api.get("/productos/inventario").set("pagination",JSON.stringify({
         cursor
       }))
     
-      cursor = res.body.pageCursor
+      cursor = res.body.nextPageCursor
       newBatch = res.body.data
       results = results.concat(newBatch)
       // console.log(cursor)
@@ -72,17 +72,17 @@ describe("Pagination tests",() => {
     let newBatch ;
     do{
       let res;
-      if (!cursor) res = await api.get("/productos/inventario").set("paging",JSON.stringify({
+      if (!cursor) res = await api.get("/productos/inventario").set("pagination",JSON.stringify({
         cursorsetup
       }))
-      else res = await api.get("/productos/inventario").set("paging",JSON.stringify({
+      else res = await api.get("/productos/inventario").set("pagination",JSON.stringify({
         cursor
       }))
     
-      cursor = res.body.pageCursor
+      cursor = res.body.nextPageCursor
       newBatch = res.body.data
       results = results.concat(newBatch)
-      console.log(cursor)
+      // console.log(cursor)
     }while (newBatch.length > 0 );
 
   
@@ -93,7 +93,7 @@ describe("Pagination tests",() => {
   }, 100000)
 
   test("Invalid values in cursorSetup directions returns a 400 error", async () => {
-    await api.get("/productos/inventario").set("paging",JSON.stringify({
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursor: 10
     })).expect(400)
 
@@ -102,7 +102,7 @@ describe("Pagination tests",() => {
         disponibilidad: 2
       }
     }
-    await api.get("/productos/inventario").set("paging",JSON.stringify({
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursorsetup
     })).expect(400)
 
@@ -111,7 +111,7 @@ describe("Pagination tests",() => {
         disponibilidad: -2
       }
     }
-    await api.get("/productos/inventario").set("paging",JSON.stringify({
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursorsetup
     })).expect(400)
 
@@ -121,7 +121,7 @@ describe("Pagination tests",() => {
       },
       pagesize: 30
     }
-    await api.get("/productos/inventario").set("paging",JSON.stringify({
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursorsetup
     })).expect(400)
 
@@ -131,7 +131,7 @@ describe("Pagination tests",() => {
       },
       pagesize: -1
     }
-    await api.get("/productos/inventario").set("paging",JSON.stringify({
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursorsetup
     })).expect(400)
 

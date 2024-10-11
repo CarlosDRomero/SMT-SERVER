@@ -41,20 +41,20 @@ const buildPageOrderingRule = (fieldName, orderDirection) => {
   return order_rule
 }
 
-const addQueryData = ({ name, direction = 0 }, last, pagingQueryData, valuesOffset, isId) => {
+const addQueryData = ({ name, direction = 0 }, last, paginationQueryData, valuesOffset, isId) => {
   const parsedDirection = parseDirection(direction)
   if (last){
-    pagingQueryData.pagingValues.push(last)
-    pagingQueryData.pagingConditions.push(buildPageCondition(name, parsedDirection, valuesOffset + pagingQueryData.pagingValues.length, isId))
+    paginationQueryData.paginationValues.push(last)
+    paginationQueryData.paginationConditions.push(buildPageCondition(name, parsedDirection, valuesOffset + paginationQueryData.paginationValues.length, isId))
     
   }
-  pagingQueryData.pagingOrdering.push(buildPageOrderingRule(name, parsedDirection))
+  paginationQueryData.paginationOrdering.push(buildPageOrderingRule(name, parsedDirection))
 }
 
-const joinPagingWhereConditions = (pagingConditions) => {
+const joinPaginationWhereConditions = (paginationConditions) => {
   let whereConditions = null
   
-  for (const condition of pagingConditions){
+  for (const condition of paginationConditions){
     if (!whereConditions) {
       whereConditions = condition
       continue
@@ -67,19 +67,19 @@ const joinPagingWhereConditions = (pagingConditions) => {
   return whereConditions.indexOf(PAGE_CONDITION_FORMAT) === -1 ? whereConditions : ""
 }
 
-const joinOrderRules = (pagingOrderRules) => {
-  return pagingOrderRules.join(", ")
+const joinOrderRules = (paginationOrderRules) => {
+  return paginationOrderRules.join(", ")
 }
 
-const joinPagingQueryData = ({ pagingConditions, pagingOrdering }) => {
+const joinPaginationQueryData = ({ paginationConditions, paginationOrdering }) => {
   let query = ""
   
-  if (pagingConditions.length > 0){
-    const whereConditions = joinPagingWhereConditions(pagingConditions)
+  if (paginationConditions.length > 0){
+    const whereConditions = joinPaginationWhereConditions(paginationConditions)
     if (whereConditions) query += `WHERE ${whereConditions} `
   }
   
-  const orderRules = joinOrderRules(pagingOrdering)
+  const orderRules = joinOrderRules(paginationOrdering)
   
   query += `ORDER BY ${orderRules}`
 
@@ -127,24 +127,24 @@ export const setCursorLast = (last, cursor, cursorSchema) => {
 export const applyCursorPagination = (baseQuery, cursor, cursorSchema) => {
   const valuesOffset = baseQuery.values?.length || 0
   const pageSize = cursor.pageSize || DEFAULT_PAGE_SIZE
-  const pagingQueryData = {
-    pagingConditions: [],
-    pagingOrdering: [],
-    pagingValues: []
+  const paginationQueryData = {
+    paginationConditions: [],
+    paginationOrdering: [],
+    paginationValues: []
   }
   
   if (cursor?.fields?.length){
     for (const field of cursor.fields){
       if (field.name === cursorSchema.tiebreaker.name || field.name === cursorSchema.id.name) continue
-      addQueryData(field, cursor.last?.[field.name], pagingQueryData, valuesOffset)
+      addQueryData(field, cursor.last?.[field.name], paginationQueryData, valuesOffset)
     }
   }
   // cursorSchemea must define a field as the tiebreaker
-  addQueryData(cursorSchema.tiebreaker, cursor?.last?.tiebreaker, pagingQueryData, valuesOffset)
+  addQueryData(cursorSchema.tiebreaker, cursor?.last?.tiebreaker, paginationQueryData, valuesOffset)
   
-  addQueryData(cursorSchema.id, cursor?.last?.id, pagingQueryData, valuesOffset, true)
+  addQueryData(cursorSchema.id, cursor?.last?.id, paginationQueryData, valuesOffset, true)
   
-  const text = `SELECT * FROM (${baseQuery.text}) ${joinPagingQueryData(pagingQueryData)} LIMIT ${pageSize}`
-  const values = baseQuery.values?.length ? [...baseQuery.values,...pagingQueryData.pagingValues] : pagingQueryData.pagingValues
+  const text = `SELECT * FROM (${baseQuery.text}) ${joinPaginationQueryData(paginationQueryData)} LIMIT ${pageSize}`
+  const values = baseQuery.values?.length ? [...baseQuery.values,...paginationQueryData.paginationValues] : paginationQueryData.paginationValues
   return { text, values }
 }

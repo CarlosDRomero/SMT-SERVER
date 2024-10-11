@@ -15,8 +15,8 @@ export const productoController = {
       setCursorLast(catalogo[catalogo.length - 1], req.pageCursor, productoController.pageCursorSchema)
     }
     
-    const pageCursor = encodeCursor(req.pageCursor)
-    res.json({ pageCursor, data: catalogo });
+    const nextPageCursor = encodeCursor(req.pageCursor)
+    res.json({ nextPageCursor, data: catalogo });
   },
   obetenerEspecificiones: async (req, res) => {
     const { idproducto } = req.params

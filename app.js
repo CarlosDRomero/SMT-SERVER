@@ -9,7 +9,7 @@ import productosRouter from "./routes/productos.js";
 import ticketRouter from "./routes/ticket.js";
 import notificacionesRouter from "./routes/notificaciones.js";
 
-import { errorHandler, parsePagingHeader } from "./middlewares.js";
+import { errorHandler, parsePaginationHeader } from "./middlewares.js";
 
 
 import "./devdefault.js"
@@ -25,7 +25,7 @@ const corsOptions = {
 //MIDLEWARES INICIALES
 app.use(express.json());
 app.use(cors(corsOptions));
-app.use(parsePagingHeader)
+app.use(parsePaginationHeader)
 
 //RUTAS
 

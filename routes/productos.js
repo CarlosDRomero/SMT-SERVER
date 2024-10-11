@@ -1,5 +1,5 @@
 import { Router } from "express"
-import { checkValidator, extraerUsuario, parsePaging, verificarRol } from "../middlewares.js";
+import { checkValidator, extraerUsuario, parsePagination, verificarRol } from "../middlewares.js";
 import { productoController } from "../controllers/producto.js";
 import { categoriaController } from "../controllers/categoria_producto.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
@@ -13,7 +13,7 @@ const productosRouter = Router()
 productosRouter.get("/inventario",
   cursorRequestValidator,
   checkValidator,
-  parsePaging(productoController.orderValidFields),
+  parsePagination(productoController.orderValidFields),
   productoController.obtenerProductos
   
 )
