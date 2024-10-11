@@ -1,5 +1,5 @@
 import { poolClient } from "../database/conexion.js";
-import { multiInsertFactory } from "../utils.js";
+import { multiInsertFactory, applyCursorPagination } from "../utils.js";
 
 export const productoModel = {
   findAll: async () => {
@@ -9,6 +9,16 @@ export const productoModel = {
     }
 
     const res = await poolClient.query(query);
+    return res.rows;
+  },
+  pageProducts: async (cursor, cursorSchema) => {
+    const query = {
+      name: "obtener-productos",
+      text: "SELECT * FROM producto"
+    }
+    const pagingQuery = applyCursorPagination(query, cursor, cursorSchema)
+    // console.log(pagingQuery)
+    const res = await poolClient.query(pagingQuery);
     return res.rows;
   },
   findById: async (idproducto) => {

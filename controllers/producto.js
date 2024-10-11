@@ -1,10 +1,22 @@
 import { productoModel } from "../models/producto.js";
+import { encodeCursor, setCursorLast } from "../utils.js";
+
 
 export const productoController = {
+  orderValidFields: ["precio", "disponibilidad"],
+  pageCursorSchema: {
+    tiebreaker: { name: "fecha_salida", direction: -1 },
+    id: { name: "idproducto" }
+  },
   obtenerProductos: async (req, res) => {
-    const catalogo = await productoModel.findAll();
-
-    res.json(catalogo);
+    const catalogo = await productoModel.pageProducts(req.pageCursor, productoController.pageCursorSchema);
+    
+    if (catalogo.length){
+      setCursorLast(catalogo[catalogo.length - 1], req.pageCursor, productoController.pageCursorSchema)
+    }
+    
+    const pageCursor = encodeCursor(req.pageCursor)
+    res.json({ pageCursor, data: catalogo });
   },
   obetenerEspecificiones: async (req, res) => {
     const { idproducto } = req.params
