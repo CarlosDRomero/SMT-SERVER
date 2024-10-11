@@ -1,7 +1,6 @@
 import pg from "pg"
 import { env } from "../environment.js"
 
-import { Encrypt } from "../services/encryption.js";
 const { Pool } = pg
 
 const pool = new Pool({
