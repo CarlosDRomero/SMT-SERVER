@@ -1,21 +1,20 @@
 import { Router } from "express"
-import { checkValidator, extraerUsuario, parsePagination, verificarRol } from "../middlewares.js";
+import { checkValidator, extraerUsuario,verificarRol, withPagination } from "../middlewares.js";
 import { productoController } from "../controllers/producto.js";
 import { categoriaController } from "../controllers/categoria_producto.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
 import { ProductoValidator } from "../validators/producto_validator.js"
 
 import { rolesUsuario } from "../controllers/usuario.js";
-import { cursorRequestValidator } from "../validators/cursor_validator.js";
 const productosRouter = Router()
 
 
 productosRouter.get("/inventario",
-  cursorRequestValidator,
-  checkValidator,
-  parsePagination(productoController.orderValidFields),
-  productoController.obtenerProductos
-  
+  withPagination(
+    productoController.orderValidFields,
+    productoController.pageCursorSchema,
+    productoController.obtenerProductos
+  )
 )
 
 productosRouter.get("/inventario/:idproducto",

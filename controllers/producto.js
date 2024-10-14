@@ -1,5 +1,4 @@
 import { productoModel } from "../models/producto.js";
-import { encodeCursor, setCursorLast } from "../utils.js";
 
 
 export const productoController = {
@@ -8,15 +7,12 @@ export const productoController = {
     tiebreaker: { name: "fecha_salida", direction: -1 },
     id: { name: "idproducto" }
   },
-  obtenerProductos: async (req, res) => {
+  obtenerProductos: async (req, res, next) => {
     const catalogo = await productoModel.pageProducts(req.pageCursor, productoController.pageCursorSchema);
     
-    if (catalogo.length){
-      setCursorLast(catalogo[catalogo.length - 1], req.pageCursor, productoController.pageCursorSchema)
-    }
-    
-    const nextPageCursor = encodeCursor(req.pageCursor)
-    res.json({ nextPageCursor, data: catalogo });
+    req.pageData = catalogo
+
+    next()
   },
   obetenerEspecificiones: async (req, res) => {
     const { idproducto } = req.params

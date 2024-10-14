@@ -3,8 +3,8 @@ import { Encrypt } from "./services/encryption.js"
 import { genCode } from "./services/random.js";
 import { tokens } from "./services/tokens.js";
 import { usuarioModel } from "./models/usuario.js";
-import { parseCursorOrderingFieldsDirections } from "./utils.js";
-
+import { encodeCursor, parseCursorOrderingFieldsDirections, setCursorLast } from "./utils.js";
+import { cursorRequestValidator } from "./validators/cursor_validator.js"
 
 export const claveEncrypt = async (req, _, next) => {
   req.body.clave = await Encrypt.toHash(req.body.clave);
@@ -115,6 +115,7 @@ export const gestionarUsuario = (rolObjetivo, rolesGestionantes) => async (req, 
 export const parsePaginationHeader = (req, _, next) => {
   if (req.headers.pagination)
     req.headers.pagination = JSON.parse(req.headers.pagination)
+  console.log("Pagination: ", req.headers.pagination)
   next()
 }
 export const parsePagination = (validOrderingFields) => (req, res, next) => {
@@ -137,6 +138,25 @@ export const parsePagination = (validOrderingFields) => (req, res, next) => {
   req.pageCursor = {}
   next()
 }
+
+export const sendPaginationResponse = (pageCursorSchema) => (req, res) => {
+  let nextPageCursor = null
+  if (req.pageData.length){
+    setCursorLast(req.pageData[req.pageData.length - 1], req.pageCursor, pageCursorSchema)
+    nextPageCursor = encodeCursor(req.pageCursor)
+  }
+
+  res.json({ nextPageCursor, data: req.pageData });
+}
+
+export const withPagination = (validOrderParams, cursorSchema, dataPagination) => ([
+  parsePaginationHeader,
+  cursorRequestValidator,
+  checkValidator,
+  parsePagination(validOrderParams),
+  dataPagination,
+  sendPaginationResponse(cursorSchema)
+])
 
 
 
