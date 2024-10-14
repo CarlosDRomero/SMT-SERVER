@@ -65,17 +65,22 @@ CREATE TABLE categoria_producto(
 	denominacion varchar(75) NOT NULL UNIQUE
 );
 
+CREATE TABLE marca_producto(
+	idmarca serial PRIMARY KEY,
+	nombre varchar(75) NOT NULL UNIQUE
+);
 CREATE TABLE producto(
 	idproducto uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idcategoria integer NOT NULL,
-	marca varchar(20) NOT NULL,
+	idmarca integer NOT NULL,
 	nombre varchar(500) NOT NULL,
 	disponibilidad integer,
 	precio float,
 	descripcion text NOT NULL,
 	url_imagen varchar(500) NOT NULL,
 	fecha_salida date NOT NULL,
-	CONSTRAINT categoria_producto FOREIGN KEY(idcategoria) REFERENCES categoria_producto(idcategoria)
+	CONSTRAINT categoria_producto FOREIGN KEY(idcategoria) REFERENCES categoria_producto(idcategoria),
+	CONSTRAINT marca_producto FOREIGN KEY (idmarca) REFERENCES marca_producto(idmarca)
 );
 
 CREATE TABLE producto_espec(
