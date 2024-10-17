@@ -3,7 +3,7 @@ import app from "../app.js"
 import { poolClient } from "../database/conexion.js"
 import { limpiarTablas } from "./test_helper.js"
 import { productoController } from "../controllers/producto.js"
-import { applyCursorPagination, parseCursorOrderingFieldsDirections } from "../utils.js"
+import { applyCursorPagination, filterValidCursorOrderingFields } from "../utils.js"
 
 const api = supertest(app)
 
@@ -15,12 +15,12 @@ describe("Pagination tests",() => {
   test("Full pagination is equal to the full query", async () => {
 
     const cursorsetup = {
-      orderby: {
-        disponibilidad: -1
-      }
+      orderby: [
+        { name: "disponibilidad", direction: -1 }
+      ]
     }
     const fullQuery = applyCursorPagination({ text: "SELECT * FROM producto", values: [] }, {
-      fields: parseCursorOrderingFieldsDirections(cursorsetup.orderby, productoController.orderValidFields)
+      fields: filterValidCursorOrderingFields(cursorsetup.orderby, productoController.orderValidFields)
     }, productoController.pageCursorSchema)
     fullQuery.text = fullQuery.text.split("LIMIT")[0]
     console.log(fullQuery)
@@ -60,7 +60,7 @@ describe("Pagination tests",() => {
       // }
     }
     const fullQuery = applyCursorPagination({ text: "SELECT * FROM producto", values: [] }, {
-      fields: parseCursorOrderingFieldsDirections(cursorsetup.orderby, productoController.orderValidFields)
+      fields: filterValidCursorOrderingFields(cursorsetup.orderby, productoController.orderValidFields)
     }, productoController.pageCursorSchema)
     fullQuery.text = fullQuery.text.split("LIMIT")[0]
     console.log(fullQuery)
@@ -91,50 +91,38 @@ describe("Pagination tests",() => {
 
     expect(fullResults).toEqual(results)
   }, 100000)
-
-  test("Invalid values in cursorSetup directions returns a 400 error", async () => {
+  test("Invalid values in cursorSetup pageSizes or orderby format returns a 400 error", async () => {
     await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursor: 10
     })).expect(400)
 
     let cursorsetup = {
-      orderby: {
-        disponibilidad: 2
-      }
-    }
-    await api.get("/productos/inventario").set("pagination",JSON.stringify({
-      cursorsetup
-    })).expect(400)
-
-    cursorsetup = {
-      orderby: {
-        disponibilidad: -2
-      }
-    }
-    await api.get("/productos/inventario").set("pagination",JSON.stringify({
-      cursorsetup
-    })).expect(400)
-
-    cursorsetup = {
-      orderby: {
-        disponibilidad: "ASC"
-      },
-      pagesize: 30
-    }
-    await api.get("/productos/inventario").set("pagination",JSON.stringify({
-      cursorsetup
-    })).expect(400)
-
-    cursorsetup = {
-      orderby: {
-        precio: 1
-      },
+      orderby: [
+        { name: "precio", direction: 1 }
+      ],
       pagesize: -1
     }
     await api.get("/productos/inventario").set("pagination",JSON.stringify({
       cursorsetup
     })).expect(400)
+    cursorsetup = {
+      orderby: {
+        disponibilidad: -1
+      }
+    }
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
+      cursorsetup
+    })).expect(400)
 
+    cursorsetup = {
+      orderby: [
+        { name: "precio", direction: 1 }
+      ],
+      pagesize: 0
+    }
+    await api.get("/productos/inventario").set("pagination",JSON.stringify({
+      cursorsetup
+    })).expect(400)
     
   }, 5000)
 })
