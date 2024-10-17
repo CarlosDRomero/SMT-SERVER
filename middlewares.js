@@ -3,7 +3,7 @@ import { Encrypt } from "./services/encryption.js"
 import { genCode } from "./services/random.js";
 import { tokens } from "./services/tokens.js";
 import { usuarioModel } from "./models/usuario.js";
-import { encodeCursor, parseCursorOrderingFieldsDirections, setCursorLast } from "./utils.js";
+import { encodeCursor, filterValidCursorOrderingFields, setCursorLast } from "./utils.js";
 import { cursorRequestValidator } from "./validators/cursor_validator.js"
 
 export const claveEncrypt = async (req, _, next) => {
@@ -123,7 +123,7 @@ export const parsePagination = (validOrderingFields) => (req, res, next) => {
     const { cursor, cursorsetup } = req.headers.pagination
     if (cursorsetup){
       req.pageCursor = {
-        fields: parseCursorOrderingFieldsDirections(cursorsetup.orderby, validOrderingFields),
+        fields: filterValidCursorOrderingFields(cursorsetup.orderby, validOrderingFields),
         pageSize: cursorsetup.pagesize
       }
       console.log(`Setup: ${JSON.stringify(cursorsetup)}`)
@@ -149,6 +149,9 @@ export const sendPaginationResponse = (pageCursorSchema) => (req, res) => {
   res.json({ nextPageCursor, data: req.pageData });
 }
 
+/**
+ * Una función para aplicar el algoritmo de paginación sobre las rutas que get que se quiera
+**/
 export const withPagination = (validOrderParams, cursorSchema, dataPagination) => ([
   parsePaginationHeader,
   cursorRequestValidator,

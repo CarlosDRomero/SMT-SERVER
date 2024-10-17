@@ -95,15 +95,9 @@ const joinPaginationQueryData = ({ paginationConditions, paginationOrdering }) =
 //   )
 // }
 
-export const parseCursorOrderingFieldsDirections = (fields, validOrderingFields) => {
-  const newFields = []
+export const filterValidCursorOrderingFields = (fields, validOrderingFields) => {
   if (fields)
-    for (const [name, direction] of Object.entries(fields)){
-      if (validOrderingFields.includes(name))
-        newFields.push({ name , direction })
-    }
-
-  return newFields
+    return fields.filter(field => validOrderingFields.includes(field.name) && [-1, 0, 1].includes(field.direction))
 }
 
 export const encodeCursor = (cursor) => {
