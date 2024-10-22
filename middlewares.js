@@ -115,7 +115,6 @@ export const gestionarUsuario = (rolObjetivo, rolesGestionantes) => async (req, 
 export const parsePaginationHeader = (req, _, next) => {
   if (req.headers.pagination)
     req.headers.pagination = JSON.parse(req.headers.pagination)
-  console.log("Pagination: ", req.headers.pagination)
   next()
 }
 export const parsePagination = (validOrderingFields) => (req, res, next) => {
@@ -126,7 +125,6 @@ export const parsePagination = (validOrderingFields) => (req, res, next) => {
         fields: filterValidCursorOrderingFields(cursorsetup.orderby, validOrderingFields),
         pageSize: cursorsetup.pagesize
       }
-      console.log(`Setup: ${JSON.stringify(cursorsetup)}`)
       return next()
     }
     else if (cursor){
