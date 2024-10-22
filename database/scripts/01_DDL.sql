@@ -93,7 +93,7 @@ CREATE TABLE producto_espec(
 	CONSTRAINT producto_espec FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE
 );
 
-CREATE TABLE promocion(
+CREATE TABLE cupon(
 	idpromocion serial PRIMARY KEY,
 	idusuario uuid,
 	
@@ -113,6 +113,15 @@ CREATE TABLE promocion_categoria(
 	PRIMARY KEY (idpromocion, idcategoria),
 	CONSTRAINT promocion_categoria FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
 	CONSTRAINT categoria_promocion FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria)
+);
+
+CREATE TABLE promocion_producto(
+    idpromocion integer NOT NULL,
+    idproducto integer NOT NULL,
+    
+    PRIMARY KEY (idpromocion, idproducto),
+    CONSTRAINT promocion_producto FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
+    CONSTRAINT producto_promocion FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
 );
 
 /*
