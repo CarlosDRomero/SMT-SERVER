@@ -93,35 +93,37 @@ CREATE TABLE producto_espec(
 	CONSTRAINT producto_espec FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE
 );
 
-CREATE TABLE cupon(
-	idpromocion serial PRIMARY KEY,
-	idusuario uuid,
+CREATE TABLE promocion(
+	idpromocion uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	
 	asunto varchar(30) NOT NULL,
 	descripcion varchar(500),
-	porcentaje float,
-	fecha_inicio timestamp WITH TIME ZONE DEFAULT current_timestamp,
-	fecha_fin timestamp WITH TIME ZONE,
+	porcentaje float
 	
-	CONSTRAINT cupon_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
 );
 
-CREATE TABLE promocion_categoria(
-	idpromocion integer NOT NULL,
-	idcategoria integer NOT NULL,
-	
-	PRIMARY KEY (idpromocion, idcategoria),
-	CONSTRAINT promocion_categoria FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
-	CONSTRAINT categoria_promocion FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria)
-);
+CREATE TABLE tipo_promocion(
+	idpromocion uuid not null, 
 
-CREATE TABLE promocion_producto(
-    idpromocion integer NOT NULL,
-    idproducto integer NOT NULL,
-    
-    PRIMARY KEY (idpromocion, idproducto),
-    CONSTRAINT promocion_producto FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
-    CONSTRAINT producto_promocion FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
+	idusuario uuid,
+	idcategoria integer,
+	idproducto uuid,
+
+	fecha_inicio date DEFAULT current_date,
+	fecha_fin date,
+
+	UNIQUE (idpromocion, idusuario, idcategoria, idproducto),
+
+	CONSTRAINT col_tipo_promocion CHECK (
+		(idcategoria IS NULL AND idproducto IS NULL AND idusuario IS NOT NULL) OR
+		(idusuario IS NULL AND idproducto IS NULL AND idcategoria IS NOT NULL) OR
+		(idusuario IS NULL AND idcategoria IS NULL AND idproducto IS NOT NULL)
+	),
+
+	CONSTRAINT fk_tipo_promocion FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
+	CONSTRAINT cupon_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
+	CONSTRAINT promocion_categoria FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria),
+	CONSTRAINT promocion_producto FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
 );
 
 /*

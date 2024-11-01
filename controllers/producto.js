@@ -2,7 +2,7 @@ import { productoModel } from "../models/producto.js";
 
 
 export const productoController = {
-  orderValidFields: ["precio", "disponibilidad"],
+  orderValidFields: ["precio_final", "disponibilidad", "descuento"],
   pageCursorSchema: {
     tiebreaker: { name: "fecha_salida", direction: -1 },
     id: { name: "idproducto" }

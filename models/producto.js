@@ -13,8 +13,8 @@ export const productoModel = {
   },
   pageProducts: async (cursor, cursorSchema) => {
     const query = {
-      name: "obtener-productos",
-      text: "SELECT * FROM producto"
+      name: "paginar-productos",
+      text: "SELECT * FROM productos_completos"
     }
     const paginationQuery = applyCursorPagination(query, cursor, cursorSchema)
     // console.log(paginationQuery)
@@ -24,7 +24,7 @@ export const productoModel = {
   findById: async (idproducto) => {
     const query = {
       name: "obtener-producto-id",
-      text: "SELECT * FROM producto WHERE idproducto=$1",
+      text: "SELECT * FROM productos_completos WHERE idproducto=$1",
       values: [idproducto]
     }
 
@@ -37,7 +37,7 @@ export const productoModel = {
       text: `
         SELECT coe.idespec, atributo,valor FROM producto_espec  coe  
         JOIN atributo_espec ae ON ae.idespec = coe.idespec 
-        WHERE idproducto=$1;
+        WHERE idproducto=$1
       `,
       values: [idproducto]
     }
