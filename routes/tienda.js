@@ -5,6 +5,8 @@ import { carritoComprasController } from "../controllers/carrito_compras.js";
 import { productoCarritoValidator } from "../validators/tienda_validator.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
 import { productoController } from "../controllers/producto.js";
+import { validatorOrdenCompra } from "../validators/validatorOrdenCompra.js";
+import { ordenCompraController } from "../controllers/ordenCompra.js";
 
 const tiendaRouter = Router()
 
@@ -36,6 +38,12 @@ tiendaRouter.get("/carrito/:idproducto",
   carritoComprasController.obtenerProductoUsuario,
 )
 
+tiendaRouter.get("/orden-de-compra",
+  extraerUsuario,
+  verificarRol(rolesUsuario.CLIENTE),
+  ordenCompraController.obtenerOrdenesUsuario,
+)
+
 tiendaRouter.post("/carrito/:idproducto",
   extraerUsuario,
   verificarRol(rolesUsuario.CLIENTE),
@@ -45,6 +53,16 @@ tiendaRouter.post("/carrito/:idproducto",
   productoController.validarCantidadProducto,
   carritoComprasController.agregarACarrito
 )
+
+tiendaRouter.post("/orden-de-compra",
+  extraerUsuario,
+  verificarRol(rolesUsuario.CLIENTE),
+  validatorOrdenCompra,
+  checkValidator,
+  ordenCompraController.calcularCostoOrden,
+  ordenCompraController.generarOrdenCompra
+)
+
 
 tiendaRouter.delete("/carrito/:idproducto",
   extraerUsuario,
