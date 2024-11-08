@@ -8,7 +8,9 @@ const pool = new Pool({
   host: env.DB_HOST,
   database: env.DB_NAME,
   password: env.DB_PASS,
-  port: env.DB_PORT
+  port: env.DB_PORT,
+  ssl: true
+
 })
 
 export let poolClient = null;
@@ -43,13 +45,13 @@ pool.on("connect", async (client) => {
 
 })
 
-pool.on("error", () => {
-  console.log("Error con la base de datos")
+pool.on("error", (e) => {
+  console.log("Error con la base de datos", e)
 })
 try{
   poolClient = await pool.connect();
-}catch{
-  console.log("Error al conectar con la base datos")
+}catch(e){
+  console.log("Error al conectar con la base datos", e)
   initializeRetryInterval();
 }
 
