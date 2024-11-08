@@ -186,7 +186,7 @@ CREATE TABLE orden_compra(
 	fecha_orden timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	
 	CONSTRAINT orden_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
-	CONSTRAINT orden_direccion FOREIGN KEY (iddireccion) REFERENCES direccion(iddireccion)
+	CONSTRAINT orden_direccion FOREIGN KEY (iddireccion) REFERENCES direccion(iddireccion) ON DELETE SET NULL
 	
 );
 
