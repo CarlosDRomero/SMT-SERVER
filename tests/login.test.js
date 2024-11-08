@@ -13,7 +13,7 @@ const api = supertest(app)
 
 
 beforeAll(async () => {
-  await limpiarTablas();
+  await limpiarTablas(["usuario"]);
   await setTimeZone();
 })
 
@@ -59,7 +59,7 @@ describe("Tests ruta /auth/login", () => {
   })
   describe("Tests de usuario ya confirmado", () => {
     beforeAll(async () => {
-      await limpiarTablas();
+      await limpiarTablas(["usuario"]);
       await api.post("/auth/register").send({
         nombres: "Test",
         apellidos: "Test Man",
@@ -88,7 +88,7 @@ describe("Tests ruta /auth/login", () => {
   })
   describe("Rutas protegidas", () => {
     beforeAll(async () => {
-      await limpiarTablas();
+      await limpiarTablas(["usuario"]);
       await api.post("/auth/register").send({
         nombres: "un admin",
         apellidos: "ese admin",
