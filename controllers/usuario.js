@@ -47,8 +47,8 @@ export const usuarioController = {
     if (!usuario || !await Encrypt.compareHash(req.body.clave, usuario.clave)){
       return res.status(401).json({ error: "Credenciales invalidas" })
     }
-    if (usuario.fecha_confirmado === null || calcularExpirado(usuario.fecha_confirmado, 5, "m")) {
-      req.payload = { idusuario: usuario.idusuario, email: usuario.email }
+    if (usuario.fecha_confirmado === null || calcularExpirado(usuario.fecha_confirmado, 1, "h")) {
+      req.payloadc = { idusuario: usuario.idusuario, email: usuario.email }
 
       return next()
     }
