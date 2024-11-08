@@ -146,11 +146,11 @@ CREATE TABLE cupon_usuario(
 	idcupon uuid NOT NULL,
 	idusuario uuid NOT NULL,
 	fecha_activacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
-	
+	usado BOOLEAN DEFAULT FALSE,
 	
 	PRIMARY KEY (idcupon, idusuario),
-	CONSTRAINT ccupon_usuario FOREIGN KEY (idcupon) REFERENCES cupon(idcupon),
-	CONSTRAINT usuario_cupon FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
+	CONSTRAINT ccupon_usuario FOREIGN KEY (idcupon) REFERENCES cupon(idcupon) ON DELETE CASCADE,
+	CONSTRAINT usuario_cupon FOREIGN KEY (idusuario) REFERENCES usuario(idusuario) ON DELETE CASCADE
 );
 
 /*
@@ -318,4 +318,11 @@ CREATE VIEW vista_admins AS SELECT * FROM usuario WHERE rol='admin';
 CREATE VIEW vista_estados_ticket AS SELECT ROW_NUMBER() OVER()  AS num,estado  FROM (select unnest(enum_range(NULL::estadosticket)) as estado );
 CREATE VIEW vista_prioridad_ticket AS SELECT ROW_NUMBER() OVER()  AS num,prioridad  FROM (select unnest(enum_range(NULL::prioridadticket)) as prioridad);
 CREATE VIEW ofertas_activas AS SELECT * FROM oferta WHERE current_date BETWEEN fecha_inicio AND fecha_fin;
-CREATE VIEW cupones_usuarios AS SELECT cu.idusuario, c.* FROM cupon_usuario cu JOIN cupon c ON  c.idcupon=cu.idcupon;
+CREATE OR REPLACE VIEW cupones_usuarios AS 
+SELECT 
+cu.idusuario, 
+c.*, cu.fecha_activacion, 
+cu.usado, 
+fecha_activacion + (INTERVAL '1' DAY) * duracion expiracion, 
+(current_timestamp >= (fecha_activacion + (INTERVAL '1' DAY) * duracion)) expirado  
+FROM cupon_usuario cu JOIN cupon c ON  c.idcupon=cu.idcupon;

@@ -1,5 +1,5 @@
 import { poolClient } from "../database/conexion.js";
-import { applyCursorPagination } from "../utils.js";
+import { applyCursorPagination, multiInsertFactory } from "../utils.js";
 
 export const promocionesModel = {
   createOffer: async (infoOferta) => {
@@ -154,7 +154,18 @@ export const promocionesModel = {
     const query = {
       name: "verificar-cupon-usuario",
       text: `
-      SELECT * FROM cupones_usuarios WHERE idcupon = $1 AND idusuario=$2
+      SELECT * FROM cupones_usuarios WHERE idcupon = $1 AND idusuario=$2 AND NOT usado AND NOT expirado
+      `,
+      values: [idcupon,idusuario]
+    }
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
+  markAsUsed: async (idcupon, idusuario) => {
+    const query = {
+      name: "marcar-cupon-usado",
+      text: `
+      UPDATE cupon_usuario SET usado = TRUE WHERE idcupon = $1 AND idusuario=$2
       `,
       values: [idcupon,idusuario]
     }
@@ -238,7 +249,17 @@ export const promocionesModel = {
     }
     const res = await poolClient.query(query);
     return res.rows[0];
-  }
+  },
+  assignCouponsToUser: async (cupones, idusuario) => {
+    const query = {
+      text: "INSERT INTO cupon_usuario (idcupon, idusuario) VALUES",
+      values: []
+    }
+    multiInsertFactory(query, cupones.map(c => [c.idcupon, idusuario]))
+    const res = await poolClient.query(query);
+    return res.rows;
+  },
+
   
 }
 

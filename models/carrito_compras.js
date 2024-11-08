@@ -49,7 +49,7 @@ export const carritoComprasModel = {
   getProductsInfoByUser: async (idusuario) => {
     const query = {
       name: "obtener-info-producto-usuario",
-      text: "SELECT * FROM obtener_productos_info($1) as i JOIN producto c ON i.idproducto=c.idproducto",
+      text: "SELECT * FROM obtener_productos_info($1) as i JOIN producto_oferta c ON i.idproducto=c.idproducto",
       values: [idusuario]
     }
     const res = await poolClient.query(query);

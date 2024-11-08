@@ -1,2 +1,4 @@
 asunto,descripcion,porcentaje,cantidad,duracion,min_compras,min_gastado
 "Promoción de bienvenida","Descuento especial para nuevos usuarios",15,,30,0,0
+"Promoción de 5 compras","Felicidades has ganado un descuento especial para compradores activos",20,,15,5,
+"Promoción de 10 compras","Felicidades has ganado un descuento especial para compradores activos II",10,,20,10,

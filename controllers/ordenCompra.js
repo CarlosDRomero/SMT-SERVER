@@ -1,6 +1,8 @@
 import { ordenCompraModel } from "../models/orden_compra.js"
 import { productoModel } from "../models/producto.js"
 import { carritoComprasModel } from "../models/carrito_compras.js"
+import { promocionesModel } from "../models/promocion.js"
+import { crearNotificacionAsignacionCupon } from "../services/notificaciones.js"
 
 export const ordenCompraController = {
   generarOrdenCompra: async(req, res, next) => {
@@ -11,21 +13,40 @@ export const ordenCompraController = {
       await carritoComprasModel.removeFromCart(producto.idproducto)
     }
     res.json(orden)
-  },
-  calcularCostoOrden: async(req, res, next) => {
-    const cupon = undefined
-    req.body.productos = await Promise.all(req.body.productos.map(async p => {
-      const { precio } = await productoModel.findById(p.idproducto)
-      return { ...p, costo: precio }
-    }))
-    console.log(req.body.productos)
-    req.body.costo_total = req.body.productos.reduce((acumulador, productoActual) => acumulador + productoActual.costo * productoActual.cantidad, 0)
-
-    req.body.costo_final = cupon ? cupon.descuento ? req.body.costo_total * (1 - cupon.descuento) : req.body.costo_total - cupon.cantidad : req.body.costo_total
 
     next()
   },
-  obtenerOrdenesUsuario: async(req, res, next) => {
+  calcularCostoOrden: async(req, res, next) => {
+    const cupon = await promocionesModel.checkCouponByUserId(req.body.idcupon, req.usuario.idusuario)
+    req.body.productos = await Promise.all(req.body.productos.map(async p => {
+      const { precio_final } = await productoModel.findById(p.idproducto)
+      return { ...p, costo: precio_final }
+    }))
+    req.body.costo_total = req.body.productos.reduce((acumulador, productoActual) => acumulador + productoActual.costo * productoActual.cantidad, 0)
+    if (cupon) {
+      await promocionesModel.markAsUsed(cupon.idcupon, req.usuario.idusuario)
+    }
+    req.body.costo_final = cupon ? cupon.porcentaje ? Math.round(req.body.costo_total * (1 - (cupon.porcentaje / 100))) : req.body.costo_total - cupon.cantidad : req.body.costo_total
+    console.log("cupon", req.body.costo_total, req.body.costo_final, req.body.costo_total * (1 - (cupon?.porcentaje / 100)))
+    next()
+  },
+  validarCuponesGanados: async (req, res, next) => {
+    const { idusuario } = req.usuario
+    const cuponesPendientes = await ordenCompraModel.getPendingCoupons(idusuario)
+    if (cuponesPendientes.length === 0) return
+
+    
+    await promocionesModel.assignCouponsToUser(cuponesPendientes, idusuario)
+
+    req.payload = await Promise.all(
+      cuponesPendientes.map(async c =>
+        await crearNotificacionAsignacionCupon(idusuario, c)
+      )
+    )
+    console.log(req.payload)
+    next()
+  },
+  obtenerOrdenesUsuario: async(req, res) => {
     //obtener usuario,ordenes del usuario, por cada orden obtener productos y agregarle los productos a un array
     const { idusuario } = req.usuario
     const ordenes = await ordenCompraModel.getOrdersByUser(idusuario)

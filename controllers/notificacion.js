@@ -10,6 +10,7 @@ export const notificacionController = {
         if (!notificacion) return;
         console.log(notificacion)
         const notificaciondb = await notificacionService.crearNotificacion(notificacion)
+        console.log(notificaciondb)
         notificacionService.notificarSockets(objetivo, notificaciondb)
         if (email && notificaciondb){
           notificacionService.notificarACorreo(email,notificaciondb,notificacion.anexos )

@@ -7,6 +7,7 @@ import { UUIDParamValidator } from "../validators/general_validators.js";
 import { productoController } from "../controllers/producto.js";
 import { validatorOrdenCompra } from "../validators/validatorOrdenCompra.js";
 import { ordenCompraController } from "../controllers/ordenCompra.js";
+import { notificacionController } from "../controllers/notificacion.js";
 
 const tiendaRouter = Router()
 
@@ -60,7 +61,9 @@ tiendaRouter.post("/orden-de-compra",
   validatorOrdenCompra,
   checkValidator,
   ordenCompraController.calcularCostoOrden,
-  ordenCompraController.generarOrdenCompra
+  ordenCompraController.generarOrdenCompra,
+  ordenCompraController.validarCuponesGanados,
+  notificacionController.notificar
 )
 
 

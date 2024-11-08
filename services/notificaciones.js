@@ -2,6 +2,16 @@ import { io } from "../socket/socket.js"
 import { notificacionModel, tiposNotificacion } from "../models/notificacion.js"
 import { mailerService } from "./mailer.js";
 
+export const crearNotificacionAsignacionCupon = (idusuario, cupon) => {
+  return notificacionPayloadFactory({
+    tipo: "directa",
+    idevento: 6,
+    fuente: cupon.idcupon,
+    objetivo: idusuario,
+    mensaje: `Ha recibido un cupón: ${cupon.asunto}`
+  })
+}
+
 export const notificacionPayloadFactory = async ({ tipo, emailPayload, idevento, iniciador, objetivo, fuente, mensaje }) => {
   let payload = { objetivo };
   const idtipo = tiposNotificacion[tipo];

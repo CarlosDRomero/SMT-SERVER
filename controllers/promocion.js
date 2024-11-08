@@ -1,16 +1,8 @@
 import { promocionesModel } from "../models/promocion.js"
-import { notificacionPayloadFactory } from "../services/notificaciones.js"
+import { crearNotificacionAsignacionCupon } from "../services/notificaciones.js"
 import { rolesUsuario } from "./usuario.js"
 
-const crearNotificacionAsignacionCupon = (idusuario, cupon) => {
-  return notificacionPayloadFactory({
-    tipo: "directa",
-    idevento: 6,
-    fuente: cupon.idcupon,
-    objetivo: idusuario,
-    mensaje: `Ha recibido un cupón: ${cupon.asunto}`
-  })
-}
+
 
 
 export const promocionesController = {
@@ -81,7 +73,7 @@ export const promocionesController = {
   },
   obtenerCuponesUsuario: async (req, res) => {
     const { idusuario } = req.usuario
-    const cupones = promocionesModel.getCouponsByUserId(idusuario)
+    const cupones = await promocionesModel.getCouponsByUserId(idusuario)
 
     res.json(cupones)
   },
