@@ -6,6 +6,7 @@ CREATE TYPE estadosTicket AS ENUM ('nuevo', 'aceptado', 'listo', 'en proceso', '
 CREATE TYPE prioridadTicket AS ENUM ('baja', 'media', 'alta');
 CREATE TYPE estadoMensaje AS ENUM ('enviado', 'recibido', 'leido');
 
+
 CREATE TABLE usuario (
   idusuario uuid DEFAULT gen_random_uuid(),
   nombres varchar(50) NOT NULL,
@@ -93,37 +94,63 @@ CREATE TABLE producto_espec(
 	CONSTRAINT producto_espec FOREIGN KEY (idproducto) REFERENCES producto(idproducto) ON DELETE CASCADE
 );
 
-CREATE TABLE promocion(
-	idpromocion uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-	
-	asunto varchar(30) NOT NULL,
-	descripcion varchar(500),
-	porcentaje float
-	
-);
+CREATE TABLE oferta(
 
-CREATE TABLE tipo_promocion(
-	idpromocion uuid not null, 
-
-	idusuario uuid,
+	idoferta uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	
+	asunto varchar(150) NOT NULL,
+	descripcion TEXT NOT NULL,
+	porcentaje integer,
+	
 	idcategoria integer,
 	idproducto uuid,
 
-	fecha_inicio date DEFAULT current_date,
+	fecha_inicio date,
 	fecha_fin date,
-
-	UNIQUE (idpromocion, idusuario, idcategoria, idproducto),
-
-	CONSTRAINT col_tipo_promocion CHECK (
-		(idcategoria IS NULL AND idproducto IS NULL AND idusuario IS NOT NULL) OR
-		(idusuario IS NULL AND idproducto IS NULL AND idcategoria IS NOT NULL) OR
-		(idusuario IS NULL AND idcategoria IS NULL AND idproducto IS NOT NULL)
+	fecha_creacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	
+	CONSTRAINT col_contexto_oferta CHECK (
+		((idproducto IS NULL AND idcategoria IS NOT NULL) OR
+		(idcategoria IS NULL AND idproducto IS NOT NULL)) AND
+		fecha_inicio<fecha_fin
 	),
+	
+	CONSTRAINT oferta_categoria FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria),
+	CONSTRAINT oferta_producto FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
+);
 
-	CONSTRAINT fk_tipo_promocion FOREIGN KEY (idpromocion) REFERENCES promocion(idpromocion),
-	CONSTRAINT cupon_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
-	CONSTRAINT promocion_categoria FOREIGN KEY (idcategoria) REFERENCES categoria_producto(idcategoria),
-	CONSTRAINT promocion_producto FOREIGN KEY (idproducto) REFERENCES producto(idproducto)
+CREATE TABLE cupon(
+
+	idcupon uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+	
+	asunto varchar(150) NOT NULL,
+	descripcion TEXT NOT NULL,
+	porcentaje integer,
+	cantidad integer,
+	
+	
+	--- Duración en días del cupón desde que sea activado
+	duracion integer NOT NULL,
+	
+	min_compras integer,
+	min_gastado integer,
+	UNIQUE (porcentaje, cantidad, duracion, min_compras, min_gastado),
+	CONSTRAINT col_cupon CHECK (
+		((porcentaje IS NULL AND cantidad IS NOT NULL) OR
+		(cantidad IS NULL AND porcentaje IS NOT NULL)) AND
+		(min_compras  IS NOT NULL OR min_gastado IS NOT NULL)
+	)
+);
+
+CREATE TABLE cupon_usuario(
+	idcupon uuid NOT NULL,
+	idusuario uuid NOT NULL,
+	fecha_activacion timestamp WITH TIME ZONE DEFAULT current_timestamp,
+	
+	
+	PRIMARY KEY (idcupon, idusuario),
+	CONSTRAINT ccupon_usuario FOREIGN KEY (idcupon) REFERENCES cupon(idcupon),
+	CONSTRAINT usuario_cupon FOREIGN KEY (idusuario) REFERENCES usuario(idusuario)
 );
 
 /*
@@ -288,6 +315,6 @@ CREATE VIEW vista_clientes AS SELECT * FROM usuario WHERE rol='cliente';
 CREATE VIEW vista_empleados AS SELECT * FROM usuario WHERE rol='empleado';
 CREATE VIEW vista_admins AS SELECT * FROM usuario WHERE rol='admin';
 CREATE VIEW vista_estados_ticket AS SELECT ROW_NUMBER() OVER()  AS num,estado  FROM (select unnest(enum_range(NULL::estadosticket)) as estado );
-CREATE VIEW vista_prioridad_ticket AS SELECT ROW_NUMBER() OVER()  AS num,prioridad  FROM (select unnest(enum_range(NULL::prioridadticket)) as prioridad)
-
-
+CREATE VIEW vista_prioridad_ticket AS SELECT ROW_NUMBER() OVER()  AS num,prioridad  FROM (select unnest(enum_range(NULL::prioridadticket)) as prioridad);
+CREATE VIEW ofertas_activas AS SELECT * FROM oferta WHERE current_date BETWEEN fecha_inicio AND fecha_fin;
+CREATE VIEW cupones_usuarios AS SELECT cu.idusuario, c.* FROM cupon_usuario cu JOIN cupon c ON  c.idcupon=cu.idcupon;

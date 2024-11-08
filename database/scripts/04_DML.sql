@@ -32,6 +32,10 @@ COPY tipo_servicio(tipo_servicio,descripcion,url_imagen)
 FROM '/docker-entrypoint-initdb.d/initial_data/servicios.csv'
 DELIMITER ';'
 CSV HEADER;
+COPY cupon(asunto,descripcion,porcentaje,cantidad,duracion,min_compras,min_gastado)
+FROM '/docker-entrypoint-initdb.d/initial_data/cupon.csv'
+DELIMITER ','
+CSV HEADER;
 
 INSERT INTO tipo_receptor (idtipo, tipo) VALUES
 (1,'directo'),

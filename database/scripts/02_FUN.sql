@@ -206,7 +206,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION aplicar_descuento (float, float)
 returns float language sql
 as $$
-    SELECT $1 * (1-$2);
+    SELECT $1 * (1-($2/100));
 $$;
 
 
@@ -216,11 +216,11 @@ CREATE OR REPLACE AGGREGATE concatenar_descuentos (float)(
     initcond = 1
 );
 
-CREATE VIEW productos_completos AS 
+CREATE OR REPLACE VIEW producto_oferta AS 
 SELECT p.*, 
 			COALESCE(round(p.precio*concatenar_descuentos(pr.porcentaje)),p.precio) precio_final, 
-			1-concatenar_descuentos(pr.porcentaje) descuento 
+			round(100*(1-concatenar_descuentos(pr.porcentaje))) descuento
 FROM producto p
-LEFT JOIN tipo_promocion tp ON tp.idcategoria = p.idcategoria  OR tp.idproducto = p.idproducto
-LEFT JOIN promocion pr ON pr.idpromocion = tp.idpromocion 
+LEFT JOIN oferta pr ON (pr.idcategoria = p.idcategoria  OR pr.idproducto = p.idproducto) 
+AND current_date BETWEEN pr.fecha_inicio AND pr.fecha_fin
 GROUP BY p.idproducto
