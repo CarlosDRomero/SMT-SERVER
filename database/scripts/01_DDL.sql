@@ -179,9 +179,10 @@ CREATE TABLE producto_carrito(
 CREATE TABLE orden_compra(
 	idorden uuid PRIMARY KEY DEFAULT gen_random_uuid(),
 	idusuario uuid NOT NULL,
-	iddireccion uuid NOT NULL,
+	iddireccion uuid,
 	estado estadoOrden DEFAULT 'pedido'::estadoOrden,
 	costo_total integer DEFAULT 0,
+	costo_final integer DEFAULT 0,
 	fecha_orden timestamp WITH TIME ZONE DEFAULT current_timestamp,
 	
 	CONSTRAINT orden_usuario FOREIGN KEY (idusuario) REFERENCES usuario(idusuario),
