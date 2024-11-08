@@ -12,5 +12,5 @@ export const IdUsuarioBodyOptional = [
 
 export const NumberParamValidator = (...paraValidar) => {
   if (paraValidar.length === 0) paraValidar.push("id")
-  return paraValidar.map(p => param(p, "No se envio un valor valido").not().isEmpty())
+  return paraValidar.map(p => param(p, "No se envio un valor valido").isNumeric())
 }

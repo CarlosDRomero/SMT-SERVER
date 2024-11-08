@@ -2,11 +2,13 @@ import { Router } from "express"
 import { rolesUsuario, usuarioController } from "../controllers/usuario.js"
 import { registroValidator } from "../validators/registro_validator.js";
 import { loginValidator } from "../validators/login_validator.js";
-import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo, checkNoExtraFields } from "../middlewares.js";
+import { extraerUsuario, verificarRol, checkValidator, claveEncrypt, extraerNombreUsuario, firmarToken, generarCodigo } from "../middlewares.js";
 import { codigoController } from "../controllers/codigo_verificacion.js";
 import { mailerController } from "../controllers/mailer.js";
 import { codigoValidator } from "../validators/codigo_validator.js";
 import { UUIDParamValidator } from "../validators/general_validators.js";
+import { promocionesController } from "../controllers/promocion.js";
+import { notificacionController } from "../controllers/notificacion.js";
 
 const authRouter = Router()
 
@@ -42,6 +44,8 @@ authRouter.post("/login",
   loginValidator,
   checkValidator,
   usuarioController.login,
+  promocionesController.asignarCuponUsuario([{ field: "min_compras", eq: 0 }, { field: "min_gastado", eq: 0 }]),
+  notificacionController.notificar,
   firmarToken,
   generarCodigo,
   mailerController.mailVerificacion,
@@ -54,6 +58,8 @@ authRouter.post("/verification/:id",
   checkValidator,
   codigoController.validarCodigo,
   usuarioController.confirmar,
+  promocionesController.asignarCuponUsuario([{ field: "min_compras", eq: 0 }, { field: "min_gastado", eq: 0 }]),
+  notificacionController.notificar,
   firmarToken
 )
 authRouter.get("/resendcode/:id",

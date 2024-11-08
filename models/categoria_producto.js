@@ -11,6 +11,16 @@ export const categoriaModel = {
     const res = await poolClient.query(query);
     return res.rows;
   },
+  findById: async (idcategoria) => {
+    const query = {
+      name: "obtener-categoria",
+      text: "SELECT * FROM categoria_producto WHERE idcategoria = $1",
+      values: [idcategoria]
+    }
+
+    const res = await poolClient.query(query);
+    return res.rows[0];
+  },
   findSpecsById: async (idcategoria) => {
     const query = {
       name: "obtener-especificaciones-categoria",

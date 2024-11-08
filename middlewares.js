@@ -14,7 +14,7 @@ export const claveEncrypt = async (req, _, next) => {
 export const firmarToken = (req,res, next) => {
 
   if (!req.usuario) return next();
-
+  console.log("Logged in")
   const payload = { idusuario: req.usuario.idusuario, nombres: req.usuario.nombres, apellidos: req.usuario.apellidos, email: req.usuario.email, nombreUsuario: req.usuario.nombre_usuario }
   const token = tokens.tokenSign(payload);
   return res.json({ token });
@@ -29,8 +29,8 @@ export const extraerNombreUsuario = (req, res, next) => {
 }
 
 export const generarCodigo = (req, _, next) => {
-  req.payload = { ...req.payload, codigo: genCode() };
-  console.log("CODIGO: ",req.payload.codigo)
+  req.payloadc = { ...req.payloadc, codigo: genCode() };
+  console.log("CODIGO: ",req.payloadc.codigo)
   next();
 }
 //TODO:OPCIONAL > return map de la propiedad del mensaje del error
@@ -81,7 +81,6 @@ export const extraerUsuario = async (req, _, next) => {
 
 export const verificarRol = (rolesAdmitidos) => {
   return async (req, _, next) => {
-    console.log("VALIDANDO ROLES: ", rolesAdmitidos)
     if (!rolesAdmitidos.includes(req.usuario.rol)) return next({ name: "RolNoPermitido", message: "Acceso no permitido" })
     
     next()
@@ -117,7 +116,7 @@ export const parsePaginationHeader = (req, _, next) => {
     req.headers.pagination = JSON.parse(req.headers.pagination)
   next()
 }
-export const parsePagination = (validOrderingFields) => (req, res, next) => {
+export const parsePagination = (validOrderingFields = []) => (req, res, next) => {
   if (req.headers.pagination){
     const { cursor, cursorsetup } = req.headers.pagination
     if (cursorsetup){
@@ -150,12 +149,12 @@ export const sendPaginationResponse = (pageCursorSchema) => (req, res) => {
 /**
  * Una función para aplicar el algoritmo de paginación sobre las rutas que get que se quiera
 **/
-export const withPagination = (validOrderParams, cursorSchema, dataPagination) => ([
+export const withPagination = (validOrderParams, cursorSchema, paginationData) => ([
   parsePaginationHeader,
   cursorRequestValidator,
   checkValidator,
   parsePagination(validOrderParams),
-  dataPagination,
+  paginationData,
   sendPaginationResponse(cursorSchema)
 ])
 

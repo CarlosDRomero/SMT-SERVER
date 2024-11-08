@@ -2,10 +2,12 @@ import { Router } from "express"
 import { checkValidator, extraerUsuario,verificarRol, withPagination } from "../middlewares.js";
 import { productoController } from "../controllers/producto.js";
 import { categoriaController } from "../controllers/categoria_producto.js";
-import { UUIDParamValidator } from "../validators/general_validators.js";
+import { NumberParamValidator, UUIDParamValidator } from "../validators/general_validators.js";
 import { ProductoValidator } from "../validators/producto_validator.js"
 
 import { rolesUsuario } from "../controllers/usuario.js";
+import { promocionesController } from "../controllers/promocion.js";
+import { CuponValidator, OfertaValidator } from "../validators/promociones_validator.js";
 const productosRouter = Router()
 
 
@@ -48,6 +50,7 @@ productosRouter.delete("/inventario/:idproducto",
 
 
 productosRouter.get("/categorias", categoriaController.obtenerCategorias)
+productosRouter.get("/categorias/:idcategoria", NumberParamValidator("idcategoria"), categoriaController.obtenerCategoria)
 productosRouter.get("/especificaciones-categoria/:idcategoria", categoriaController.obetenerEspecificiones)
 
 productosRouter.get("/especificaciones-producto/:idproducto",
@@ -56,7 +59,58 @@ productosRouter.get("/especificaciones-producto/:idproducto",
   productoController.obetenerEspecificiones
 )
 
+productosRouter.get("/ofertas",
+  withPagination(
+    [], promocionesController.ofertaPageCursorSchema, promocionesController.obtenerOfertasPaginadas
+  )
+)
 
+productosRouter.post("/ofertas",
+  extraerUsuario,
+  verificarRol(rolesUsuario.ADMIN),
+  OfertaValidator,
+  checkValidator,
+  promocionesController.verificarOfertaSobrepuesta,
+  promocionesController.crearOferta
+)
+productosRouter.put("/ofertas/:idoferta",
+  extraerUsuario,
+  verificarRol(rolesUsuario.ADMIN),
+  OfertaValidator,
+  UUIDParamValidator("idoferta"),
+  checkValidator,
+  promocionesController.verificarOfertaSobrepuesta,
+  promocionesController.actualizarOferta
+)
+
+productosRouter.get("/cupones/administrar",
+  extraerUsuario,
+  verificarRol(rolesUsuario.ADMIN),
+  promocionesController.obtenerCupones
+)
+productosRouter.get("/cupones",
+  extraerUsuario,
+  verificarRol(rolesUsuario.CLIENTE),
+  promocionesController.obtenerCuponesUsuario
+)
+
+productosRouter.post("/cupones",
+  extraerUsuario,
+  verificarRol(rolesUsuario.ADMIN),
+  CuponValidator,
+  checkValidator,
+  promocionesController.verificarInfoCupon,
+  promocionesController.crearCupon
+)
+productosRouter.put("/cupones/:idcupon",
+  extraerUsuario,
+  verificarRol(rolesUsuario.ADMIN),
+  OfertaValidator,
+  UUIDParamValidator("idcupon"),
+  checkValidator,
+  promocionesController.verificarInfoCupon,
+  promocionesController.actualizarCupon
+)
 
 
 export default productosRouter;

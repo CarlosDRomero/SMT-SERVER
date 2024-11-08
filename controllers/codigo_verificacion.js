@@ -4,7 +4,7 @@ import { calcularExpirado } from "../services/time.js"
 
 export const codigoController = {
   crearCodigo: async (req, res) => {
-    const { idusuario, codigo } = req.payload
+    const { idusuario, codigo } = req.payloadc
     const nuevo_codigo = await Encrypt.toHash(codigo)
     const codigo_db = await codigoModel.findCodigoUsuario(idusuario)
     let codigo_verificacion;
