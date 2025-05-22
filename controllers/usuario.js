@@ -80,7 +80,6 @@ export const usuarioController = {
   validarEmailCliente: async (req, res, next) => {
     const { email } = req.body
     const usuario = await usuarioModel.findByEmailOrUserName({ email })
-    console.log("usuario encontrado: ",usuario)
     if (!usuario)return next()
     next({ name: "RolNoDebido", message: "Inicia sesion para crear un ticket" })
 

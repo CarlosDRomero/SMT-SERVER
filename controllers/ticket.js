@@ -1,5 +1,6 @@
 import { env } from "../environment.js"
 import { ticketModel } from "../models/ticket.js"
+import { ticketClassifierAPI } from "../services/API/TicketClassifier.js"
 import { notificacionPayloadFactory } from "../services/notificaciones.js"
 import { rolesUsuario } from "./usuario.js"
 
@@ -136,22 +137,27 @@ export const popularTicket = async (ticket, usuario,campos) => {
 export const popularTickets = (tickets, usuario, campos) => {
   return Promise.all(tickets.map(async t => await popularTicket(t, usuario, campos)))
 }
-
+const generarTicket = async (ticketNuevo, req, res, next) => {
+  res.status(201).json(ticketNuevo)
+  const clasificacion = await ticketClassifierAPI.clasificarTicket(ticketNuevo.asunto, ticketNuevo.contenido)
+  
+  const tags = await ticketModel.getTicketTags()
+  const [{ idtipo_servicio }] = tags.filter(servicio => servicio.tipo_servicio === clasificacion.type)
+  const ticketClasificado = await ticketModel.manageTicket({ idtipo_servicio, prioridad: clasificacion.priority }, ticketNuevo.idticket)
+  
+  console.log(ticketClasificado)
+  req.payload = [await generarNotificacionNuevo(ticketClasificado)]
+  next()
+}
 export const ticketController = {
   crearTicketUsuario: async (req, res, next) => {
     const { idusuario } = req.usuario;
     const ticketNuevo = await ticketModel.createTicketUser(idusuario,req.body)
-    res.status(201).json(ticketNuevo)
-    req.payload = [await generarNotificacionNuevo(ticketNuevo)]
-    next()
+    generarTicket(ticketNuevo, req, res, next)
   },
   crearTicketEmail: async (req, res, next) => {
     const ticketNuevo = await ticketModel.createTicketEmail(req.body)
-
-    res.status(201).json(ticketNuevo)
-
-    req.payload = [await generarNotificacionNuevo(ticketNuevo)]
-    next()
+    generarTicket(ticketNuevo, req, res, next)
   },
   obtenerTickets: async (req, res) => {
     let tickets;

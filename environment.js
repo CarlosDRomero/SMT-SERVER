@@ -16,5 +16,7 @@ export const env = {
   DB_NAME: !IS_TEST ? process.env.DB_NAME : process.env.TEST_DB_NAME,
   DB_PASS: !IS_TEST ? process.env.DB_PASS : process.env.TEST_DB_PASS,
   DB_HOST: !IS_TEST ? process.env.DB_HOST : process.env.TEST_DB_HOST,
-  DB_PORT: !IS_TEST ? process.env.DB_PORT : process.env.TEST_DB_PORT
+  DB_PORT: !IS_TEST ? process.env.DB_PORT : process.env.TEST_DB_PORT,
+  TICKET_CLASSIFIER_URL: process.env.TICKET_CLASSIFIER_URL,
+  TICKET_CLASSIFIER_API_KEY: process.env.TICKET_CLASSIFIER_API_KEY
 }

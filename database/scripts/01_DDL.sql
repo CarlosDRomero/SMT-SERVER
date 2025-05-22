@@ -6,7 +6,6 @@ CREATE TYPE estadosTicket AS ENUM ('nuevo', 'aceptado', 'listo', 'en proceso', '
 CREATE TYPE prioridadTicket AS ENUM ('baja', 'media', 'alta');
 CREATE TYPE estadoMensaje AS ENUM ('enviado', 'recibido', 'leido');
 
-
 CREATE TABLE usuario (
   idusuario uuid DEFAULT gen_random_uuid(),
   nombres varchar(50) NOT NULL,
