@@ -9,7 +9,7 @@ const pool = new Pool({
   database: env.DB_NAME,
   password: env.DB_PASS,
   port: env.DB_PORT,
-  ssl: true
+  // ssl: true
 
 })
 
