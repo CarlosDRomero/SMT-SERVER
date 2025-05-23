@@ -131,9 +131,7 @@ export const popularTicket = async (ticket, usuario,campos) => {
       
     ticket.tipo_servicio = (await ticketModel.getTicketTag(ticket.idticket))?.tipo_servicio
   }
-
 }
-
 export const popularTickets = (tickets, usuario, campos) => {
   return Promise.all(tickets.map(async t => await popularTicket(t, usuario, campos)))
 }
@@ -144,8 +142,6 @@ const generarTicket = async (ticketNuevo, req, res, next) => {
   const tags = await ticketModel.getTicketTags()
   const [{ idtipo_servicio }] = tags.filter(servicio => servicio.tipo_servicio === clasificacion.type)
   const ticketClasificado = await ticketModel.manageTicket({ idtipo_servicio, prioridad: clasificacion.priority }, ticketNuevo.idticket)
-  
-  console.log(ticketClasificado)
   req.payload = [await generarNotificacionNuevo(ticketClasificado)]
   next()
 }
@@ -177,9 +173,7 @@ export const ticketController = {
     const { idticket } = req.params
     const ticket = await ticketModel.findById(idticket)
     if (!ticket || ((ticket.empleado_asignado && ticket.empleado_asignado !== idusuario) && rol !== rolesUsuario.ADMIN || (rol !== rolesUsuario.ADMIN && ticket.estado === "cerrado"))) return next({ name: "RecursoNoEncontrado", message: "Ticket no encontrado" })
-    if (ticket.idusuario) {
-      await popularTicket(ticket, req.usuario, ["usuario","calificacion"])
-    }
+    await popularTicket(ticket, req.usuario, ["usuario","calificacion"])
     res.json(ticket)
   },
   obtenerTicketUsuario: async (req, res) => {
