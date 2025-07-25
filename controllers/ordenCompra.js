@@ -27,7 +27,9 @@ export const ordenCompraController = {
       await promocionesModel.markAsUsed(cupon.idcupon, req.usuario.idusuario)
     }
     req.body.costo_final = cupon ? cupon.porcentaje ? Math.round(req.body.costo_total * (1 - (cupon.porcentaje / 100))) : req.body.costo_total - cupon.cantidad : req.body.costo_total
-    console.log("cupon", req.body.costo_total, req.body.costo_final, req.body.costo_total * (1 - (cupon?.porcentaje / 100)))
+    req.body.costo_final = Math.round(req.body.costo_final * 1.19)
+    
+    // console.log("cupon", req.body.costo_total, req.body.costo_final, req.body.costo_total * (1 - (cupon?.porcentaje / 100)))
     next()
   },
   validarCuponesGanados: async (req, res, next) => {
