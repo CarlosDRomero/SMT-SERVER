@@ -25,7 +25,7 @@ const corsOptions = {
 //MIDLEWARES INICIALES
 app.use(express.json());
 app.use(cors(corsOptions));
-
+console.log(`ORIGIN: ${corsOptions.origin}`)
 //RUTAS
 
 app.use("/auth", authRouter)

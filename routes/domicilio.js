@@ -18,7 +18,7 @@ domicilioRouter.get("/listaMunicipios/:c_departamento",
 );
 
 domicilioRouter.get("/departamento-municipio/:c_municipio",
-  NumberParamValidator("c_municipio"),
+  // NumberParamValidator("c_municipio"), <---- Pendiente validar
   checkValidator,
   colombiaAPIController.obtenerDepartamentoMunicipio
 );

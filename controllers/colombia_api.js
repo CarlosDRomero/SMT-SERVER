@@ -13,7 +13,7 @@ export const colombiaAPIController = {
   },
   obtenerDepartamentoMunicipio: async(req, res) => {
     const { c_municipio } = req.params
-    const [info] = await colombiaAPI.obtenerDepartamentoMunicipio(c_municipio)
+    const info = await colombiaAPI.obtenerDepartamentoMunicipio(c_municipio)
     res.json(info)
   }
 
