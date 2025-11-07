@@ -139,14 +139,13 @@ export const popularTickets = (tickets, usuario, campos) => {
 }
 const generarTicket = async (ticketNuevo, req, res, next) => {
   res.status(201).json(ticketNuevo)
-  const clasificacion = await ticketClassifierAPI.clasificarTicket(ticketNuevo.asunto, ticketNuevo.contenido)
+  // const clasificacion = await ticketClassifierAPI.clasificarTicket(ticketNuevo.asunto, ticketNuevo.contenido)
   
-  const tags = await ticketModel.getTicketTags()
-  const [{ idtipo_servicio }] = tags.filter(servicio => servicio.tipo_servicio === clasificacion.type)
-  const ticketClasificado = await ticketModel.manageTicket({ idtipo_servicio, prioridad: clasificacion.priority }, ticketNuevo.idticket)
+  // const tags = await ticketModel.getTicketTags()
+  // const [{ idtipo_servicio }] = tags.filter(servicio => servicio.tipo_servicio === clasificacion.type)
+  // const ticketClasificado = await ticketModel.manageTicket({ idtipo_servicio, prioridad: clasificacion.priority }, ticketNuevo.idticket)
   
-  console.log(ticketClasificado)
-  req.payload = [await generarNotificacionNuevo(ticketClasificado)]
+  req.payload = [await generarNotificacionNuevo(ticketNuevo)]
   next()
 }
 export const ticketController = {
